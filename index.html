@@ -1,69 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Chatbot</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .chat-container { width: 95%; max-width: 450px; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); display: flex; flex-direction: column; overflow: hidden; }
-        .chat-header { background: #4a90e2; color: white; padding: 15px; font-size: 20px; text-align: center; }
-        .chat-box { padding: 15px; height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { padding: 10px; border-radius: 8px; max-width: 80%; }
-        .user { background: #d1e7ff; align-self: flex-end; }
-        .bot { background: #e8e8e8; align-self: flex-start; }
-        .input-area { display: flex; border-top: 1px solid #ddd; }
-        input { flex: 1; padding: 12px; border: none; outline: none; font-size: 16px; }
-        button { padding: 12px 20px; background: #4a90e2; color: white; border: none; cursor: pointer; font-size: 16px; }
-    </style>
+  <title>Sleep Intake Chatbot</title>
+  <style>
+    body { font-family: Arial; background: #f5f5f5; padding: 20px; }
+    #chat { background: white; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; }
+    .msg { margin-bottom: 15px; }
+    .bot { color: #1a73e8; font-weight: bold; }
+    .user { color: #333; }
+    input, button { padding: 10px; font-size: 16px; width: 100%; margin-top: 10px; }
+  </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">My Chatbot</div>
-        <div class="chat-box" id="chatBox"></div>
-        <div class="input-area">
-            <input id="userInput" type="text" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()"/>
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
-    <script>
-        const chatBox = document.getElementById("chatBox");
-        // Using relative path for better reliability
-        const backendURL = "/chat";
 
-        function addMessage(text, sender) {
-            const msg = document.createElement("div");
-            msg.classList.add("message", sender);
-            msg.textContent = text;
-            chatBox.appendChild(msg);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            return msg;
-        }
+<div id="chat">
+  <h2>Sleep Intake Chatbot</h2>
+  <div id="messages"></div>
 
-        async function sendMessage() {
-            const input = document.getElementById("userInput");
-            const message = input.value.trim();
-            if (!message) return;
+  <input id="answerInput" placeholder="Type your answer..." />
+  <button onclick="sendAnswer()">Send</button>
+  <button onclick="stopSession()" style="background:#e53935;color:white;">Finish</button>
+</div>
 
-            addMessage(message, "user");
-            input.value = "";
-            const loadingMsg = addMessage("Typing...", "bot");
+<script>
+let sessionId = null;
 
-            try {
-                const response = await fetch(backendURL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message })
-                });
-                const data = await response.json();
-                chatBox.removeChild(loadingMsg);
-                if (data.reply) addMessage(data.reply, "bot");
-                else addMessage("Error: No response.", "bot");
-            } catch (error) {
-                if (loadingMsg.parentNode) chatBox.removeChild(loadingMsg);
-                addMessage("Server error. Try again!", "bot");
-            }
-        }
-    </script>
+function addMessage(text, sender) {
+  const messages = document.getElementById("messages");
+  const div = document.createElement("div");
+  div.className = "msg " + sender;
+  div.innerText = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+async function startSession() {
+  const res = await fetch("https://mychatbot-backend-c2yu.onrender.com/start", {
+    method: "POST"
+  });
+  const data = await res.json();
+  sessionId = data.session_id;
+  addMessage(data.question, "bot");
+}
+
+async function sendAnswer() {
+  const answer = document.getElementById("answerInput").value;
+  if (!answer.trim()) return;
+
+  addMessage(answer, "user");
+  document.getElementById("answerInput").value = "";
+
+  const res = await fetch("https://mychatbot-backend-c2yu.onrender.com/intake", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_id: sessionId, answer })
+  });
+
+  const data = await res.json();
+  addMessage(data.question, "bot");
+}
+
+async function stopSession() {
+  const res = await fetch("https://mychatbot-backend-c2yu.onrender.com/stop", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_id: sessionId })
+  });
+
+  const data = await res.json();
+  addMessage("Summary:\n" + JSON.stringify(data.summary, null, 2), "bot");
+}
+
+startSession();
+</script>
+
 </body>
 </html>
