@@ -36,11 +36,19 @@ function addMessage(text, sender) {
 
 async function startSession() {
   const res = await fetch("https://mychatbot-backend-c2yu.onrender.com/start", {
-    method: "POST"
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({})
   });
+
   const data = await res.json();
   sessionId = data.session_id;
-  addMessage(data.question, "bot");
+
+  addMessage(data.message, "bot");
+
+  if (data.next_question) {
+    addMessage(data.next_question.prompt, "bot");
+  }
 }
 
 async function sendAnswer() {
@@ -53,11 +61,22 @@ async function sendAnswer() {
   const res = await fetch("https://mychatbot-backend-c2yu.onrender.com/intake", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ session_id: sessionId, answer })
+    body: JSON.stringify({ session_id: sessionId, answer_text: answer })
   });
 
   const data = await res.json();
-  addMessage(data.question, "bot");
+
+  if (data.message) {
+    addMessage(data.message, "bot");
+  }
+
+  if (data.next_question) {
+    addMessage(data.next_question.prompt, "bot");
+  }
+
+  if (data.human_summary) {
+    addMessage("Summary:\n" + data.human_summary, "bot");
+  }
 }
 
 async function stopSession() {
@@ -68,7 +87,12 @@ async function stopSession() {
   });
 
   const data = await res.json();
-  addMessage("Summary:\n" + JSON.stringify(data.summary, null, 2), "bot");
+
+  addMessage(data.message, "bot");
+
+  if (data.human_summary) {
+    addMessage("Summary:\n" + data.human_summary, "bot");
+  }
 }
 
 startSession();
