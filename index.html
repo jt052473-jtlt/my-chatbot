@@ -19,83 +19,73 @@
 
   <input id="answerInput" placeholder="Type your answer..." />
   <button onclick="sendAnswer()">Send</button>
-  <button onclick="stopSession()" style="background:#e53935;color:white;">Finish</button>
+  <button onclick="finishSession()" style="background:#e53935;color:white;">Finish</button>
 </div>
 
-<script>
-let sessionId = null;
+<!-- Load your new modules -->
+<script type="module">
+  import { InterviewFlow } from "./interviewFlow.js";
+  import { buildHumanSummary } from "./summaryBuilder.js";
 
-function addMessage(text, sender) {
-  const messages = document.getElementById("messages");
-  const div = document.createElement("div");
-  div.className = "msg " + sender;
-  div.innerText = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
+  let flow = new InterviewFlow("full");   // or "quick"
+  let sessionActive = true;
 
-async function startSession() {
-  const res = await fetch("https://mychatbot-backend-c2yu.onrender.com/start", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({})
-  });
-
-  const data = await res.json();
-  sessionId = data.session_id;
-
-  addMessage(data.message, "bot");
-
-  if (data.next_question) {
-    addMessage(data.next_question.prompt, "bot");
-  }
-}
-
-async function sendAnswer() {
-  const answer = document.getElementById("answerInput").value;
-  if (!answer.trim()) return;
-
-  addMessage(answer, "user");
-  document.getElementById("answerInput").value = "";
-
-  const res = await fetch("https://mychatbot-backend-c2yu.onrender.com/intake", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ session_id: sessionId, answer_text: answer })
-  });
-
-  const data = await res.json();
-
-  if (data.message) {
-    addMessage(data.message, "bot");
+  function addMessage(text, sender) {
+    const messages = document.getElementById("messages");
+    const div = document.createElement("div");
+    div.className = "msg " + sender;
+    div.innerText = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
   }
 
-  if (data.next_question) {
-    addMessage(data.next_question.prompt, "bot");
+  function showNextQuestion() {
+    const q = flow.getCurrentQuestion();
+    if (q) {
+      addMessage(q.prompt, "bot");
+    } else {
+      finishSession();
+    }
   }
 
-  if (data.human_summary) {
-    addMessage("Summary:\n" + data.human_summary, "bot");
-  }
-}
+  window.sendAnswer = function () {
+    if (!sessionActive) return;
 
-async function stopSession() {
-  const res = await fetch("https://mychatbot-backend-c2yu.onrender.com/stop", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ session_id: sessionId })
-  });
+    const input = document.getElementById("answerInput");
+    const answer = input.value.trim();
+    if (!answer) return;
 
-  const data = await res.json();
+    addMessage(answer, "user");
+    input.value = "";
 
-  addMessage(data.message, "bot");
+    flow.answerCurrentQuestion(answer);
 
-  if (data.human_summary) {
-    addMessage("Summary:\n" + data.human_summary, "bot");
-  }
-}
+    if (flow.isFinished()) {
+      finishSession();
+    } else {
+      showNextQuestion();
+    }
+  };
 
-startSession();
+  window.finishSession = async function () {
+    if (!sessionActive) return;
+    sessionActive = false;
+
+    const packet = flow.getPacket();
+    const summary = buildHumanSummary(packet);
+
+    addMessage("Summary:\n" + summary, "bot");
+
+    // Send packet to backend
+    await fetch("https://mychatbot-backend-c2yu.onrender.com/stop", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(packet)
+    });
+  };
+
+  // Start the flow
+  showNextQuestion();
 </script>
 
 </body>
