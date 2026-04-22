@@ -1,66 +1,140 @@
 // summaryBuilder.js
-// Converts packet data into a readable human summary
+// Builds a human-readable summary from the packet data
 
 export function buildHumanSummary(packet) {
-  const v = (field) =>
-    packet[field] && packet[field].trim() !== "" ? packet[field] : "N/A";
+  const lines = [];
 
-  return `
-Sleep Intake Summary
+  if (packet.mode) {
+    lines.push(`Intake mode: ${packet.mode === "full" ? "Full packet" : "Quick packet"}.`);
+  }
 
-Patient:
-- Name: ${v("patient_full_name")}
-- Date of Birth: ${v("patient_date_of_birth")}
-- Address: ${v("patient_address")}
-- Phone(s): ${v("patient_phone_numbers")}
-- Email: ${v("patient_email")}
-- Emergency Contact: ${v("emergency_contact")}
+  if (packet.patient_full_name) {
+    lines.push(`Patient name: ${packet.patient_full_name}.`);
+  }
 
-Physicians:
-- Referring Physician: ${v("referring_physician")}
-- Primary Physician: ${v("primary_physician")}
+  if (packet.patient_date_of_birth) {
+    lines.push(`Date of birth: ${packet.patient_date_of_birth}.`);
+  }
 
-Sleep History:
-- Primary Sleep Complaint: ${v("primary_sleep_complaint")}
-- Onset of Problem: ${v("sleep_problem_onset")}
-- Previous Sleep Studies/Treatments: ${v("previous_sleep_studies_or_treatments")}
-- Additional Comments: ${v("additional_sleep_comments")}
+  if (packet.patient_address) {
+    lines.push(`Address: ${packet.patient_address}.`);
+  }
 
-Sleep Habits:
-- Sleep Habits Summary: ${v("sleep_habits_summary")}
-- Workday Schedule: ${v("usual_bedtime_workdays")}
-- Days Off Schedule: ${v("usual_bedtime_days_off")}
-- Sleep Latency/Awakenings: ${v("sleep_latency_and_awakenings")}
-- Work Shift Type: ${v("work_shift_type")}
+  if (packet.patient_phone_numbers) {
+    lines.push(`Phone/Contact: ${packet.patient_phone_numbers}.`);
+  }
 
-Lifestyle:
-- Lifestyle Summary: ${v("lifestyle_factors_summary")}
-- Caffeine/Alcohol Use: ${v("caffeine_and_alcohol_use")}
-- Tobacco Use: ${v("tobacco_use_details")}
-- Home Oxygen/CPAP Use: ${v("home_oxygen_and_cpap_use")}
-- Nasal Breathing/Claustrophobia: ${v("nasal_breathing_and_claustrophobia")}
-- Neck Size (inches): ${v("neck_size_inches")}
+  if (packet.patient_email) {
+    lines.push(`Email: ${packet.patient_email}.`);
+  }
 
-Medical History:
-- Overall Medical History Summary: ${v("medical_history_summary")}
-- Cardiac/Respiratory/Endocrine: ${v("cardiac_respiratory_endocrine_history")}
-- Neurologic/Mental/ENT: ${v("neurologic_mental_ent_history")}
-- Other Medical Conditions: ${v("other_medical_conditions")}
-- Family History: ${v("family_history_summary")}
-- Surgical History: ${v("surgical_history")}
+  if (packet.emergency_contact) {
+    lines.push(`Emergency contact: ${packet.emergency_contact}.`);
+  }
 
-Medications:
-- Medications List: ${v("medications_list")}
+  if (packet.referring_physician) {
+    lines.push(`Referring physician: ${packet.referring_physician}.`);
+  }
 
-Symptoms / Review of Systems:
-- Sleep Symptoms: ${v("sleep_symptoms_summary")}
-- General Review of Systems: ${v("general_review_of_systems_summary")}
+  if (packet.primary_physician) {
+    lines.push(`Primary care physician: ${packet.primary_physician}.`);
+  }
 
-Epworth:
-- Epworth Details: ${v("epworth_details")}
-- Epworth Total Score: ${v("epworth_total_score")}
+  if (packet.primary_sleep_complaint) {
+    lines.push(`Primary sleep complaint: ${packet.primary_sleep_complaint}.`);
+  }
 
-HIPAA / Consents:
-- HIPAA Consent Acknowledgment: ${v("hipaa_consent_acknowledgment")}
-`.trim();
+  if (packet.sleep_problem_onset) {
+    lines.push(`Onset of sleep problem: ${packet.sleep_problem_onset}.`);
+  }
+
+  if (packet.previous_sleep_studies_or_treatments) {
+    lines.push(`Previous sleep studies/treatments: ${packet.previous_sleep_studies_or_treatments}.`);
+  }
+
+  if (packet.additional_sleep_comments) {
+    lines.push(`Additional sleep comments: ${packet.additional_sleep_comments}.`);
+  }
+
+  if (packet.usual_bedtime_workdays) {
+    lines.push(`Workday sleep schedule: ${packet.usual_bedtime_workdays}.`);
+  }
+
+  if (packet.usual_bedtime_days_off) {
+    lines.push(`Days-off sleep schedule: ${packet.usual_bedtime_days_off}.`);
+  }
+
+  if (packet.sleep_latency_and_awakenings) {
+    lines.push(`Sleep latency/awakenings: ${packet.sleep_latency_and_awakenings}.`);
+  }
+
+  if (packet.work_shift_type) {
+    lines.push(`Work shift type: ${packet.work_shift_type}.`);
+  }
+
+  if (packet.caffeine_and_alcohol_use) {
+    lines.push(`Caffeine/alcohol use: ${packet.caffeine_and_alcohol_use}.`);
+  }
+
+  if (packet.tobacco_use_details) {
+    lines.push(`Tobacco use: ${packet.tobacco_use_details}.`);
+  }
+
+  if (packet.home_oxygen_and_cpap_use) {
+    lines.push(`Home oxygen/CPAP/BiPAP: ${packet.home_oxygen_and_cpap_use}.`);
+  }
+
+  if (packet.nasal_breathing_and_claustrophobia) {
+    lines.push(`Nasal breathing/claustrophobia: ${packet.nasal_breathing_and_claustrophobia}.`);
+  }
+
+  if (packet.neck_size_inches) {
+    lines.push(`Neck size: ${packet.neck_size_inches} inches.`);
+  }
+
+  if (packet.cardiac_respiratory_endocrine_history) {
+    lines.push(`Cardiac/respiratory/endocrine history: ${packet.cardiac_respiratory_endocrine_history}.`);
+  }
+
+  if (packet.neurologic_mental_ent_history) {
+    lines.push(`Neurologic/mental/ENT/GERD history: ${packet.neurologic_mental_ent_history}.`);
+  }
+
+  if (packet.other_medical_conditions) {
+    lines.push(`Other medical conditions: ${packet.other_medical_conditions}.`);
+  }
+
+  if (packet.family_history_summary) {
+    lines.push(`Family history: ${packet.family_history_summary}.`);
+  }
+
+  if (packet.surgical_history) {
+    lines.push(`Surgical history: ${packet.surgical_history}.`);
+  }
+
+  if (packet.medications_list) {
+    lines.push(`Medications: ${packet.medications_list}.`);
+  }
+
+  if (packet.sleep_symptoms_summary) {
+    lines.push(`Sleep-related symptoms: ${packet.sleep_symptoms_summary}.`);
+  }
+
+  if (packet.general_review_of_systems_summary) {
+    lines.push(`General review of systems: ${packet.general_review_of_systems_summary}.`);
+  }
+
+  if (packet.epworth_details) {
+    lines.push(`Epworth details: ${packet.epworth_details}.`);
+  }
+
+  if (packet.epworth_total_score) {
+    lines.push(`Epworth total score / daytime sleepiness: ${packet.epworth_total_score}.`);
+  }
+
+  if (lines.length === 0) {
+    return "No intake data was captured.";
+  }
+
+  return lines.join("\n");
 }
