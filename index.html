@@ -3,38 +3,53 @@
 <head>
   <title>Sleep Intake Chatbot</title>
   <style>
-    body { font-family: Arial; background: #f5f5f5; padding: 20px; }
-    #chat { background: white; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; }
-    .msg { margin-bottom: 15px; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+    #chat { background: white; padding: 20px; border-radius: 10px; max-width: 700px; margin: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    h2 { margin-top: 0; }
+    #messages { max-height: 400px; overflow-y: auto; margin-bottom: 10px; }
+    .msg { margin-bottom: 12px; line-height: 1.4; }
     .bot { color: #1a73e8; font-weight: bold; }
-    .user { color: #333; }
-    input, button { padding: 10px; font-size: 16px; width: 100%; margin-top: 10px; }
+    .user { color: #333; margin-left: 10px; }
+    .meta { font-size: 12px; color: #777; margin-bottom: 10px; }
+    #controls { display: flex; gap: 8px; margin-top: 10px; }
+    #answerInput { flex: 1; padding: 10px; font-size: 16px; }
+    button { padding: 10px 14px; font-size: 15px; cursor: pointer; border-radius: 4px; border: none; }
+    #sendBtn { background: #1a73e8; color: white; }
+    #finishBtn { background: #e53935; color: white; }
   </style>
 </head>
 <body>
 
 <div id="chat">
   <h2>Sleep Intake Chatbot</h2>
+  <div class="meta">You can press Enter to send your answer.</div>
+
   <div id="messages"></div>
 
-  <input id="answerInput" placeholder="Type your answer..." />
-  <button onclick="sendAnswer()">Send</button>
-  <button onclick="finishSession()" style="background:#e53935;color:white;">Finish</button>
+  <div id="controls">
+    <input id="answerInput" placeholder="Type your answer..." autocomplete="off" />
+    <button id="sendBtn">Send</button>
+    <button id="finishBtn">Finish</button>
+  </div>
 </div>
 
-<!-- Load your new modules -->
 <script type="module">
   import { InterviewFlow } from "./interviewFlow.js";
   import { buildHumanSummary } from "./summaryBuilder.js";
 
-  let flow = new InterviewFlow("full");   // or "quick"
+  // Choose mode: "quick" or "full"
+  let flow = new InterviewFlow("full");
   let sessionActive = true;
 
   function addMessage(text, sender) {
     const messages = document.getElementById("messages");
     const div = document.createElement("div");
-    div.className = "msg " + sender;
-    div.innerText = text;
+    div.className = "msg";
+    if (sender === "bot") {
+      div.innerHTML = `<span class="bot">Bot:</span> <span class="user">${text}</span>`;
+    } else {
+      div.innerHTML = `<span class="user">${text}</span>`;
+    }
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
   }
@@ -48,7 +63,7 @@
     }
   }
 
-  window.sendAnswer = function () {
+  function sendAnswer() {
     if (!sessionActive) return;
 
     const input = document.getElementById("answerInput");
@@ -65,9 +80,9 @@
     } else {
       showNextQuestion();
     }
-  };
+  }
 
-  window.finishSession = async function () {
+  async function finishSession() {
     if (!sessionActive) return;
     sessionActive = false;
 
@@ -76,13 +91,28 @@
 
     addMessage("Summary:\n" + summary, "bot");
 
-    // Send packet to backend
-    await fetch("https://mychatbot-backend-c2yu.onrender.com/stop", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(packet)
-    });
-  };
+    try {
+      await fetch("https://mychatbot-backend-c2yu.onrender.com/stop", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(packet)
+      });
+    } catch (err) {
+      console.error("Error sending packet:", err);
+    }
+  }
+
+  // Wire buttons
+  document.getElementById("sendBtn").addEventListener("click", sendAnswer);
+  document.getElementById("finishBtn").addEventListener("click", finishSession);
+
+  // Enter-to-send
+  document.getElementById("answerInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendAnswer();
+    }
+  });
 
   // Start the flow
   showNextQuestion();
