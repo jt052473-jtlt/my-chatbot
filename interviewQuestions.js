@@ -1,6 +1,9 @@
 // interviewQuestions.js
 // All questions aligned to backend packetSchema.js
 
+// -------------------------------
+// QUICK MODE QUESTIONS
+// -------------------------------
 export const quickModeQuestions = [
   {
     id: "mode_intro",
@@ -72,12 +75,14 @@ export const quickModeQuestions = [
   }
 ];
 
+// -------------------------------
+// FULL MODE QUESTIONS
+// -------------------------------
 export const fullModeQuestions = [
   {
     id: "mode_intro",
     key: null,
-    prompt:
-      "We’ll go a bit deeper and walk through the full sleep packet together.",
+    prompt: "Let’s take a moment to complete the sleep package.",
     type: "info"
   },
   {
@@ -176,8 +181,7 @@ export const fullModeQuestions = [
   {
     id: "usual_bedtime_days_off",
     key: "usual_bedtime_days_off",
-    prompt:
-      "On days off, what time do you usually go to bed and wake up?",
+    prompt: "On days off, what time do you usually go to bed and wake up?",
     type: "text"
   },
   {
@@ -300,6 +304,9 @@ export const fullModeQuestions = [
   }
 ];
 
+// -------------------------------
+// EXPORT MODE SELECTOR
+// -------------------------------
 export function getQuestionListForMode(mode) {
   return mode === "full" ? fullModeQuestions : quickModeQuestions;
 }
