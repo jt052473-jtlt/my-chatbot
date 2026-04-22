@@ -1,15 +1,15 @@
 // interviewFlow.js
 // Handles question flow, answer saving, and DOB normalization
 
-import { quickModeQuestions, fullModeQuestions } from "./interviewQuestions.js";
+import { getQuestionsForLanguage } from "./interviewQuestions.js";
 
-// Normalize ANY date format into MM/DD/YYYY if possible
+/* ---------------------------------------------------------
+   NORMALIZE DOB (MM/DD/YYYY)
+--------------------------------------------------------- */
 function normalizeDOB(input) {
   try {
     const date = new Date(input);
-    if (isNaN(date.getTime())) {
-      return input; // keep original if parsing fails
-    }
+    if (isNaN(date.getTime())) return input;
 
     const mm = String(date.getMonth() + 1).padStart(2, "0");
     const dd = String(date.getDate()).padStart(2, "0");
@@ -21,7 +21,9 @@ function normalizeDOB(input) {
   }
 }
 
-// Save answers using backend schema keys
+/* ---------------------------------------------------------
+   SAVE ANSWER INTO PACKET
+--------------------------------------------------------- */
 export function saveAnswer(key, value, packetData) {
   if (!key) return;
 
@@ -32,39 +34,68 @@ export function saveAnswer(key, value, packetData) {
   packetData[key] = value;
 }
 
-// Get the correct question list based on mode
-export function getQuestionsForMode(mode) {
-  return mode === "full" ? fullModeQuestions : quickModeQuestions;
-}
-
-// Main flow controller
+/* ---------------------------------------------------------
+   INTERVIEW FLOW CLASS
+--------------------------------------------------------- */
 export class InterviewFlow {
-  constructor(mode = "quick") {
+  constructor(mode = "full", language = "en", existingPacket = null, existingIndex = 0) {
     this.mode = mode;
-    this.questions = getQuestionsForMode(mode);
-    this.currentIndex = 0;
+    this.language = language;
 
-    // Initialize packet data with mode included
-    this.packetData = { mode };
+    // Load questions in selected language
+    this.questions = getQuestionsForLanguage(language);
+
+    // Restore or start fresh
+    this.currentIndex = existingIndex || 0;
+    this.packetData = existingPacket || {};
+
+    // Store metadata
+    this.packetData.mode = mode;
+    this.packetData.language = language;
   }
 
+  /* ---------------------------------------------------------
+     GET CURRENT QUESTION
+  --------------------------------------------------------- */
   getCurrentQuestion() {
     return this.questions[this.currentIndex] || null;
   }
 
+  /* ---------------------------------------------------------
+     SAVE ANSWER + MOVE TO NEXT
+  --------------------------------------------------------- */
   answerCurrentQuestion(value) {
     const question = this.getCurrentQuestion();
+
     if (question && question.key) {
       saveAnswer(question.key, value, this.packetData);
     }
+
     this.currentIndex++;
   }
 
+  /* ---------------------------------------------------------
+     CHECK IF FINISHED
+  --------------------------------------------------------- */
   isFinished() {
     return this.currentIndex >= this.questions.length;
   }
 
+  /* ---------------------------------------------------------
+     GET PACKET FOR BACKEND
+  --------------------------------------------------------- */
   getPacket() {
     return this.packetData;
+  }
+
+  /* ---------------------------------------------------------
+     PROGRESS HELPERS
+  --------------------------------------------------------- */
+  getTotalQuestions() {
+    return this.questions.length;
+  }
+
+  getCurrentIndex() {
+    return this.currentIndex;
   }
 }
