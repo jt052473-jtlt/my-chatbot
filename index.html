@@ -1,122 +1,140 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Sleep Intake Chatbot</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-    #chat { background: white; padding: 20px; border-radius: 10px; max-width: 700px; margin: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    h2 { margin-top: 0; }
-    #messages { max-height: 400px; overflow-y: auto; margin-bottom: 10px; }
-    .msg { margin-bottom: 12px; line-height: 1.4; }
-    .bot { color: #1a73e8; font-weight: bold; }
-    .user { color: #333; margin-left: 10px; }
-    .meta { font-size: 12px; color: #777; margin-bottom: 10px; }
-    #controls { display: flex; gap: 8px; margin-top: 10px; }
-    #answerInput { flex: 1; padding: 10px; font-size: 16px; }
-    button { padding: 10px 14px; font-size: 15px; cursor: pointer; border-radius: 4px; border: none; }
-    #sendBtn { background: #1a73e8; color: white; }
-    #finishBtn { background: #e53935; color: white; }
-  </style>
-</head>
-<body>
+// summaryBuilder.js
+// Builds a human-readable summary from the packet data
 
-<div id="chat">
-  <h2>Sleep Intake Chatbot</h2>
-  <div class="meta">You can press Enter to send your answer.</div>
+export function buildHumanSummary(packet) {
+  const lines = [];
 
-  <div id="messages"></div>
-
-  <div id="controls">
-    <input id="answerInput" placeholder="Type your answer..." autocomplete="off" />
-    <button id="sendBtn">Send</button>
-    <button id="finishBtn">Finish</button>
-  </div>
-</div>
-
-<script type="module">
-  import { InterviewFlow } from "./interviewFlow.js";
-  import { buildHumanSummary } from "./summaryBuilder.js";
-
-  // Choose mode: "quick" or "full"
-  let flow = new InterviewFlow("full");
-  let sessionActive = true;
-
-  function addMessage(text, sender) {
-    const messages = document.getElementById("messages");
-    const div = document.createElement("div");
-    div.className = "msg";
-    if (sender === "bot") {
-      div.innerHTML = `<span class="bot">Bot:</span> <span class="user">${text}</span>`;
-    } else {
-      div.innerHTML = `<span class="user">${text}</span>`;
-    }
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
+  if (packet.mode) {
+    lines.push(`Intake mode: ${packet.mode === "full" ? "Full packet" : "Quick packet"}.`);
   }
 
-  function showNextQuestion() {
-    const q = flow.getCurrentQuestion();
-    if (q) {
-      addMessage(q.prompt, "bot");
-    } else {
-      finishSession();
-    }
+  if (packet.patient_full_name) {
+    lines.push(`Patient name: ${packet.patient_full_name}.`);
   }
 
-  function sendAnswer() {
-    if (!sessionActive) return;
-
-    const input = document.getElementById("answerInput");
-    const answer = input.value.trim();
-    if (!answer) return;
-
-    addMessage(answer, "user");
-    input.value = "";
-
-    flow.answerCurrentQuestion(answer);
-
-    if (flow.isFinished()) {
-      finishSession();
-    } else {
-      showNextQuestion();
-    }
+  if (packet.patient_date_of_birth) {
+    lines.push(`Date of birth: ${packet.patient_date_of_birth}.`);
   }
 
-  async function finishSession() {
-    if (!sessionActive) return;
-    sessionActive = false;
-
-    const packet = flow.getPacket();
-    const summary = buildHumanSummary(packet);
-
-    addMessage("Summary:\n" + summary, "bot");
-
-    try {
-      await fetch("https://mychatbot-backend-c2yu.onrender.com/stop", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(packet)
-      });
-    } catch (err) {
-      console.error("Error sending packet:", err);
-    }
+  if (packet.patient_address) {
+    lines.push(`Address: ${packet.patient_address}.`);
   }
 
-  // Wire buttons
-  document.getElementById("sendBtn").addEventListener("click", sendAnswer);
-  document.getElementById("finishBtn").addEventListener("click", finishSession);
+  if (packet.patient_phone_numbers) {
+    lines.push(`Phone/Contact: ${packet.patient_phone_numbers}.`);
+  }
 
-  // Enter-to-send
-  document.getElementById("answerInput").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      sendAnswer();
-    }
-  });
+  if (packet.patient_email) {
+    lines.push(`Email: ${packet.patient_email}.`);
+  }
 
-  // Start the flow
-  showNextQuestion();
-</script>
+  if (packet.emergency_contact) {
+    lines.push(`Emergency contact: ${packet.emergency_contact}.`);
+  }
 
-</body>
-</html>
+  if (packet.referring_physician) {
+    lines.push(`Referring physician: ${packet.referring_physician}.`);
+  }
+
+  if (packet.primary_physician) {
+    lines.push(`Primary care physician: ${packet.primary_physician}.`);
+  }
+
+  if (packet.primary_sleep_complaint) {
+    lines.push(`Primary sleep complaint: ${packet.primary_sleep_complaint}.`);
+  }
+
+  if (packet.sleep_problem_onset) {
+    lines.push(`Onset of sleep problem: ${packet.sleep_problem_onset}.`);
+  }
+
+  if (packet.previous_sleep_studies_or_treatments) {
+    lines.push(`Previous sleep studies/treatments: ${packet.previous_sleep_studies_or_treatments}.`);
+  }
+
+  if (packet.additional_sleep_comments) {
+    lines.push(`Additional sleep comments: ${packet.additional_sleep_comments}.`);
+  }
+
+  if (packet.usual_bedtime_workdays) {
+    lines.push(`Workday sleep schedule: ${packet.usual_bedtime_workdays}.`);
+  }
+
+  if (packet.usual_bedtime_days_off) {
+    lines.push(`Days-off sleep schedule: ${packet.usual_bedtime_days_off}.`);
+  }
+
+  if (packet.sleep_latency_and_awakenings) {
+    lines.push(`Sleep latency/awakenings: ${packet.sleep_latency_and_awakenings}.`);
+  }
+
+  if (packet.work_shift_type) {
+    lines.push(`Work shift type: ${packet.work_shift_type}.`);
+  }
+
+  if (packet.caffeine_and_alcohol_use) {
+    lines.push(`Caffeine/alcohol use: ${packet.caffeine_and_alcohol_use}.`);
+  }
+
+  if (packet.tobacco_use_details) {
+    lines.push(`Tobacco use: ${packet.tobacco_use_details}.`);
+  }
+
+  if (packet.home_oxygen_and_cpap_use) {
+    lines.push(`Home oxygen/CPAP/BiPAP: ${packet.home_oxygen_and_cpap_use}.`);
+  }
+
+  if (packet.nasal_breathing_and_claustrophobia) {
+    lines.push(`Nasal breathing/claustrophobia: ${packet.nasal_breathing_and_claustrophobia}.`);
+  }
+
+  if (packet.neck_size_inches) {
+    lines.push(`Neck size: ${packet.neck_size_inches} inches.`);
+  }
+
+  if (packet.cardiac_respiratory_endocrine_history) {
+    lines.push(`Cardiac/respiratory/endocrine history: ${packet.cardiac_respiratory_endocrine_history}.`);
+  }
+
+  if (packet.neurologic_mental_ent_history) {
+    lines.push(`Neurologic/mental/ENT/GERD history: ${packet.neurologic_mental_ent_history}.`);
+  }
+
+  if (packet.other_medical_conditions) {
+    lines.push(`Other medical conditions: ${packet.other_medical_conditions}.`);
+  }
+
+  if (packet.family_history_summary) {
+    lines.push(`Family history: ${packet.family_history_summary}.`);
+  }
+
+  if (packet.surgical_history) {
+    lines.push(`Surgical history: ${packet.surgical_history}.`);
+  }
+
+  if (packet.medications_list) {
+    lines.push(`Medications: ${packet.medications_list}.`);
+  }
+
+  if (packet.sleep_symptoms_summary) {
+    lines.push(`Sleep-related symptoms: ${packet.sleep_symptoms_summary}.`);
+  }
+
+  if (packet.general_review_of_systems_summary) {
+    lines.push(`General review of systems: ${packet.general_review_of_systems_summary}.`);
+  }
+
+  if (packet.epworth_details) {
+    lines.push(`Epworth details: ${packet.epworth_details}.`);
+  }
+
+  if (packet.epworth_total_score) {
+    lines.push(`Epworth total score / daytime sleepiness: ${packet.epworth_total_score}.`);
+  }
+
+  if (lines.length === 0) {
+    return "No intake data was captured.";
+  }
+
+  return lines.join("\n");
+}
