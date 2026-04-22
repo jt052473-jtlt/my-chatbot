@@ -1,312 +1,139 @@
 // interviewQuestions.js
-// All questions aligned to backend packetSchema.js
+// Multilingual questions aligned to backend keys
+// English (en), Spanish-US (es), Korean (ko)
 
-// -------------------------------
-// QUICK MODE QUESTIONS
-// -------------------------------
-export const quickModeQuestions = [
-  {
-    id: "mode_intro",
-    key: null,
-    prompt:
-      "Alright, we’ll keep this quick. I’ll just grab the main details for your sleep visit.",
-    type: "info"
-  },
+const baseQuestions = [
   {
     id: "patient_full_name",
     key: "patient_full_name",
-    prompt: "First up, what’s your full name so I can get your chart started?",
+    en: "What is your full name as it appears on your records?",
+    es: "¿Cuál es su nombre completo tal como aparece en sus registros?",
+    ko: "기록에 있는 전체 이름을 말씀해 주세요.",
     type: "text"
   },
   {
     id: "patient_date_of_birth",
     key: "patient_date_of_birth",
-    prompt: "What’s your date of birth?",
-    type: "text"
-  },
-  {
-    id: "patient_phone_numbers",
-    key: "patient_phone_numbers",
-    prompt:
-      "What’s the best phone number and email to reach you about your sleep study?",
-    type: "text"
-  },
-  {
-    id: "primary_sleep_complaint",
-    key: "primary_sleep_complaint",
-    prompt:
-      "Tell me in your own words what sleep problem brought you here today.",
-    type: "text"
-  },
-  {
-    id: "sleep_habits_summary",
-    key: "sleep_habits_summary",
-    prompt:
-      "Walk me through your usual sleep schedule—bedtime, wake time, and how long it takes you to fall asleep.",
-    type: "text"
-  },
-  {
-    id: "lifestyle_factors_summary",
-    key: "lifestyle_factors_summary",
-    prompt:
-      "How about caffeine, alcohol, and tobacco—what do you typically use in a day?",
-    type: "text"
-  },
-  {
-    id: "medical_history_summary",
-    key: "medical_history_summary",
-    prompt:
-      "Give me a quick overview of your medical history—things like heart issues, blood pressure, diabetes, lung problems, or anything else important.",
-    type: "text"
-  },
-  {
-    id: "medications_list",
-    key: "medications_list",
-    prompt:
-      "What medications are you taking right now, and what are they for?",
-    type: "text"
-  },
-  {
-    id: "epworth_total_score",
-    key: "epworth_total_score",
-    prompt:
-      "Thinking about your daytime sleepiness, what would you say your Epworth score is, or just describe how sleepy you feel during the day?",
-    type: "text"
-  }
-];
-
-// -------------------------------
-// FULL MODE QUESTIONS
-// -------------------------------
-export const fullModeQuestions = [
-  {
-    id: "mode_intro",
-    key: null,
-    prompt: "Let’s take a moment to complete the sleep package.",
-    type: "info"
-  },
-  {
-    id: "hipaa_consent_acknowledgment",
-    key: "hipaa_consent_acknowledgment",
-    prompt:
-      "Have you reviewed and agreed to the HIPAA consents and authorizations for your sleep study?",
-    type: "yes_no"
-  },
-  {
-    id: "patient_full_name",
-    key: "patient_full_name",
-    prompt: "What’s your full name as it appears on your records?",
-    type: "text"
-  },
-  {
-    id: "patient_date_of_birth",
-    key: "patient_date_of_birth",
-    prompt: "What is your date of birth?",
+    en: "What is your date of birth?",
+    es: "¿Cuál es su fecha de nacimiento?",
+    ko: "생년월일은 언제입니까?",
     type: "text"
   },
   {
     id: "patient_address",
     key: "patient_address",
-    prompt: "What is your full home address, including city, state, and ZIP?",
+    en: "What is your full home address, including city, state, and ZIP?",
+    es: "¿Cuál es su dirección completa, incluyendo ciudad, estado y código postal?",
+    ko: "도시, 주, 우편번호를 포함한 집 주소를 알려 주세요.",
     type: "text"
   },
   {
     id: "patient_phone_numbers",
     key: "patient_phone_numbers",
-    prompt:
-      "What are your main phone numbers—home, cell, and work if you use them?",
+    en: "What are your main phone numbers—home, cell, and work if you use them?",
+    es: "¿Cuáles son sus números de teléfono principales—casa, celular y trabajo si los usa?",
+    ko: "주요 전화번호(집, 휴대폰, 직장 번호가 있다면)를 알려 주세요.",
     type: "text"
   },
   {
     id: "patient_email",
     key: "patient_email",
-    prompt: "What email address do you prefer for communication?",
+    en: "What email address do you prefer for communication?",
+    es: "¿Qué dirección de correo electrónico prefiere para comunicarnos con usted?",
+    ko: "연락받기를 원하는 이메일 주소는 무엇입니까?",
     type: "text"
   },
   {
     id: "emergency_contact",
     key: "emergency_contact",
-    prompt:
-      "Who should we list as your emergency contact, and what’s their phone number?",
-    type: "text"
-  },
-  {
-    id: "referring_physician",
-    key: "referring_physician",
-    prompt:
-      "Who referred you for this sleep evaluation, and do you know their phone number?",
-    type: "text"
-  },
-  {
-    id: "primary_physician",
-    key: "primary_physician",
-    prompt:
-      "Who is your primary care physician, and what’s their contact information if you know it?",
+    en: "Who should we list as your emergency contact, and what is their phone number?",
+    es: "¿A quién debemos poner como su contacto de emergencia y cuál es su número de teléfono?",
+    ko: "비상 연락처로 누구를 적어야 하며, 그 사람의 전화번호는 무엇입니까?",
     type: "text"
   },
   {
     id: "primary_sleep_complaint",
     key: "primary_sleep_complaint",
-    prompt:
-      "Describe your main sleep problem—what’s been going on that made you seek help?",
+    en: "Describe your main sleep problem—what has been going on that made you seek help?",
+    es: "Describa su problema principal de sueño—¿qué ha estado pasando que le hizo buscar ayuda?",
+    ko: "주요 수면 문제를 설명해 주세요—도움을 받으려 하게 된 이유는 무엇입니까?",
     type: "text"
   },
   {
     id: "sleep_problem_onset",
     key: "sleep_problem_onset",
-    prompt: "When did this sleep problem first start for you?",
-    type: "text"
-  },
-  {
-    id: "previous_sleep_studies_or_treatments",
-    key: "previous_sleep_studies_or_treatments",
-    prompt:
-      "Have you had any previous sleep studies or treatments, like CPAP or medications?",
-    type: "text"
-  },
-  {
-    id: "additional_sleep_comments",
-    key: "additional_sleep_comments",
-    prompt:
-      "Is there anything else about your sleep that you think is important to mention?",
+    en: "When did this sleep problem first start?",
+    es: "¿Cuándo comenzó por primera vez este problema de sueño?",
+    ko: "이 수면 문제가 처음 시작된 시기는 언제입니까?",
     type: "text"
   },
   {
     id: "usual_bedtime_workdays",
     key: "usual_bedtime_workdays",
-    prompt:
-      "On work days, what time do you usually go to bed and what time do you usually wake up?",
+    en: "On workdays, what time do you usually go to bed and wake up?",
+    es: "En días laborales, ¿a qué hora suele acostarse y despertarse?",
+    ko: "근무일에는 보통 몇 시에 잠자리에 들고 몇 시에 일어나십니까?",
     type: "text"
   },
   {
     id: "usual_bedtime_days_off",
     key: "usual_bedtime_days_off",
-    prompt: "On days off, what time do you usually go to bed and wake up?",
+    en: "On days off, what time do you usually go to bed and wake up?",
+    es: "En sus días libres, ¿a qué hora suele acostarse y despertarse?",
+    ko: "쉬는 날에는 보통 몇 시에 잠자리에 들고 몇 시에 일어나십니까?",
     type: "text"
   },
   {
     id: "sleep_latency_and_awakenings",
     key: "sleep_latency_and_awakenings",
-    prompt:
-      "About how long does it take you to fall asleep, how many times do you wake up at night, and how long are you awake when that happens?",
-    type: "text"
-  },
-  {
-    id: "work_shift_type",
-    key: "work_shift_type",
-    prompt:
-      "What kind of work schedule do you have—day shift, evening shift, night shift, or rotating?",
+    en: "How long does it take you to fall asleep, how many times do you wake up at night, and how long are you awake when that happens?",
+    es: "¿Cuánto tarda en dormirse, cuántas veces se despierta por la noche y cuánto permanece despierto cuando eso ocurre?",
+    ko: "잠이 드는 데 얼마나 걸리고, 밤에 몇 번이나 깨며, 깼을 때 얼마나 오래 깨어 있습니까?",
     type: "text"
   },
   {
     id: "caffeine_and_alcohol_use",
     key: "caffeine_and_alcohol_use",
-    prompt:
-      "How much coffee, tea, soda, and alcohol do you typically have in a day?",
+    en: "How much coffee, tea, soda, and alcohol do you typically consume in a day?",
+    es: "¿Cuánto café, té, refrescos y alcohol consume típicamente en un día?",
+    ko: "하루에 커피, 차, 탄산음료, 술을 얼마나 드십니까?",
     type: "text"
   },
   {
     id: "tobacco_use_details",
     key: "tobacco_use_details",
-    prompt:
-      "Do you use any tobacco products? If so, what type, how much per day, and for how many years?",
+    en: "Do you use any tobacco products? If so, what type, how much per day, and for how many years?",
+    es: "¿Usa algún producto de tabaco? Si es así, ¿qué tipo, cuánto al día y desde hace cuántos años?",
+    ko: "담배 제품을 사용하십니까? 사용한다면 종류, 하루 사용량, 사용 기간을 알려 주세요.",
     type: "text"
   },
   {
-    id: "home_oxygen_and_cpap_use",
-    key: "home_oxygen_and_cpap_use",
-    prompt:
-      "Do you use home oxygen or CPAP/BiPAP at home, and if so, do you know the settings?",
-    type: "text"
-  },
-  {
-    id: "nasal_breathing_and_claustrophobia",
-    key: "nasal_breathing_and_claustrophobia",
-    prompt:
-      "Are you able to breathe normally through your nose, and do you have any issues with claustrophobia?",
-    type: "text"
-  },
-  {
-    id: "neck_size_inches",
-    key: "neck_size_inches",
-    prompt: "Do you know your neck size in inches?",
-    type: "text"
-  },
-  {
-    id: "cardiac_respiratory_endocrine_history",
-    key: "cardiac_respiratory_endocrine_history",
-    prompt:
-      "Have you ever been told you have heart disease, high blood pressure, stroke, diabetes, thyroid problems, lung disease, COPD, or asthma?",
-    type: "text"
-  },
-  {
-    id: "neurologic_mental_ent_history",
-    key: "neurologic_mental_ent_history",
-    prompt:
-      "Any neurologic conditions, mental health conditions, sinus or ENT issues, or acid reflux?",
-    type: "text"
-  },
-  {
-    id: "other_medical_conditions",
-    key: "other_medical_conditions",
-    prompt:
-      "Are there any other medical conditions you think we should know about?",
-    type: "text"
-  },
-  {
-    id: "family_history_summary",
-    key: "family_history_summary",
-    prompt:
-      "Can you tell me about your parents’ and siblings’ health—any major conditions or sleep issues in the family?",
-    type: "text"
-  },
-  {
-    id: "surgical_history",
-    key: "surgical_history",
-    prompt:
-      "Have you had any surgeries in the past? If so, what were they and when?",
+    id: "medical_history_summary",
+    key: "medical_history_summary",
+    en: "Give me a quick overview of your medical history—heart issues, blood pressure, diabetes, lung problems, or anything else important.",
+    es: "Deme un resumen rápido de su historial médico—problemas del corazón, presión arterial, diabetes, problemas pulmonares u otros importantes.",
+    ko: "심장 질환, 혈압, 당뇨, 폐 질환 등 중요한 의학적 병력을 간단히 말씀해 주세요.",
     type: "text"
   },
   {
     id: "medications_list",
     key: "medications_list",
-    prompt:
-      "Please list your current medications, including the dose, how often you take them, and what they’re for.",
+    en: "Please list your current medications, including the dose, how often you take them, and what they are for.",
+    es: "Por favor, enumere sus medicamentos actuales, incluyendo la dosis, la frecuencia y para qué son.",
+    ko: "현재 복용 중인 약을 용량, 복용 빈도, 복용 이유와 함께 알려 주세요.",
     type: "text"
   },
   {
     id: "sleep_symptoms_summary",
     key: "sleep_symptoms_summary",
-    prompt:
-      "Do you have symptoms like snoring, pauses in breathing, gasping, restless legs, vivid dreams, sleep paralysis, morning headaches, or daytime sleepiness?",
-    type: "text"
-  },
-  {
-    id: "general_review_of_systems_summary",
-    key: "general_review_of_systems_summary",
-    prompt:
-      "Any other symptoms like fever, weight changes, anxiety or depression, chest pain, palpitations, cough, heartburn, frequent nighttime urination, joint pain, skin changes, memory issues, heat or cold intolerance, or bleeding or clotting problems?",
-    type: "text"
-  },
-  {
-    id: "epworth_details",
-    key: "epworth_details",
-    prompt:
-      "Thinking about situations like reading, watching TV, riding in a car, or sitting quietly after lunch, how likely are you to doze off in those situations?",
+    en: "Do you have symptoms like snoring, pauses in breathing, gasping, restless legs, vivid dreams, sleep paralysis, morning headaches, or daytime sleepiness?",
+    es: "¿Tiene síntomas como ronquidos, pausas en la respiración, jadeos, piernas inquietas, sueños vívidos, parálisis del sueño, dolores de cabeza matutinos o somnolencia diurna?",
+    ko: "코골이, 숨 멈춤, 헐떡임, 다리 불편감, 생생한 꿈, 가위눌림, 아침 두통, 주간 졸림 같은 증상이 있습니까?",
     type: "text"
   },
   {
     id: "epworth_total_score",
     key: "epworth_total_score",
-    prompt:
-      "If you’ve ever been given an Epworth Sleepiness Scale, do you know your total score, or can you estimate how sleepy you feel overall during the day?",
-    type: "text"
-  }
-];
-
-// -------------------------------
-// EXPORT MODE SELECTOR
-// -------------------------------
-export function getQuestionListForMode(mode) {
-  return mode === "full" ? fullModeQuestions : quickModeQuestions;
-}
+    en: "If you know your Epworth Sleepiness Scale score, what is it? Or how sleepy do you feel during the day?",
+    es: "Si conoce su puntaje de la Escala de Somnolencia de Epworth, ¿cuál es? O, ¿qué tan somnoliento se siente durante el día?",
+    ko: "에프워스 졸림 척도 점수를 알고 계신가요? 아니면 낮 동안 얼마나 졸린지 말씀해 주세요.",
