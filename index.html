@@ -1,140 +1,105 @@
-// summaryBuilder.js
-// Builds a human-readable summary from the packet data
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sleep Intake with Sam</title>
 
-export function buildHumanSummary(packet) {
-  const lines = [];
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f2f2f7;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
 
-  if (packet.mode) {
-    lines.push(`Intake mode: ${packet.mode === "full" ? "Full packet" : "Quick packet"}.`);
-  }
+    .app-container {
+      width: 100%;
+      max-width: 850px;
+      padding: 20px;
+    }
 
-  if (packet.patient_full_name) {
-    lines.push(`Patient name: ${packet.patient_full_name}.`);
-  }
+    h1 {
+      margin-top: 0;
+      text-align: center;
+      color: #1a73e8;
+    }
 
-  if (packet.patient_date_of_birth) {
-    lines.push(`Date of birth: ${packet.patient_date_of_birth}.`);
-  }
+    /* Start Screen */
+    #startScreen {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
 
-  if (packet.patient_address) {
-    lines.push(`Address: ${packet.patient_address}.`);
-  }
+    #startScreen h2 {
+      margin-top: 0;
+    }
 
-  if (packet.patient_phone_numbers) {
-    lines.push(`Phone/Contact: ${packet.patient_phone_numbers}.`);
-  }
+    #startScreen label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
 
-  if (packet.patient_email) {
-    lines.push(`Email: ${packet.patient_email}.`);
-  }
+    select, input[type="checkbox"], button {
+      margin-top: 6px;
+    }
 
-  if (packet.emergency_contact) {
-    lines.push(`Emergency contact: ${packet.emergency_contact}.`);
-  }
+    /* Controls Row */
+    #controlsRow {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-  if (packet.referring_physician) {
-    lines.push(`Referring physician: ${packet.referring_physician}.`);
-  }
+    #instructionBanner {
+      font-size: 14px;
+      color: #444;
+    }
 
-  if (packet.primary_physician) {
-    lines.push(`Primary care physician: ${packet.primary_physician}.`);
-  }
+    #typingIndicator {
+      font-size: 13px;
+      color: #777;
+      display: none;
+    }
 
-  if (packet.primary_sleep_complaint) {
-    lines.push(`Primary sleep complaint: ${packet.primary_sleep_complaint}.`);
-  }
+    /* Progress Bar */
+    #progressBarContainer {
+      display: none;
+      width: 100%;
+      background: #e0e0e0;
+      height: 10px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
 
-  if (packet.sleep_problem_onset) {
-    lines.push(`Onset of sleep problem: ${packet.sleep_problem_onset}.`);
-  }
+    #progressBar {
+      height: 10px;
+      width: 0%;
+      background: #1a73e8;
+      transition: width 0.3s ease;
+    }
 
-  if (packet.previous_sleep_studies_or_treatments) {
-    lines.push(`Previous sleep studies/treatments: ${packet.previous_sleep_studies_or_treatments}.`);
-  }
+    /* Chat Messages */
+    #messages {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      height: 420px;
+      overflow-y: auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
 
-  if (packet.additional_sleep_comments) {
-    lines.push(`Additional sleep comments: ${packet.additional_sleep_comments}.`);
-  }
-
-  if (packet.usual_bedtime_workdays) {
-    lines.push(`Workday sleep schedule: ${packet.usual_bedtime_workdays}.`);
-  }
-
-  if (packet.usual_bedtime_days_off) {
-    lines.push(`Days-off sleep schedule: ${packet.usual_bedtime_days_off}.`);
-  }
-
-  if (packet.sleep_latency_and_awakenings) {
-    lines.push(`Sleep latency/awakenings: ${packet.sleep_latency_and_awakenings}.`);
-  }
-
-  if (packet.work_shift_type) {
-    lines.push(`Work shift type: ${packet.work_shift_type}.`);
-  }
-
-  if (packet.caffeine_and_alcohol_use) {
-    lines.push(`Caffeine/alcohol use: ${packet.caffeine_and_alcohol_use}.`);
-  }
-
-  if (packet.tobacco_use_details) {
-    lines.push(`Tobacco use: ${packet.tobacco_use_details}.`);
-  }
-
-  if (packet.home_oxygen_and_cpap_use) {
-    lines.push(`Home oxygen/CPAP/BiPAP: ${packet.home_oxygen_and_cpap_use}.`);
-  }
-
-  if (packet.nasal_breathing_and_claustrophobia) {
-    lines.push(`Nasal breathing/claustrophobia: ${packet.nasal_breathing_and_claustrophobia}.`);
-  }
-
-  if (packet.neck_size_inches) {
-    lines.push(`Neck size: ${packet.neck_size_inches} inches.`);
-  }
-
-  if (packet.cardiac_respiratory_endocrine_history) {
-    lines.push(`Cardiac/respiratory/endocrine history: ${packet.cardiac_respiratory_endocrine_history}.`);
-  }
-
-  if (packet.neurologic_mental_ent_history) {
-    lines.push(`Neurologic/mental/ENT/GERD history: ${packet.neurologic_mental_ent_history}.`);
-  }
-
-  if (packet.other_medical_conditions) {
-    lines.push(`Other medical conditions: ${packet.other_medical_conditions}.`);
-  }
-
-  if (packet.family_history_summary) {
-    lines.push(`Family history: ${packet.family_history_summary}.`);
-  }
-
-  if (packet.surgical_history) {
-    lines.push(`Surgical history: ${packet.surgical_history}.`);
-  }
-
-  if (packet.medications_list) {
-    lines.push(`Medications: ${packet.medications_list}.`);
-  }
-
-  if (packet.sleep_symptoms_summary) {
-    lines.push(`Sleep-related symptoms: ${packet.sleep_symptoms_summary}.`);
-  }
-
-  if (packet.general_review_of_systems_summary) {
-    lines.push(`General review of systems: ${packet.general_review_of_systems_summary}.`);
-  }
-
-  if (packet.epworth_details) {
-    lines.push(`Epworth details: ${packet.epworth_details}.`);
-  }
-
-  if (packet.epworth_total_score) {
-    lines.push(`Epworth total score / daytime sleepiness: ${packet.epworth_total_score}.`);
-  }
-
-  if (lines.length === 0) {
-    return "No intake data was captured.";
-  }
-
-  return lines.join("\n");
-}
+    .bubble {
+      max-width: 75%;
+      padding: 12px 16px;
+      border
