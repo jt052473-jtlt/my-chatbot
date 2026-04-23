@@ -137,3 +137,18 @@ const baseQuestions = [
     en: "If you know your Epworth Sleepiness Scale score, what is it? Or how sleepy do you feel during the day?",
     es: "Si conoce su puntaje de la Escala de Somnolencia de Epworth, ¿cuál es? O, ¿qué tan somnoliento se siente durante el día?",
     ko: "에프워스 졸림 척도 점수를 알고 계신가요? 아니면 낮 동안 얼마나 졸린지 말씀해 주세요.",
+    type: "text"
+  }
+];
+
+/* ---------------------------------------------------------
+   EXPORT FUNCTION
+--------------------------------------------------------- */
+export function getQuestionsForLanguage(lang = "en") {
+  return baseQuestions.map(q => ({
+    id: q.id,
+    key: q.key,
+    prompt: q[lang] || q.en,
+    type: q.type
+  }));
+}
