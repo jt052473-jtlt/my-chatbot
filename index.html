@@ -102,4 +102,290 @@
     .bubble {
       max-width: 75%;
       padding: 12px 16px;
-      border
+      border-radius: 18px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      font-size: 15px;
+      display: inline-block;
+      clear: both;
+    }
+
+    .sam-bubble {
+      background: #e3f2fd;
+      color: #0d47a1;
+      float: left;
+      border-bottom-left-radius: 4px;
+    }
+
+    .user-bubble {
+      background: #d1ffd6;
+      color: #1b5e20;
+      float: right;
+      border-bottom-right-radius: 4px;
+    }
+
+    /* Input Row */
+    #inputRow {
+      display: none;
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    #answerInput {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      color: white;
+      background: #1a73e8;
+      white-space: nowrap;
+    }
+
+    button.secondary {
+      background: #555;
+    }
+
+    button.danger {
+      background: #d32f2f;
+    }
+
+    #micButton {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-size: 22px;
+      padding: 0;
+      background: #d81b60;
+    }
+
+    /* Summary */
+    #summaryContainer {
+      display: none;
+      background: #f1f8e9;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 15px;
+      white-space: pre-wrap;
+      font-size: 15px;
+    }
+
+    #readSummaryBtn {
+      display: none;
+      margin-top: 10px;
+    }
+
+    /* Bigger Text Mode */
+    #bigTextToggle {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .big-text #messages,
+    .big-text #summaryContainer,
+    .big-text #answerInput {
+      font-size: 19px;
+    }
+
+    .big-text .bubble {
+      font-size: 19px;
+    }
+
+    @media (max-width: 600px) {
+      #messages {
+        height: 350px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+
+  <h1>Sleep Intake with Sam</h1>
+
+  <!-- START SCREEN -->
+  <div id="startScreen">
+    <h2>Welcome</h2>
+    <p>Select your language and how you’d like to answer questions.</p>
+
+    <label for="languageSelect">Language / Idioma / 언어</label>
+    <select id="languageSelect">
+      <option value="en">English (US)</option>
+      <option value="es">Español (EE.UU.)</option>
+      <option value="ko">한국어 (Korean)</option>
+    </select>
+
+    <label>
+      <input type="checkbox" id="voiceModeToggle" />
+      Use Voice Mode (Sam will speak and listen)
+    </label>
+
+    <div style="margin-top:12px;">
+      <button id="startButton">Start New Intake</button>
+      <button id="resumeButton" class="secondary">Resume Saved Intake</button>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div id="controlsRow">
+    <div>
+      <div id="instructionBanner"></div>
+      <div id="typingIndicator">Sam is speaking…</div>
+    </div>
+
+    <button id="bigTextToggle">Bigger Text</button>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div id="progressBarContainer">
+    <div id="progressBar"></div>
+  </div>
+
+  <!-- CHAT MESSAGES -->
+  <div id="messages"></div>
+
+  <!-- INPUT ROW -->
+  <div id="inputRow">
+    <input id="answerInput" placeholder="Type your answer…" autocomplete="off" />
+    <button id="sendBtn">Send</button>
+    <button id="micButton">🎤</button>
+    <button id="finishBtn" class="danger">Finish</button>
+  </div>
+
+  <!-- SUMMARY -->
+  <div id="summaryContainer"></div>
+  <button id="readSummaryBtn">🔊 Read Summary</button>
+
+</div>
+
+<script type="module">
+  import { InterviewFlow } from "./interviewFlow.js";
+  import { buildHumanSummary } from "./summaryBuilder.js";
+
+  /* ---------------------------------------------------------
+     DOM ELEMENTS
+  --------------------------------------------------------- */
+  const startScreen = document.getElementById("startScreen");
+  const languageSelect = document.getElementById("languageSelect");
+  const voiceModeToggle = document.getElementById("voiceModeToggle");
+  const startButton = document.getElementById("startButton");
+  const resumeButton = document.getElementById("resumeButton");
+
+  const controlsRow = document.getElementById("controlsRow");
+  const instructionBanner = document.getElementById("instructionBanner");
+  const typingIndicator = document.getElementById("typingIndicator");
+
+  const progressBarContainer = document.getElementById("progressBarContainer");
+  const progressBar = document.getElementById("progressBar");
+
+  const messagesDiv = document.getElementById("messages");
+  const inputRow = document.getElementById("inputRow");
+  const answerInput = document.getElementById("answerInput");
+  const sendBtn = document.getElementById("sendBtn");
+  const micButton = document.getElementById("micButton");
+  const finishBtn = document.getElementById("finishBtn");
+
+  const summaryContainer = document.getElementById("summaryContainer");
+  const readSummaryBtn = document.getElementById("readSummaryBtn");
+  const bigTextToggle = document.getElementById("bigTextToggle");
+
+  /* ---------------------------------------------------------
+     STATE
+  --------------------------------------------------------- */
+  let flow = null;
+  let sessionActive = false;
+  let currentLanguage = "en";
+  let voiceMode = false;
+
+  let recognition = null;
+  let isListening = false;
+  let isSpeaking = false;
+
+  const STORAGE_KEY = "sleep_intake_sam_session";
+
+  /* ---------------------------------------------------------
+     HELPERS
+  --------------------------------------------------------- */
+  function addBubble(text, sender) {
+    const div = document.createElement("div");
+    div.className = "bubble " + (sender === "sam" ? "sam-bubble" : "user-bubble");
+    div.textContent = text;
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  function setInstructionBanner() {
+    instructionBanner.textContent = voiceMode
+      ? "Speak your answer after each question. Sam will automatically continue."
+      : "Type your answer and press Enter or Send to continue.";
+  }
+
+  function updateProgress() {
+    if (!flow) return;
+    const total = flow.getTotalQuestions();
+    const current = flow.getCurrentIndex();
+    const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+    progressBar.style.width = percent + "%";
+  }
+
+  function saveSession() {
+    if (!flow) return;
+    const data = {
+      packetData: flow.getPacket(),
+      currentIndex: flow.getCurrentIndex(),
+      language: currentLanguage,
+      voiceMode: voiceMode
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function loadSession() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    try { return JSON.parse(raw); }
+    catch { return null; }
+  }
+
+  function clearSession() {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+
+  /* ---------------------------------------------------------
+     SPEECH SYNTHESIS
+  --------------------------------------------------------- */
+  function speakText(text, langCode) {
+    if (!window.speechSynthesis) return;
+
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = langCode;
+    utter.rate = 1.0;
+    utter.pitch = 1.0;
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length) {
+      if (langCode === "es-US") {
+        utter.voice = voices.find(v => v.lang.startsWith("es") && /Ana|Google/.test(v.name))
+          || voices.find(v => v.lang.startsWith("es"));
+      } else if (langCode === "ko-KR") {
+        utter.voice = voices.find(v => v.lang === "ko-KR")
+          || voices.find(v => /Korean/i.test(v.name));
+      } else {
+        utter.voice = voices.find(v => /Aria|Google US English|Microsoft/.test(v.name))
+          || voices.find(v => v.lang.startsWith("en"));
+      }
+    }
+
+    typingIndicator.style.display = "block";
+    isSpeaking = true;
+
