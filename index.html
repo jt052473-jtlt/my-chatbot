@@ -10,40 +10,43 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-font-smoothing: antialiased;
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f3f4f6;
-      color: #111827;
-      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: #fafafa;
+      color: #111;
+      padding: 2rem;
     }
 
     .app-container {
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 1.5rem;
     }
 
     .app-header {
       text-align: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
     }
 
     .app-header h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      color: #111827;
+      font-size: 2.2rem;
+      font-weight: 600;
+      color: #111;
+      letter-spacing: -0.5px;
     }
 
     .app-header p {
-      color: #4b5563;
+      margin-top: 0.5rem;
+      color: #555;
+      font-size: 1rem;
     }
 
     .app-main {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 1.5rem;
+      gap: 2rem;
     }
 
     @media (max-width: 900px) {
@@ -53,14 +56,13 @@
     }
 
     .chat-section {
-      background: #ffffff;
-      border-radius: 0.75rem;
-      padding: 1rem;
+      background: #fff;
+      border-radius: 18px;
+      padding: 1.5rem;
+      height: 70vh;
       display: flex;
       flex-direction: column;
-      height: 70vh;
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-      border: 1px solid #e5e7eb;
+      border: 1px solid #e5e5e5;
     }
 
     .chat-window {
@@ -71,7 +73,7 @@
     }
 
     .message {
-      margin-bottom: 0.75rem;
+      margin-bottom: 1rem;
       display: flex;
     }
 
@@ -84,23 +86,23 @@
     }
 
     .bubble {
-      max-width: 80%;
-      padding: 0.6rem 0.8rem;
-      border-radius: 0.75rem;
+      max-width: 75%;
+      padding: 0.75rem 1rem;
+      border-radius: 16px;
       font-size: 0.95rem;
       line-height: 1.4;
     }
 
     .message.user .bubble {
-      background: #2563eb;
+      background: #007aff;
       color: white;
-      border-bottom-right-radius: 0.1rem;
+      border-bottom-right-radius: 4px;
     }
 
     .message.assistant .bubble {
-      background: #e5e7eb;
-      color: #111827;
-      border-bottom-left-radius: 0.1rem;
+      background: #f2f2f7;
+      color: #111;
+      border-bottom-left-radius: 4px;
     }
 
     .chat-form {
@@ -110,56 +112,50 @@
 
     .chat-input {
       flex: 1;
-      padding: 0.6rem 0.75rem;
+      padding: 0.75rem 1rem;
       border-radius: 999px;
-      border: 1px solid #d1d5db;
-      background: #f9fafb;
-      color: #111827;
+      border: 1px solid #d1d1d6;
+      background: #fff;
+      font-size: 1rem;
     }
 
     .chat-input:focus {
       outline: none;
-      border-color: #2563eb;
-      background: #ffffff;
+      border-color: #007aff;
     }
 
     .chat-submit {
-      padding: 0.6rem 1rem;
+      padding: 0.75rem 1.25rem;
       border-radius: 999px;
       border: none;
-      background: #2563eb;
+      background: #007aff;
       color: white;
-      cursor: pointer;
       font-weight: 500;
-    }
-
-    .chat-submit:hover {
-      background: #1d4ed8;
+      cursor: pointer;
     }
 
     .sidebar-section {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.5rem;
     }
 
     .card {
-      background: #ffffff;
-      border-radius: 0.75rem;
-      padding: 1rem;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+      background: #fff;
+      border-radius: 18px;
+      padding: 1.25rem;
+      border: 1px solid #e5e5e5;
     }
 
     .card h2 {
       font-size: 1.1rem;
-      margin-bottom: 0.75rem;
-      color: #111827;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #111;
     }
 
     .btn {
-      display: inline-block;
-      padding: 0.5rem 0.75rem;
+      padding: 0.6rem 1rem;
       border-radius: 999px;
       border: none;
       cursor: pointer;
@@ -168,52 +164,38 @@
     }
 
     .btn-primary {
-      background: #22c55e;
-      color: #064e3b;
+      background: #34c759;
+      color: white;
     }
 
     .btn-secondary {
-      background: #f9fafb;
-      color: #111827;
-      border: 1px solid #d1d5db;
-    }
-
-    .btn-primary:hover {
-      background: #16a34a;
-    }
-
-    .btn-secondary:hover {
-      background: #e5e7eb;
+      background: #f2f2f7;
+      color: #111;
+      border: 1px solid #d1d1d6;
     }
 
     .json-viewer {
-      background: #f9fafb;
-      border-radius: 0.5rem;
-      padding: 0.75rem;
-      font-size: 0.8rem;
+      background: #f8f8f8;
+      border-radius: 12px;
+      padding: 1rem;
+      font-size: 0.85rem;
       max-height: 260px;
       overflow-y: auto;
-      border: 1px solid #e5e7eb;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      color: #111827;
-    }
-
-    .app-footer {
-      margin-top: 1.5rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #6b7280;
+      border: 1px solid #e5e5e5;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
   </style>
 </head>
 <body>
   <div class="app-container">
+
     <header class="app-header">
       <h1>Sleep Intake Assistant</h1>
-      <p>Guided intake for sleep patients, with structured outputs for your workflow.</p>
+      <p>Guided clinical intake with structured output.</p>
     </header>
 
     <main class="app-main">
+
       <!-- CHAT SECTION -->
       <section class="chat-section">
         <div id="chatWindow" class="chat-window"></div>
@@ -224,56 +206,16 @@
             id="chatInput"
             type="text"
             class="chat-input"
-            placeholder="Type your message..."
+            placeholder="Type your message…"
             autocomplete="off"
           />
           <button type="submit" class="chat-submit">Send</button>
         </form>
       </section>
 
-      <!-- FLOATING MIC BUTTON (Voice Input) -->
-      <button id="micButton"
-        style="
-          position: fixed;
-          bottom: 110px;
-          right: 25px;
-          width: 65px;
-          height: 65px;
-          border-radius: 50%;
-          background: #2563eb;
-          color: white;
-          border: none;
-          font-size: 28px;
-          cursor: pointer;
-          box-shadow: 0 0 12px rgba(0,0,0,0.25);
-          display: none;
-          z-index: 9999;
-        ">
-        🎤
-      </button>
-
-      <!-- FLOATING VOICE MODE TOGGLE -->
-      <button id="voiceModeToggle"
-        style="
-          position: fixed;
-          bottom: 25px;
-          right: 25px;
-          padding: 12px 18px;
-          border-radius: 999px;
-          background: #22c55e;
-          color: #064e3b;
-          border: none;
-          font-size: 15px;
-          cursor: pointer;
-          box-shadow: 0 0 12px rgba(0,0,0,0.25);
-          display: none;
-          z-index: 9999;
-        ">
-        Voice Mode: OFF
-      </button>
-
       <!-- SIDEBAR SECTION -->
       <section class="sidebar-section">
+
         <div class="card">
           <h2>Session Controls</h2>
           <button id="startInterview" class="btn btn-primary">Start Interview</button>
@@ -284,37 +226,40 @@
           <h2>Structured Output</h2>
           <pre id="jsonOutput" class="json-viewer">{}</pre>
         </div>
+
       </section>
+
     </main>
 
-    <footer class="app-footer">
-      Sleep Intake Assistant • Structured patient interview workflow
-    </footer>
   </div>
   <!-- ========================= -->
   <!--   BEGIN JAVASCRIPT LOGIC  -->
   <!-- ========================= -->
   <script>
-    // SESSION ID FOR BACKEND
+    /* ---------------------------------------------
+       SESSION + DOM ELEMENTS
+    --------------------------------------------- */
     let sessionId = null;
 
-    // DOM ELEMENTS
     const chatWindow = document.getElementById("chatWindow");
     const chatForm = document.getElementById("chatForm");
     const chatInput = document.getElementById("chatInput");
     const jsonOutput = document.getElementById("jsonOutput");
     const startInterviewBtn = document.getElementById("startInterview");
     const resetInterviewBtn = document.getElementById("resetInterview");
-    const micButton = document.getElementById("micButton");
-    const voiceModeToggle = document.getElementById("voiceModeToggle");
 
-    // INTERVIEW STATE
+    /* ---------------------------------------------
+       INTERVIEW STATE
+    --------------------------------------------- */
     let interviewActive = false;
     let voiceMode = false;
     let listening = false;
 
-    // SPEECH RECOGNITION SETUP
+    /* ---------------------------------------------
+       SPEECH RECOGNITION (Apple-style minimal)
+    --------------------------------------------- */
     let recognition = null;
+
     if ("webkitSpeechRecognition" in window) {
       recognition = new webkitSpeechRecognition();
       recognition.continuous = false;
@@ -322,50 +267,63 @@
       recognition.lang = "en-US";
     }
 
-    // CHAT MESSAGE RENDERING
+    /* ---------------------------------------------
+       BASIC MESSAGE RENDERING
+    --------------------------------------------- */
     function baseAddMessage(sender, text) {
       const msg = document.createElement("div");
       msg.className = `message ${sender}`;
+
       const bubble = document.createElement("div");
       bubble.className = "bubble";
       bubble.textContent = text;
+
       msg.appendChild(bubble);
       chatWindow.appendChild(msg);
+
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
-    // ASSISTANT SPEAKS OUT LOUD
+
+    /* ---------------------------------------------
+       ASSISTANT SPEAKS (Apple voice preference)
+    --------------------------------------------- */
     function speak(text) {
       try {
         const synth = window.speechSynthesis;
         const utter = new SpeechSynthesisUtterance(text);
+
         const voices = synth.getVoices();
         const preferred = voices.find(v =>
-          v.name.toLowerCase().includes("female") ||
           v.name.toLowerCase().includes("samantha") ||
-          v.name.toLowerCase().includes("google") ||
+          v.name.toLowerCase().includes("female") ||
           v.name.toLowerCase().includes("zira")
         );
-        if (preferred) {
-          utter.voice = preferred;
-        }
-        utter.pitch = 1.05;
-        utter.rate = 0.97;
+
+        if (preferred) utter.voice = preferred;
+
+        utter.pitch = 1.02;
+        utter.rate = 0.98;
         utter.volume = 1.0;
+
         synth.speak(utter);
       } catch (e) {
         console.warn("Speech synthesis not available.");
       }
     }
 
-    // WRAPPED addMessage TO INCLUDE SPEECH
+    /* ---------------------------------------------
+       WRAPPED addMessage (with optional voice)
+    --------------------------------------------- */
     function addMessage(sender, text) {
       baseAddMessage(sender, text);
+
       if (sender === "assistant" && voiceMode && interviewActive) {
         speak(text);
       }
     }
-
-    // SEND MESSAGE TO BACKEND (WITH SESSION)
+    /* ---------------------------------------------
+       SEND MESSAGE TO BACKEND (WITH SESSION)
+    --------------------------------------------- */
     async function sendMessage(text) {
       if (!text.trim()) return;
 
@@ -388,24 +346,34 @@
           sessionId = data.session_id;
         }
 
+        // Show backend's natural-language reply (if any)
         if (data.reply) {
           addMessage("assistant", data.reply);
         }
 
+        // Show structured output
         if (data.structured_output) {
           jsonOutput.textContent = JSON.stringify(data.structured_output, null, 2);
+        }
+
+        // After backend reply, move to next scripted question
+        if (interviewActive) {
+          askNextQuestion();
         }
 
         // Auto-listen again if voice mode is active
         if (voiceMode && interviewActive) {
           startListening();
         }
+
       } catch (err) {
         addMessage("assistant", "⚠️ Error contacting server.");
       }
     }
 
-    // CHAT FORM SUBMIT
+    /* ---------------------------------------------
+       CHAT FORM SUBMIT
+    --------------------------------------------- */
     chatForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const text = chatInput.value;
@@ -413,76 +381,117 @@
       sendMessage(text);
     });
 
-    // START LISTENING (MIC)
+    /* ---------------------------------------------
+       START LISTENING (MIC)
+    --------------------------------------------- */
     function startListening() {
       if (!recognition || listening === true) return;
+
       listening = true;
-      micButton.style.background = "#22c55e";
+      micButton.style.background = "#34c759";
 
       recognition.start();
 
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         listening = false;
-        micButton.style.background = "#2563eb";
+        micButton.style.background = "#007aff";
         sendMessage(transcript);
       };
 
       recognition.onerror = () => {
         listening = false;
-        micButton.style.background = "#2563eb";
-        addMessage("assistant", "⚠️ I couldn't hear that. Try again.");
+        micButton.style.background = "#007aff";
+        addMessage("assistant", "⚠️ I couldn't hear that.");
       };
 
       recognition.onend = () => {
         listening = false;
-        micButton.style.background = "#2563eb";
+        micButton.style.background = "#007aff";
       };
     }
 
-    // MIC BUTTON CLICK
+    /* ---------------------------------------------
+       MIC BUTTON CLICK
+    --------------------------------------------- */
     micButton.addEventListener("click", () => {
       if (!interviewActive) return;
       startListening();
     });
-    // VOICE MODE TOGGLE
+    /* ---------------------------------------------
+       SCRIPTED CLINICAL INTERVIEW (MODE B)
+    --------------------------------------------- */
+    const intakeQuestions = [
+      "To begin, can you tell me your full name?",
+      "What is your date of birth?",
+      "What brings you in today regarding your sleep?",
+      "How long has this issue been going on?",
+      "What time do you usually go to bed on weekdays?",
+      "What time do you usually wake up on weekdays?",
+      "Do you snore loudly or has anyone told you that you stop breathing in your sleep?",
+      "Do you have trouble falling asleep, staying asleep, or both?",
+      "Do you feel sleepy during the day, such as while reading, watching TV, or driving?",
+      "Do you have any diagnosed medical conditions?",
+      "Are you taking any medications or sleep aids?",
+      "Is there anything else about your sleep that you think is important?"
+    ];
+
+    let currentQuestionIndex = -1;
+
+    function askNextQuestion() {
+      currentQuestionIndex += 1;
+
+      if (currentQuestionIndex < intakeQuestions.length) {
+        addMessage("assistant", intakeQuestions[currentQuestionIndex]);
+      } else {
+        addMessage("assistant", "Thank you. Your sleep intake is complete. Your provider can now review your structured summary.");
+      }
+    }
+
+    /* ---------------------------------------------
+       VOICE MODE TOGGLE
+    --------------------------------------------- */
     voiceModeToggle.addEventListener("click", () => {
       voiceMode = !voiceMode;
 
       if (voiceMode) {
         voiceModeToggle.textContent = "Voice Mode: ON";
-        voiceModeToggle.style.background = "#16a34a";
-        voiceModeToggle.style.color = "#022c22";
-        if (interviewActive) {
-          startListening();
-        }
+        voiceModeToggle.style.background = "#34c759";
+        voiceModeToggle.style.color = "#fff";
+
+        if (interviewActive) startListening();
       } else {
         voiceModeToggle.textContent = "Voice Mode: OFF";
-        voiceModeToggle.style.background = "#22c55e";
-        voiceModeToggle.style.color = "#064e3b";
+        voiceModeToggle.style.background = "#f2f2f7";
+        voiceModeToggle.style.color = "#111";
       }
     });
 
-    // START INTERVIEW
+    /* ---------------------------------------------
+       START INTERVIEW
+    --------------------------------------------- */
     startInterviewBtn.addEventListener("click", () => {
       interviewActive = true;
+      currentQuestionIndex = -1;
+
       micButton.style.display = "block";
       voiceModeToggle.style.display = "block";
 
-      addMessage("assistant", "Great! Let's begin your sleep intake interview.");
-      addMessage("assistant", "Tell me what brings you in today.");
+      addMessage("assistant", "Great. Let's begin your sleep intake.");
+      askNextQuestion();
 
-      if (voiceMode) {
-        startListening();
-      }
+      if (voiceMode) startListening();
     });
 
-    // RESET INTERVIEW
+    /* ---------------------------------------------
+       RESET INTERVIEW
+    --------------------------------------------- */
     resetInterviewBtn.addEventListener("click", () => {
       interviewActive = false;
       voiceMode = false;
       listening = false;
       sessionId = null;
+      currentQuestionIndex = -1;
 
       micButton.style.display = "none";
       voiceModeToggle.style.display = "none";
@@ -491,8 +500,8 @@
       jsonOutput.textContent = "{}";
 
       voiceModeToggle.textContent = "Voice Mode: OFF";
-      voiceModeToggle.style.background = "#22c55e";
-      voiceModeToggle.style.color = "#064e3b";
+      voiceModeToggle.style.background = "#f2f2f7";
+      voiceModeToggle.style.color = "#111";
 
       addMessage("assistant", "Interview reset. Ready when you are.");
     });
