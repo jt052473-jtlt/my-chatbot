@@ -209,6 +209,7 @@
     }
   </style>
 </head>
+
 <body>
 <div class="app-container">
 
@@ -269,9 +270,10 @@
 
 </div>
 
+<!-- MAIN APP SCRIPT -->
 <script type="module">
-  import { InterviewFlow } from "./interviewFlow.js";
-  import { buildHumanSummary } from "./summaryBuilder.js";
+  import { InterviewFlow } from "./interviewFlow2.js";
+  import { buildHumanSummary } from "./summaryBuilder2.js";
 
   /* ---------------------------------------------------------
      DOM ELEMENTS
@@ -388,13 +390,33 @@
 
     typingIndicator.style.display = "block";
     isSpeaking = true;
+    window.speechSynthesis.speak(utter);
+
+    utter.onend = () => {
+      typingIndicator.style.display = "none";
+      isSpeaking = false;
+    };
   }
-</script>
 
-<!-- rebuild -->
-</body>
-</html>
-<!-- rebuild2 -->
+  /* ---------------------------------------------------------
+     MAIN LOGIC
+  --------------------------------------------------------- */
+  function startNewIntake() {
+    currentLanguage = languageSelect.value;
+    voiceMode = voiceModeToggle.checked;
 
+    flow = new InterviewFlow(currentLanguage);
+    sessionActive = true;
 
+    startScreen.style.display = "none";
+    controlsRow.style.display = "flex";
+    progressBarContainer.style.display = "block";
+    inputRow.style.display = "flex";
 
+    setInstructionBanner();
+    askNextQuestion();
+  }
+
+  function resumeIntake() {
+    const saved = loadSession();
+    if (!saved
