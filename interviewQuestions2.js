@@ -1,156 +1,83 @@
-// interviewQuestions.js
-// Multilingual questions aligned to backend keys
-// English (en), Spanish-US (es), Korean (ko)
+// interviewQuestions2.js
+// Provides multilingual question sets for the sleep intake chatbot
 
-const baseQuestions = [
-  {
-    id: "patient_full_name",
-    key: "patient_full_name",
-    en: "What is your full name as it appears on your records?",
-    es: "¿Cuál es su nombre completo tal como aparece en sus registros?",
-    ko: "기록에 있는 전체 이름을 말씀해 주세요.",
-    type: "text"
-  },
-  {
-    id: "patient_date_of_birth",
-    key: "patient_date_of_birth",
-    en: "What is your date of birth?",
-    es: "¿Cuál es su fecha de nacimiento?",
-    ko: "생년월일은 언제입니까?",
-    type: "text"
-  },
-  {
-    id: "patient_address",
-    key: "patient_address",
-    en: "What is your full home address, including city, state, and ZIP?",
-    es: "¿Cuál es su dirección completa, incluyendo ciudad, estado y código postal?",
-    ko: "도시, 주, 우편번호를 포함한 집 주소를 알려 주세요.",
-    type: "text"
-  },
-  {
-    id: "patient_phone_numbers",
-    key: "patient_phone_numbers",
-    en: "What are your main phone numbers—home, cell, and work if you use them?",
-    es: "¿Cuáles son sus números de teléfono principales—casa, celular y trabajo si los usa?",
-    ko: "주요 전화번호(집, 휴대폰, 직장 번호가 있다면)를 알려 주세요.",
-    type: "text"
-  },
-  {
-    id: "patient_email",
-    key: "patient_email",
-    en: "What email address do you prefer for communication?",
-    es: "¿Qué dirección de correo electrónico prefiere para comunicarnos con usted?",
-    ko: "연락받기를 원하는 이메일 주소는 무엇입니까?",
-    type: "text"
-  },
-  {
-    id: "emergency_contact",
-    key: "emergency_contact",
-    en: "Who should we list as your emergency contact, and what is their phone number?",
-    es: "¿A quién debemos poner como su contacto de emergencia y cuál es su número de teléfono?",
-    ko: "비상 연락처로 누구를 적어야 하며, 그 사람의 전화번호는 무엇입니까?",
-    type: "text"
-  },
-  {
-    id: "primary_sleep_complaint",
-    key: "primary_sleep_complaint",
-    en: "Describe your main sleep problem—what has been going on that made you seek help?",
-    es: "Describa su problema principal de sueño—¿qué ha estado pasando que le hizo buscar ayuda?",
-    ko: "주요 수면 문제를 설명해 주세요—도움을 받으려 하게 된 이유는 무엇입니까?",
-    type: "text"
-  },
-  {
-    id: "sleep_problem_onset",
-    key: "sleep_problem_onset",
-    en: "When did this sleep problem first start?",
-    es: "¿Cuándo comenzó por primera vez este problema de sueño?",
-    ko: "이 수면 문제가 처음 시작된 시기는 언제입니까?",
-    type: "text"
-  },
-  {
-    id: "usual_bedtime_workdays",
-    key: "usual_bedtime_workdays",
-    en: "On workdays, what time do you usually go to bed and wake up?",
-    es: "En días laborales, ¿a qué hora suele acostarse y despertarse?",
-    ko: "근무일에는 보통 몇 시에 잠자리에 들고 몇 시에 일어나십니까?",
-    type: "text"
-  },
-  {
-    id: "usual_bedtime_days_off",
-    key: "usual_bedtime_days_off",
-    en: "On days off, what time do you usually go to bed and wake up?",
-    es: "En sus días libres, ¿a qué hora suele acostarse y despertarse?",
-    ko: "쉬는 날에는 보통 몇 시에 잠자리에 들고 몇 시에 일어나십니까?",
-    type: "text"
-  },
-  {
-    id: "sleep_latency_and_awakenings",
-    key: "sleep_latency_and_awakenings",
-    en: "How long does it take you to fall asleep, how many times do you wake up at night, and how long are you awake when that happens?",
-    es: "¿Cuánto tarda en dormirse, cuántas veces se despierta por la noche y cuánto permanece despierto cuando eso ocurre?",
-    ko: "잠이 드는 데 얼마나 걸리고, 밤에 몇 번이나 깨며, 깼을 때 얼마나 오래 깨어 있습니까?",
-    type: "text"
-  },
-  {
-    id: "caffeine_and_alcohol_use",
-    key: "caffeine_and_alcohol_use",
-    en: "How much coffee, tea, soda, and alcohol do you typically consume in a day?",
-    es: "¿Cuánto café, té, refrescos y alcohol consume típicamente en un día?",
-    ko: "하루에 커피, 차, 탄산음료, 술을 얼마나 드십니까?",
-    type: "text"
-  },
-  {
-    id: "tobacco_use_details",
-    key: "tobacco_use_details",
-    en: "Do you use any tobacco products? If so, what type, how much per day, and for how many years?",
-    es: "¿Usa algún producto de tabaco? Si es así, ¿qué tipo, cuánto al día y desde hace cuántos años?",
-    ko: "담배 제품을 사용하십니까? 사용한다면 종류, 하루 사용량, 사용 기간을 알려 주세요.",
-    type: "text"
-  },
-  {
-    id: "medical_history_summary",
-    key: "medical_history_summary",
-    en: "Give me a quick overview of your medical history—heart issues, blood pressure, diabetes, lung problems, or anything else important.",
-    es: "Deme un resumen rápido de su historial médico—problemas del corazón, presión arterial, diabetes, problemas pulmonares u otros importantes.",
-    ko: "심장 질환, 혈압, 당뇨, 폐 질환 등 중요한 의학적 병력을 간단히 말씀해 주세요.",
-    type: "text"
-  },
-  {
-    id: "medications_list",
-    key: "medications_list",
-    en: "Please list your current medications, including the dose, how often you take them, and what they are for.",
-    es: "Por favor, enumere sus medicamentos actuales, incluyendo la dosis, la frecuencia y para qué son.",
-    ko: "현재 복용 중인 약을 용량, 복용 빈도, 복용 이유와 함께 알려 주세요.",
-    type: "text"
-  },
-  {
-    id: "sleep_symptoms_summary",
-    key: "sleep_symptoms_summary",
-    en: "Do you have symptoms like snoring, pauses in breathing, gasping, restless legs, vivid dreams, sleep paralysis, morning headaches, or daytime sleepiness?",
-    es: "¿Tiene síntomas como ronquidos, pausas en la respiración, jadeos, piernas inquietas, sueños vívidos, parálisis del sueño, dolores de cabeza matutinos o somnolencia diurna?",
-    ko: "코골이, 숨 멈춤, 헐떡임, 다리 불편감, 생생한 꿈, 가위눌림, 아침 두통, 주간 졸림 같은 증상이 있습니까?",
-    type: "text"
-  },
-  {
-    id: "epworth_total_score",
-    key: "epworth_total_score",
-    en: "If you know your Epworth Sleepiness Scale score, what is it? Or how sleepy do you feel during the day?",
-    es: "Si conoce su puntaje de la Escala de Somnolencia de Epworth, ¿cuál es? O, ¿qué tan somnoliento se siente durante el día?",
-    ko: "에프워스 졸림 척도 점수를 알고 계신가요? 아니면 낮 동안 얼마나 졸린지 말씀해 주세요.",
-    type: "text"
-  }
+/* ---------------------------------------------------------
+   ENGLISH QUESTIONS
+--------------------------------------------------------- */
+const questions_en = [
+  { text: "What is your full name?", key: "patient_name" },
+  { text: "What is your date of birth?", key: "patient_date_of_birth" },
+  { text: "What brings you in for a sleep evaluation today?", key: "chief_complaint" },
+  { text: "How long have you been experiencing this issue?", key: "duration_of_problem" },
+  { text: "Do you snore loudly?", key: "snoring" },
+  { text: "Do you stop breathing during sleep?", key: "apnea_events" },
+  { text: "Do you feel tired during the day?", key: "daytime_sleepiness" },
+  { text: "Do you have trouble falling asleep?", key: "insomnia" },
+  { text: "Do you wake up frequently at night?", key: "nighttime_awakenings" },
+  { text: "What time do you usually go to bed?", key: "bedtime" },
+  { text: "What time do you usually wake up?", key: "wake_time" },
+  { text: "Do you take naps during the day?", key: "naps" },
+  { text: "Do you consume caffeine? If so, how much?", key: "caffeine_use" },
+  { text: "Do you consume alcohol? If so, how often?", key: "alcohol_use" },
+  { text: "Do you take any medications?", key: "medications" },
+  { text: "Do you have any medical conditions?", key: "medical_history" },
+  { text: "Do you have any allergies?", key: "allergies" },
+  { text: "Is there anything else you’d like to share?", key: "additional_notes" }
+];
+
+/* ---------------------------------------------------------
+   SPANISH QUESTIONS
+--------------------------------------------------------- */
+const questions_es = [
+  { text: "¿Cuál es su nombre completo?", key: "patient_name" },
+  { text: "¿Cuál es su fecha de nacimiento?", key: "patient_date_of_birth" },
+  { text: "¿Qué lo trae hoy para una evaluación del sueño?", key: "chief_complaint" },
+  { text: "¿Cuánto tiempo ha tenido este problema?", key: "duration_of_problem" },
+  { text: "¿Ronca fuerte?", key: "snoring" },
+  { text: "¿Deja de respirar mientras duerme?", key: "apnea_events" },
+  { text: "¿Se siente cansado durante el día?", key: "daytime_sleepiness" },
+  { text: "¿Tiene dificultad para quedarse dormido?", key: "insomnia" },
+  { text: "¿Se despierta con frecuencia por la noche?", key: "nighttime_awakenings" },
+  { text: "¿A qué hora suele acostarse?", key: "bedtime" },
+  { text: "¿A qué hora suele despertarse?", key: "wake_time" },
+  { text: "¿Toma siestas durante el día?", key: "naps" },
+  { text: "¿Consume cafeína? ¿Cuánta?", key: "caffeine_use" },
+  { text: "¿Consume alcohol? ¿Con qué frecuencia?", key: "alcohol_use" },
+  { text: "¿Toma algún medicamento?", key: "medications" },
+  { text: "¿Tiene alguna condición médica?", key: "medical_history" },
+  { text: "¿Tiene alergias?", key: "allergies" },
+  { text: "¿Desea compartir algo más?", key: "additional_notes" }
+];
+
+/* ---------------------------------------------------------
+   KOREAN QUESTIONS
+--------------------------------------------------------- */
+const questions_ko = [
+  { text: "성함이 어떻게 되시나요?", key: "patient_name" },
+  { text: "생년월일이 어떻게 되시나요?", key: "patient_date_of_birth" },
+  { text: "오늘 수면 평가를 받으러 오신 이유는 무엇인가요?", key: "chief_complaint" },
+  { text: "이 문제가 얼마나 오래되었나요?", key: "duration_of_problem" },
+  { text: "코를 크게 고시나요?", key: "snoring" },
+  { text: "잠자는 동안 숨이 멈추는 증상이 있나요?", key: "apnea_events" },
+  { text: "낮 동안 피곤함을 느끼시나요?", key: "daytime_sleepiness" },
+  { text: "잠드는 데 어려움이 있나요?", key: "insomnia" },
+  { text: "밤에 자주 깨시나요?", key: "nighttime_awakenings" },
+  { text: "보통 몇 시에 잠자리에 드시나요?", key: "bedtime" },
+  { text: "보통 몇 시에 일어나시나요?", key: "wake_time" },
+  { text: "낮잠을 자시나요?", key: "naps" },
+  { text: "카페인을 섭취하시나요? 얼마나 드시나요?", key: "caffeine_use" },
+  { text: "술을 드시나요? 얼마나 자주 드시나요?", key: "alcohol_use" },
+  { text: "복용 중인 약이 있나요?", key: "medications" },
+  { text: "기저 질환이 있나요?", key: "medical_history" },
+  { text: "알레르기가 있나요?", key: "allergies" },
+  { text: "추가로 말씀하실 내용이 있나요?", key: "additional_notes" }
 ];
 
 /* ---------------------------------------------------------
    EXPORT FUNCTION
 --------------------------------------------------------- */
-export function getQuestionsForLanguage(lang = "en") {
-  return baseQuestions.map(q => ({
-    id: q.id,
-    key: q.key,
-    prompt: q[lang] || q.en,
-    type: q.type
-  }));
+export function getQuestionsForLanguage(language) {
+  if (language === "es") return questions_es;
+  if (language === "ko") return questions_ko;
+  return questions_en;
 }
-// rebuild
-
