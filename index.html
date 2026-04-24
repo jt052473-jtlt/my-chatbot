@@ -1,1 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sleep Intake Assistant</title>
 
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f2f2f7;
+    color: #111;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+.chat-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-right: 1px solid #e5e5ea;
+    height: 100vh;
+}
+.chat-header {
+    padding: 18px 22px;
+    font-size: 20px;
+    font-weight: 600;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e5ea;
+}
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f9f9fb;
+}
+.message {
+    max-width: 75%;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    border-radius: 18px;
+    line-height: 1.4;
+    font-size: 15px;
+}
+.bot {
+    background: #e5e5ea;
+    color: #111;
+    border-bottom-left-radius: 4px;
+}
+.user {
+    background: #007aff;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+}
+.chat-input-area {
+    padding: 14px;
+    display: flex;
+    gap: 10px;
+    background: #ffffff;
+    border-top: 1px solid #e5e5ea;
+}
+.chat-input {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #d1d1d6;
+    font-size: 15px;
+    outline: none;
+}
+.send-btn {
+    padding: 12px 18px;
+    background: #007aff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+}
+.sidebar {
+    width: 360px;
+    background: #ffffff;
+    border-left: 1px solid #e5e5ea;
+    padding: 20px;
+    overflow-y: auto;
+}
+.sidebar h2 {
+    margin-top: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+.json-output {
+    white-space: pre-wrap;
+    background: #f2f2f7;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    border: 1px solid #e5e5ea;
+}
+#micButton {
+    position: fixed;
+    bottom: 110px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #007aff;
+    color: white;
+    border: none;
+    font-size: 26px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: none;
+    z-index: 9999;
+}
+#voiceModeToggle {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: #f2f2f7;
+    color: #111;
+    border: 1px solid #d1d1d6;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 9999;
+}
+</style>
+</head>
+<body>
+
+<section class="chat-section">
+    <div class="chat-header">Sleep Intake Assistant</div>
+
+    <div id="chatMessages" class="chat-messages"></div>
+
+    <div class="chat-input-area">
+        <input id="chatInput" class="chat-input" type="text" placeholder="Type your message..." />
+        <button id="sendBtn" class="send-btn">Send</button>
+    </div>
+</section>
+
+<aside class="sidebar">
+    <h2>Controls</h2>
+
+    <button id="startInterviewBtn" class="send-btn" style="width:100%; margin-bottom:10px;">Start Interview</button>
+    <button id="resetBtn" class="send-btn" style="width:100%; background:#ff3b30;">Reset</button>
+
+    <h2 style="margin-top:30px;">Progress</h2>
+    <div id="progressDisplay" class="json-output">0 / 20</div>
+
+    <h2 style="margin-top:30px;">Structured Output</h2>
+    <pre id="jsonOutput" class="json-output">{}</pre>
+
+    <h2 style="margin-top:30px;">Provider Tools</h2>
+    <button id="downloadPdfBtn" class="send-btn" style="width:100%; background:#34c759;">Download PDF Summary</button>
+
+    <h2 style="margin-top:30px;">STOP‑BANG</h2>
+    <pre id="stopbangBox" class="json-output">Score: 0</pre>
+
+    <h2 style="margin-top:30px;">Epworth Sleepiness Scale</h2>
+    <pre id="epworthBox" class="json-output">Score: 0</pre>
+
+    <h2 style="margin-top:30px;">Extracted Fields</h2>
+    <pre id="extractionBox" class="json-output">{}</pre>
+</aside>
+
+<button id="micButton">🎤</button>
+<button id="voiceModeToggle">Voice Mode: OFF</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const chatMessages = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const startInterviewBtn = document.getElementById("startInterviewBtn");
+const resetBtn = document.getElementById("resetBtn");
+const jsonOutput = document.getElementById("jsonOutput");
+const progressDisplay = document.getElementById("progressDisplay");
+const micButton = document.getElementById("micButton");
+const voiceModeToggle = document.getElementById("voiceModeToggle");
+const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+
+let voiceMode = false;
+let recognition = null;
+let interviewActive = false;
+let currentQuestionIndex = 0;
+
+function addMessage(text, sender = "bot") {
+    const msg = document.createElement("div");
+    msg.classList.add("message", sender);
+    msg.textContent = text;
+    chatMessages.appendChild(msg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function updateProgress() {
+    const total = interviewQuestions.length;
+    const current = Math.min(currentQuestionIndex, total);
+    progressDisplay.textContent = `${current} / ${total}`;
+}
+
+async function sendMessageToBackend(message) {
+    try {
+        const response = await fetch("https://mychatbot-backend.onrender.com/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                session_id: "frontend-session",
+                user_message: message
+            })
+        });
+
+        const data = await response.json();
+        if (data.reply) addMessage(data.reply, "bot");
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+        addMessage("⚠️ Error contacting backend.", "bot");
+    }
+}
+const interviewQuestions = [
+    "What is your full name?",
+    "What is your date of birth?",
+    "What brings you in for a sleep evaluation?",
+    "Do you snore loudly?",
+    "Has anyone observed you stop breathing during sleep?",
+    "Do you feel excessively sleepy during the day?",
+    "Do you have trouble falling or staying asleep?",
+    "Do you take any medications?",
+    "Do you have any medical conditions?",
+    "What is your occupation?",
+    "What time do you usually go to bed?",
+    "What time do you usually wake up?",
+    "How many hours of sleep do you get on average?",
+    "Do you consume caffeine? If so, how much?",
+    "Do you consume alcohol? If so, how often?",
+    "Do you take naps during the day?",
+    "Do you wake up feeling refreshed?",
+    "Do you have restless legs or leg movements at night?",
+    "Do you grind your teeth or clench your jaw?",
+    "Anything else you want your sleep provider to know?"
+];
+
+function askNextQuestion() {
+    if (!interviewActive) return;
+
+    if (currentQuestionIndex >= interviewQuestions.length) {
+        finishInterview();
+        return;
+    }
+
+    const question = interviewQuestions[currentQuestionIndex];
+    addMessage(question, "bot");
+
+    if (voiceMode && recognition) {
+        setTimeout(() => recognition.start(), 600);
+    }
+}
+
+async function handleInterviewResponse(userText) {
+    updateStopBangScore(userText);
+    updateEpworthScore(userText);
+    updateExtraction(userText);
+
+    await sendMessageToBackend(userText);
+
+    currentQuestionIndex++;
+    updateProgress();
+
+    askNextQuestion();
+}
+
+function finishInterview() {
+    interviewActive = false;
+    addMessage("Thank you. Your sleep intake interview is complete.", "bot");
+}
+
+let stopbang = {
+    Snoring: 0,
+    Tired: 0,
+    ObservedApneas: 0,
+    BloodPressure: 0,
+    BMI: 0,
+    Age: 0,
+    Neck: 0,
+    Gender: 0,
+    Total: 0
+};
+
+function updateStopBangScore(userText) {
+    const t = userText.toLowerCase();
+
+    if (t.includes("snore") || t.includes("loud")) stopbang.Snoring = 1;
+    if (t.includes("tired") || t.includes("sleepy")) stopbang.Tired = 1;
+    if (t.includes("stop breathing") || t.includes("apnea")) stopbang.ObservedApneas = 1;
+    if (t.includes("blood pressure") || t.includes("hypertension")) stopbang.BloodPressure = 1;
+    if (t.includes("bmi") && parseFloat(t.replace(/[^0-9.]/g, "")) > 35) stopbang.BMI = 1;
+    if (t.includes("age") && parseInt(t.replace(/[^0-9]/g, "")) > 50) stopbang.Age = 1;
+    if (t.includes("neck") && parseInt(t.replace(/[^0-9]/g, "")) > 40) stopbang.Neck = 1;
+    if (t.includes("male") || t.includes("man")) stopbang.Gender = 1;
+
+    stopbang.Total =
+        stopbang.Snoring +
+        stopbang.Tired +
+        stopbang.ObservedApneas +
+        stopbang.BloodPressure +
+        stopbang.BMI +
+        stopbang.Age +
+        stopbang.Neck +
+        stopbang.Gender;
+
+    renderStopBang();
+}
+
+function renderStopBang() {
+    const box = document.getElementById("stopbangBox");
+    if (!box) return;
+
+    box.textContent = `
+STOP‑BANG Score: ${stopbang.Total}
+
+Snoring: ${stopbang.Snoring}
+Tired: ${stopbang.Tired}
+Observed Apneas: ${stopbang.ObservedApneas}
+Blood Pressure: ${stopbang.BloodPressure}
+BMI > 35: ${stopbang.BMI}
+Age > 50: ${stopbang.Age}
+Neck > 40cm: ${stopbang.Neck}
+Male Gender: ${stopbang.Gender}
+    `;
+}
+
+let epworth = {
+    SittingReading: 0,
+    WatchingTV: 0,
+    SittingInactive: 0,
+    PassengerCar: 0,
+    LyingDownAfternoon: 0,
+    TalkingToSomeone: 0,
+    SittingAfterLunch: 0,
+    InTraffic: 0,
+    Total: 0
+};
+
+function updateEpworthScore(userText) {
+    const t = userText.toLowerCase();
+
+    if (t.includes("sleepy") || t.includes("tired") || t.includes("doze")) {
+        epworth.SittingReading = 1;
+        epworth.WatchingTV = 1;
+        epworth.SittingInactive = 1;
+        epworth.PassengerCar = 1;
+        epworth.LyingDownAfternoon = 1;
+        epworth.TalkingToSomeone = 1;
+        epworth.SittingAfterLunch = 1;
+        epworth.InTraffic = 1;
+    }
+
+    epworth.Total =
+        epworth.SittingReading +
+        epworth.WatchingTV +
+        epworth.SittingInactive +
+        epworth.PassengerCar +
+        epworth.LyingDownAfternoon +
+        epworth.TalkingToSomeone +
+        epworth.SittingAfterLunch +
+        epworth.InTraffic;
+
+    renderEpworth();
+}
+
+function renderEpworth() {
+    const box = document.getElementById("epworthBox");
+    if (!box) return;
+
+    box.textContent = `
+Epworth Sleepiness Score: ${epworth.Total}
+
+Sitting & Reading: ${epworth.SittingReading}
+Watching TV: ${epworth.WatchingTV}
+Sitting Inactive: ${epworth.SittingInactive}
+Passenger in Car: ${epworth.PassengerCar}
+Lying Down Afternoon: ${epworth.LyingDownAfternoon}
+Talking to Someone: ${epworth.TalkingToSomeone}
+Sitting After Lunch: ${epworth.SittingAfterLunch}
+Stopped in Traffic: ${epworth.InTraffic}
+    `;
+}
+
+let extracted = {
+    name: "",
+    dob: "",
+    chiefComplaint: "",
+    snoring: "",
+    apneas: "",
+    insomnia: "",
+    medications: "",
+    medicalHistory: "",
+    bedtime: "",
+    waketime: "",
+    caffeine: "",
+    alcohol: "",
+    naps: "",
+    rls: "",
+    bruxism: "",
+    other: ""
+};
+
+function updateExtraction(userText) {
+    const t = userText.toLowerCase();
+
+    if (t.includes("name is")) extracted.name = userText;
+    if (t.includes("born") || t.includes("dob")) extracted.dob = userText;
+    if (t.includes("because") || t.includes("here for")) extracted.chiefComplaint = userText;
+    if (t.includes("snor")) extracted.snoring = userText;
+    if (t.includes("apnea") || t.includes("stop breathing")) extracted.apneas = userText;
+    if (t.includes("insomnia") || t.includes("can't sleep")) extracted.insomnia = userText;
+    if (t.includes("medication") || t.includes("take")) extracted.medications = userText;
+    if (t.includes("history") || t.includes("condition")) extracted.medicalHistory = userText;
+    if (t.includes("bed") || t.includes("sleep at")) extracted.bedtime = userText;
+    if (t.includes("wake")) extracted.waketime = userText;
+    if (t.includes("caffeine") || t.includes("coffee")) extracted.caffeine = userText;
+    if (t.includes("alcohol") || t.includes("drink")) extracted.alcohol = userText;
+    if (t.includes("nap")) extracted.naps = userText;
+    if (t.includes("restless") || t.includes("legs")) extracted.rls = userText;
+    if (t.includes("grind") || t.includes("clench")) extracted.bruxism = userText;
+    else extracted.other = userText;
+
+    renderExtraction();
+}
+
+function renderExtraction() {
+    const box = document.getElementById("extractionBox");
+    if (!box) return;
+
+    box.textContent = JSON.stringify(extracted, null, 2);
+}
+function initSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        addMessage("Speech recognition not supported on this device.", "bot");
+        return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        addMessage(transcript, "user");
+
+        if (interviewActive) {
+            handleInterviewResponse(transcript);
+        } else {
+            sendMessageToBackend(transcript);
+        }
+    };
+
+    recognition.onerror = () => {
+        addMessage("Voice input error.", "bot");
+    };
+}
+
+micButton.addEventListener("click", () => {
+    if (!recognition) initSpeechRecognition();
+    recognition.start();
+});
+
+voiceModeToggle.addEventListener("click", () => {
+    voiceMode = !voiceMode;
+    voiceModeToggle.textContent = voiceMode ? "Voice Mode: ON" : "Voice Mode: OFF";
+});
+
+startInterviewBtn.addEventListener("click", () => {
+    interviewActive = true;
+    currentQuestionIndex = 0;
+
+    micButton.style.display = "block";
+    voiceModeToggle.style.display = "block";
+
+    addMessage("Starting your sleep intake interview now.", "bot");
+
+    updateProgress();
+    askNextQuestion();
+});
+
+resetBtn.addEventListener("click", () => {
+    interviewActive = false;
+
+    chatMessages.innerHTML = "";
+    jsonOutput.textContent = "{}";
+    progressDisplay.textContent = "0 / 20";
+
+    micButton.style.display = "none";
+    voiceModeToggle.style.display = "none";
+
+    addMessage("Interview reset.", "bot");
+
+    stopbang = {
+        Snoring: 0,
+        Tired: 0,
+        ObservedApneas: 0,
+        BloodPressure: 0,
+        BMI: 0,
+        Age: 0,
+        Neck: 0,
+        Gender: 0,
+        Total: 0
+    };
+
+    epworth = {
+        SittingReading: 0,
+        WatchingTV: 0,
+        SittingInactive: 0,
+        PassengerCar: 0,
+        LyingDownAfternoon: 0,
+        TalkingToSomeone: 0,
+        SittingAfterLunch: 0,
+        InTraffic: 0,
+        Total: 0
+    };
+
+    extracted = {
+        name: "",
+        dob: "",
+        chiefComplaint: "",
+        snoring: "",
+        apneas: "",
+        insomnia: "",
+        medications: "",
+        medicalHistory: "",
+        bedtime: "",
+        waketime: "",
+        caffeine: "",
+        alcohol: "",
+        naps: "",
+        rls: "",
+        bruxism: "",
+        other: ""
+    };
+
+    renderStopBang();
+    renderEpworth();
+    renderExtraction();
+});
+
+function buildProviderSummaryText() {
+    return `
+Sleep Intake Summary
+--------------------
+
+Raw Backend JSON:
+${jsonOutput.textContent}
+    `;
+}
+
+downloadPdfBtn.addEventListener("click", () => {
+    const summary = buildProviderSummaryText();
+    const pdf = new jspdf.jsPDF({ unit: "pt", format: "letter" });
+    const lines = pdf.splitTextToSize(summary, 540);
+    pdf.text(lines, 40, 40);
+    pdf.save("Sleep-Intake-Summary.pdf");
+});
+
+</script>
+</body>
+</html>
