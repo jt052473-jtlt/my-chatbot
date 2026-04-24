@@ -331,7 +331,8 @@
         addMessage("user", text);
 
         try {
-            const response = await fetch("https://mychatbot-backend.onrender.com/chat", {
+            const response = await fetch("https://mychatbot-backend-c2yu.onrender.com/chat", {
+
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: text })
