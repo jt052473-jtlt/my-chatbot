@@ -419,4 +419,92 @@
 
   function resumeIntake() {
     const saved = loadSession();
-    if (!saved
+    if (!saved) return;
+
+    currentLanguage = saved.language;
+    voiceMode = saved.voiceMode;
+
+    flow = new InterviewFlow(currentLanguage, saved.packetData, saved.currentIndex);
+    sessionActive = true;
+
+    startScreen.style.display = "none";
+    controlsRow.style.display = "flex";
+    progressBarContainer.style.display = "block";
+    inputRow.style.display = "flex";
+
+    setInstructionBanner();
+    askNextQuestion();
+  }
+
+  function askNextQuestion() {
+    updateProgress();
+
+    const q = flow.getCurrentQuestion();
+    if (!q) {
+      finishIntake();
+      return;
+    }
+
+    addBubble(q.text, "sam");
+
+    if (voiceMode) {
+      const langCode = currentLanguage === "es" ? "es-US" :
+                       currentLanguage === "ko" ? "ko-KR" : "en-US";
+      speakText(q.text, langCode);
+    }
+  }
+
+  function handleUserAnswer() {
+    const text = answerInput.value.trim();
+    if (!text) return;
+
+    addBubble(text, "user");
+    flow.recordAnswer(text);
+    answerInput.value = "";
+
+    saveSession();
+    flow.next();
+    askNextQuestion();
+  }
+
+  function finishIntake() {
+    sessionActive = false;
+    clearSession();
+
+    const summary = buildHumanSummary(flow.getPacket(), currentLanguage);
+    summaryContainer.textContent = summary;
+    summaryContainer.style.display = "block";
+    readSummaryBtn.style.display = "block";
+
+    inputRow.style.display = "none";
+    controlsRow.style.display = "none";
+  }
+
+  /* ---------------------------------------------------------
+     EVENT LISTENERS
+  --------------------------------------------------------- */
+  startButton.onclick = startNewIntake;
+  resumeButton.onclick = resumeIntake;
+
+  sendBtn.onclick = handleUserAnswer;
+
+  answerInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") handleUserAnswer();
+  });
+
+  finishBtn.onclick = finishIntake;
+
+  bigTextToggle.onclick = () => {
+    document.body.classList.toggle("big-text");
+  };
+
+  readSummaryBtn.onclick = () => {
+    const langCode = currentLanguage === "es" ? "es-US" :
+                     currentLanguage === "ko" ? "ko-KR" : "en-US";
+    speakText(summaryContainer.textContent, langCode);
+  };
+
+</script>
+
+</body>
+</html>
