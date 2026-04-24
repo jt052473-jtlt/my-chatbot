@@ -1,7 +1,7 @@
-// interviewFlow.js
+// interviewFlow2.js
 // Handles question flow, answer saving, and DOB normalization
 
-import { getQuestionsForLanguage } from "./interviewQuestions.js";
+import { getQuestionsForLanguage } from "./interviewQuestions2.js";
 
 /* ---------------------------------------------------------
    NORMALIZE DOB (MM/DD/YYYY)
@@ -38,8 +38,7 @@ export function saveAnswer(key, value, packetData) {
    INTERVIEW FLOW CLASS
 --------------------------------------------------------- */
 export class InterviewFlow {
-  constructor(mode = "full", language = "en", existingPacket = null, existingIndex = 0) {
-    this.mode = mode;
+  constructor(language = "en", existingPacket = null, existingIndex = 0) {
     this.language = language;
 
     // Load questions in selected language
@@ -50,7 +49,6 @@ export class InterviewFlow {
     this.packetData = existingPacket || {};
 
     // Store metadata
-    this.packetData.mode = mode;
     this.packetData.language = language;
   }
 
@@ -64,7 +62,7 @@ export class InterviewFlow {
   /* ---------------------------------------------------------
      SAVE ANSWER + MOVE TO NEXT
   --------------------------------------------------------- */
-  answerCurrentQuestion(value) {
+  recordAnswer(value) {
     const question = this.getCurrentQuestion();
 
     if (question && question.key) {
@@ -97,5 +95,9 @@ export class InterviewFlow {
 
   getCurrentIndex() {
     return this.currentIndex;
+  }
+
+  next() {
+    this.currentIndex++;
   }
 }
