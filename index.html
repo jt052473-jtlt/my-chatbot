@@ -738,3 +738,54 @@
     interviewPaused = false;
     const endText = {
       en: "Interview ended early. Thank you.",
+es: "La entrevista se ha terminado antes de tiempo. Gracias.",
+ko: "문진이 조기에 종료되었습니다. 감사합니다."
+}[currentLanguage];
+
+addMessage(endText, "bot");
+speak(endText);
+});
+
+languageSelect.addEventListener("change", () => {
+  currentLanguage = languageSelect.value;
+  interviewQuestions = questions[currentLanguage];
+  currentQuestionIndex = 0;
+  updateProgress();
+
+  const langText = {
+    en: "Language set to English.",
+    es: "El idioma se ha configurado en español.",
+    ko: "언어가 한국어로 설정되었습니다."
+  }[currentLanguage];
+
+  addMessage(langText, "bot");
+  speak(langText);
+});
+
+function buildProviderSummaryText() {
+  return `
+Sleep Intake Summary
+--------------------
+
+Language: ${currentLanguage.toUpperCase()}
+Progress: ${progressDisplay.textContent}
+
+(This summary can be expanded later with structured fields.)
+  `;
+}
+
+downloadPdfBtn.addEventListener("click", () => {
+  const summary = buildProviderSummaryText();
+  const pdf = new jspdf.jsPDF({ unit: "pt", format: "letter" });
+  const lines = pdf.splitTextToSize(summary, 540);
+  pdf.text(lines, 40, 40);
+  pdf.save("Sleep-Intake-Summary.pdf");
+});
+
+window.speechSynthesis.onvoiceschanged = () => {
+  // preload voices
+};
+</script>
+
+</body>
+</html>
