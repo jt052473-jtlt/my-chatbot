@@ -1,1 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Intake Assistant</title>
+
+    <!-- Google Material Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Roboto", sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: 260px;
+            background: #ffffff;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        /* Material Buttons (compact) */
+        .btn {
+            display: block;
+            width: 180px;
+            margin: 8px auto;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+
+        /* Filled (Primary) */
+        .btn-primary {
+            background: #1976d2;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .btn-primary:hover {
+            background: #0f5ba8;
+        }
+
+        /* Tonal (Secondary) */
+        .btn-tonal {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+        .btn-tonal:hover {
+            background: #d0e7fa;
+        }
+
+        /* Outlined (Low risk) */
+        .btn-outlined {
+            background: white;
+            border: 1px solid #999;
+            color: #444;
+        }
+        .btn-outlined:hover {
+            background: #f0f0f0;
+        }
+
+        /* Top Bar */
+        #topBar {
+            width: calc(100% - 260px);
+            padding: 15px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        select, input[type="checkbox"] {
+            transform: scale(1.1);
+        }
+
+        /* Chat Area */
+        #chatContainer {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chatBox {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .msg {
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            max-width: 70%;
+            line-height: 1.4;
+        }
+
+        .bot {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .user {
+            background: #c8e6c9;
+            color: #1b5e20;
+            margin-left: auto;
+        }
+
+        /* Mic FAB */
+        #micButton {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: #9e9e9e;
+            color: white;
+            font-size: 26px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+
+        #micButton.active {
+            background: #1976d2;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR (LEFT) -->
+    <div id="sidebar">
+
+        <div class="section-title">Interview Controls</div>
+        <button id="startBtn" class="btn btn-primary">Start Interview</button>
+        <button id="pauseBtn" class="btn btn-tonal">Pause</button>
+        <button id="finishBtn" class="btn btn-primary">Finish Interview</button>
+
+        <div class="section-title">System</div>
+        <button id="resetBtn" class="btn btn-outlined">Reset</button>
+        <div id="progressDisplay" style="text-align:center; margin-top:10px; font-size:14px; color:#555;">
+            Progress: 0 / 21
+        </div>
+
+        <div class="section-title">Provider Tools</div>
+        <button id="downloadBtn" class="btn btn-primary">Download PDF Summary</button>
+
+        <div class="section-title">Voice Settings</div>
+        <button id="voiceToggle" class="btn btn-tonal">Voice Mode: OFF</button>
+
+    </div>
+
+    <!-- MAIN AREA -->
+    <div id="chatContainer">
+
+        <!-- TOP BAR -->
+        <div id="topBar">
+            <label><strong>Language:</strong></label>
+            <select id="languageSelect">
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+            </select>
+
+            <label style="display:flex; align-items:center; gap:6px;">
+                <input type="checkbox" id="readAloudToggle">
+                Read questions out loud
+            </label>
+        </div>
+
+        <!-- CHAT WINDOW -->
+        <div id="chatBox"></div>
+
+    </div>
+
+    <!-- MIC BUTTON (FLOATING ACTION BUTTON) -->
+    <button id="micButton">🎤</button>
+<script>
+/* -----------------------------
+   GLOBAL STATE
+------------------------------*/
+let questions = [
+    "What is your full name?",
+    "What is your date of birth?",
+    "What brings you in for a sleep evaluation?",
+    "How long have you been experiencing these symptoms?",
+    "Do you snore loudly?",
+    "Has anyone observed you stop breathing during sleep?",
+    "Do you wake up gasping or choking?",
+    "Do you feel excessively sleepy during the day?",
+    "Do you take naps during the day?",
+    "Do you have trouble falling asleep?",
+    "Do you wake up frequently during the night?",
+    "Do you wake up too early and cannot fall back asleep?",
+    "Do you experience restless legs at night?",
+    "Do you grind your teeth during sleep?",
+    "Do you sleepwalk or talk in your sleep?",
+    "Do you have vivid dreams or nightmares?",
+    "Do you have morning headaches?",
+    "Do you have high blood pressure?",
+    "Do you consume caffeine? If so, how much?",
+    "Do you consume alcohol? If so, how often?",
+    "Do you take any medications or supplements?"
+];
+
+let currentIndex = 0;
+let interviewActive = false;
+let paused = false;
+let voiceMode = false;
+let recognition = null;
+
+/* -----------------------------
+   DOM ELEMENTS
+------------------------------*/
+const chatBox = document.getElementById("chatBox");
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const finishBtn = document.getElementById("finishBtn");
+const resetBtn = document.getElementById("resetBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const progressDisplay = document.getElementById("progressDisplay");
+const voiceToggle = document.getElementById("voiceToggle");
+const micButton = document.getElementById("micButton");
+const readAloudToggle = document.getElementById("readAloudToggle");
+const languageSelect = document.getElementById("languageSelect");
+
+/* -----------------------------
+   CHAT MESSAGE RENDERING
+------------------------------*/
+function addMessage(text, sender = "bot") {
+    const div = document.createElement("div");
+    div.className = "msg " + sender;
+    div.textContent = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+/* -----------------------------
+   PROGRESS UPDATE
+------------------------------*/
+function updateProgress() {
+    progressDisplay.textContent = `Progress: ${currentIndex} / ${questions.length}`;
+}
+
+/* -----------------------------
+   TEXT‑TO‑SPEECH
+------------------------------*/
+function speak(text) {
+    if (!readAloudToggle.checked) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = languageSelect.value === "es" ? "es-ES" :
+                  languageSelect.value === "fr" ? "fr-FR" : "en-US";
+    speechSynthesis.speak(utter);
+}
+
+/* -----------------------------
+   SPEECH‑TO‑TEXT
+------------------------------*/
+function initRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        addMessage(transcript, "user");
+        nextQuestion();
+    };
+
+    recognition.onend = () => {
+        if (voiceMode && interviewActive && !paused) {
+            recognition.start();
+        } else {
+            micButton.classList.remove("active");
+        }
+    };
+}
+/* -----------------------------
+   PDF DOWNLOAD
+------------------------------*/
+downloadBtn.onclick = () => {
+    const text = [...document.querySelectorAll(".msg")]
+        .map(m => (m.classList.contains("bot") ? "Bot: " : "You: ") + m.textContent)
+        .join("\n\n");
+
+    const blob = new Blob([text], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "sleep_intake_summary.txt";
+    link.click();
+};
+
+/* -----------------------------
+   INTERVIEW FLOW
+------------------------------*/
+function nextQuestion() {
+    if (currentIndex >= questions.length) {
+        addMessage("Interview complete.");
+        interviewActive = false;
+        if (recognition) recognition.stop();
+        micButton.classList.remove("active");
+        return;
+    }
+
+    const q = questions[currentIndex];
+    addMessage(q, "bot");
+    speak(q);
+
+    currentIndex++;
+    updateProgress();
+}
+
+/* -----------------------------
+   BUTTON LOGIC
+------------------------------*/
+startBtn.onclick = () => {
+    if (interviewActive) return;
+
+    interviewActive = true;
+    paused = false;
+    currentIndex = 0;
+    chatBox.innerHTML = "";
+    updateProgress();
+    nextQuestion();
+
+    if (voiceMode) {
+        initRecognition();
+        recognition.start();
+        micButton.classList.add("active");
+    }
+};
+
+pauseBtn.onclick = () => {
+    if (!interviewActive) return;
+
+    paused = !paused;
+    pauseBtn.textContent = paused ? "Resume" : "Pause";
+
+    if (!paused && voiceMode && recognition) {
+        recognition.start();
+        micButton.classList.add("active");
+    } else if (paused && recognition) {
+        recognition.stop();
+        micButton.classList.remove("active");
+    }
+};
+
+finishBtn.onclick = () => {
+    addMessage("Interview finished.");
+    interviewActive = false;
+    paused = false;
+
+    if (recognition) recognition.stop();
+    micButton.classList.remove("active");
+};
+
+/* -----------------------------
+   RESET LOGIC
+------------------------------*/
+resetBtn.onclick = () => {
+    interviewActive = false;
+    paused = false;
+    currentIndex = 0;
+    chatBox.innerHTML = "";
+    updateProgress();
+
+    // Reset voice mode
+    voiceMode = false;
+    voiceToggle.textContent = "Voice Mode: OFF";
+
+    if (recognition) recognition.stop();
+    micButton.classList.remove("active");
+};
+
+/* -----------------------------
+   VOICE MODE TOGGLE
+------------------------------*/
+voiceToggle.onclick = () => {
+    voiceMode = !voiceMode;
+    voiceToggle.textContent = voiceMode ? "Voice Mode: ON" : "Voice Mode: OFF";
+
+    if (voiceMode) {
+        initRecognition();
+        recognition.start();
+        micButton.classList.add("active");
+    } else {
+        if (recognition) recognition.stop();
+        micButton.classList.remove("active");
+    }
+};
+
+/* -----------------------------
+   MIC BUTTON (MANUAL LISTEN)
+------------------------------*/
+micButton.onclick = () => {
+    if (!voiceMode) return;
+
+    initRecognition();
+    recognition.start();
+    micButton.classList.add("active");
+};
+</script>
+</html>
 
