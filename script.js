@@ -4,12 +4,68 @@
 
 const micButton = document.getElementById("micButton");
 const languageSelect = document.getElementById("languageSelect");
+const languageSearch = document.getElementById("languageSearch");
 const readAloudToggle = document.getElementById("readAloudToggle");
 const voiceModeToggle = document.getElementById("voiceModeToggle");
 const chat = document.getElementById("chat");
 const textInput = document.getElementById("textInput");
 const progressBar = document.getElementById("progressBar");
 const printBtn = document.getElementById("printBtn");
+
+/* -----------------------------
+   GEORGIA LANGUAGE LIST
+------------------------------*/
+
+const georgiaLanguages = [
+    { code: "en-US", name: "English" },
+    { code: "es-US", name: "Spanish" },
+    { code: "ko-KR", name: "Korean" },
+    { code: "vi-VN", name: "Vietnamese" },
+    { code: "zh-CN", name: "Chinese (Mandarin)" },
+    { code: "hi-IN", name: "Hindi" },
+    { code: "gu-IN", name: "Gujarati" },
+    { code: "ar-SA", name: "Arabic" },
+    { code: "fr-FR", name: "French" },
+    { code: "pt-BR", name: "Portuguese" },
+    { code: "ru-RU", name: "Russian" },
+    { code: "tl-PH", name: "Tagalog (Filipino)" },
+    { code: "am-ET", name: "Amharic" },
+    { code: "yo-NG", name: "Yoruba" },
+    { code: "de-DE", name: "German" },
+    { code: "sw-KE", name: "Swahili" },
+    { code: "ja-JP", name: "Japanese" },
+    { code: "fa-IR", name: "Persian (Farsi)" },
+    { code: "tr-TR", name: "Turkish" },
+    { code: "th-TH", name: "Thai" }
+];
+
+/* -----------------------------
+   POPULATE DROPDOWN
+------------------------------*/
+
+function populateLanguageDropdown(list) {
+    languageSelect.innerHTML = "";
+    list.forEach(lang => {
+        const option = document.createElement("option");
+        option.value = lang.code;
+        option.textContent = lang.name;
+        languageSelect.appendChild(option);
+    });
+}
+
+populateLanguageDropdown(georgiaLanguages);
+
+/* -----------------------------
+   SEARCH FILTER
+------------------------------*/
+
+languageSearch.addEventListener("input", () => {
+    const query = languageSearch.value.toLowerCase();
+    const filtered = georgiaLanguages.filter(lang =>
+        lang.name.toLowerCase().includes(query)
+    );
+    populateLanguageDropdown(filtered);
+});
 
 /* -----------------------------
    INTERVIEW QUESTIONS
@@ -35,8 +91,22 @@ let interviewActive = false;
 let paused = false;
 let lastQuestion = "";
 
+let originalResponses = [];
+let translatedResponses = [];
+
 /* -----------------------------
-   PROGRESS BAR LOGIC
+   FREE TRANSLATION FUNCTION
+------------------------------*/
+
+async function translateText(text, targetLang) {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    return data[0][0][0];
+}
+
+/* -----------------------------
+   PROGRESS BAR
 ------------------------------*/
 
 function updateProgressBar() {
@@ -45,9 +115,8 @@ function updateProgressBar() {
     const percent = (answered / total) * 100;
     progressBar.style.width = `${percent}%`;
 
-    // White → Dark Blue
-    const startColor = { r: 255, g: 255, b: 255 };   // white
-    const endColor = { r: 0, g: 80, b: 200 };        // darker blue
+    const startColor = { r: 255, g: 255, b: 255 };
+    const endColor = { r: 0, g: 80, b: 200 };
 
     const t = answered / total;
     const r = Math.round(startColor.r + (endColor.r - startColor.r) * t);
@@ -69,7 +138,7 @@ function addMessage(text, sender) {
     chat.scrollTop = chat.scrollHeight;
 }
 
-function askQuestion() {
+async function askQuestion() {
     if (currentIndex >= questions.length) {
         addMessage("Interview complete. Thank you.", "bot");
         interviewActive = false;
@@ -77,9 +146,13 @@ function askQuestion() {
         showPrintButton();
         return;
     }
+
     lastQuestion = questions[currentIndex];
-    addMessage(lastQuestion, "bot");
-    speak(lastQuestion);
+
+    const translated = await translateText(lastQuestion, languageSelect.value);
+    addMessage(translated, "bot");
+    speak(translated);
+
     updateProgressBar();
 }
 
@@ -92,6 +165,8 @@ document.getElementById("startBtn").onclick = () => {
     paused = false;
     currentIndex = 0;
     chat.innerHTML = "";
+    originalResponses = [];
+    translatedResponses = [];
     hidePrintButton();
     addMessage("Interview started.", "bot");
     updateProgressBar();
@@ -103,10 +178,6 @@ document.getElementById("pauseBtn").onclick = () => {
     paused = !paused;
     addMessage(paused ? "Interview paused." : "Interview resumed.", "bot");
 };
-
-/* -----------------------------
-   FINISH BUTTON WITH CONFIRMATION
-------------------------------*/
 
 document.getElementById("finishBtn").onclick = () => {
     if (!interviewActive) return;
@@ -120,10 +191,8 @@ document.getElementById("finishBtn").onclick = () => {
         showPrintButton();
     } else {
         addMessage("Returning to the last question.", "bot");
-        if (lastQuestion) {
-            addMessage(lastQuestion, "bot");
-            speak(lastQuestion);
-        }
+        addMessage(lastQuestion, "bot");
+        speak(lastQuestion);
     }
 };
 
@@ -132,6 +201,8 @@ document.getElementById("resetBtn").onclick = () => {
     paused = false;
     currentIndex = 0;
     chat.innerHTML = "";
+    originalResponses = [];
+    translatedResponses = [];
     hidePrintButton();
     addMessage("Interview reset.", "bot");
     updateProgressBar();
@@ -155,11 +226,17 @@ textInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendText();
 });
 
-function sendText() {
+async function sendText() {
     const text = textInput.value.trim();
     if (!text) return;
+
     addMessage(text, "user");
     textInput.value = "";
+
+    const english = await translateText(text, "en");
+    originalResponses.push(text);
+    translatedResponses.push(english);
+
     if (interviewActive && !paused) {
         currentIndex++;
         askQuestion();
@@ -179,7 +256,15 @@ function hidePrintButton() {
 }
 
 printBtn.onclick = () => {
-    window.print();
+    let summary = "=== Sleep Intake Summary ===\n\n";
+
+    translatedResponses.forEach((resp, i) => {
+        summary += `Q${i + 1}: ${questions[i]}\n`;
+        summary += `Answer (English): ${resp}\n`;
+        summary += `Original: ${originalResponses[i]}\n\n`;
+    });
+
+    alert(summary);
 };
 
 /* -----------------------------
@@ -215,17 +300,17 @@ function initRecognition() {
     recognition.interimResults = false;
     recognition.lang = languageSelect.value;
 
-    recognition.onstart = () => {
-        micButton.classList.add("active");
-    };
+    recognition.onstart = () => micButton.classList.add("active");
+    recognition.onspeechend = () => startSilenceCountdown();
 
-    recognition.onspeechend = () => {
-        startSilenceCountdown();
-    };
-
-    recognition.onresult = (event) => {
+    recognition.onresult = async (event) => {
         const transcript = event.results[0][0].transcript;
         addMessage(transcript, "user");
+
+        const english = await translateText(transcript, "en");
+        originalResponses.push(transcript);
+        translatedResponses.push(english);
+
         if (interviewActive && !paused) {
             currentIndex++;
             askQuestion();
@@ -253,7 +338,7 @@ function startSilenceCountdown() {
 }
 
 /* -----------------------------
-   MIC TOGGLE BEHAVIOR
+   MIC TOGGLE
 ------------------------------*/
 
 micButton.onclick = () => {
@@ -274,6 +359,16 @@ micButton.onclick = () => {
 
 languageSelect.onchange = () => {
     if (recognition) recognition.lang = languageSelect.value;
+
+    speechSynthesis.cancel();
+    setTimeout(() => {
+        const testVoice = getSoftFemaleVoice(languageSelect.value);
+        const utter = new SpeechSynthesisUtterance("Language updated.");
+        utter.lang = languageSelect.value;
+        utter.voice = testVoice;
+        utter.rate = 0.95;
+        if (readAloudToggle.checked) speechSynthesis.speak(utter);
+    }, 200);
 };
 
 voiceModeToggle.onchange = () => {
@@ -290,7 +385,7 @@ voiceModeToggle.onchange = () => {
 };
 
 /* -----------------------------
-   INITIALIZE
+   INIT
 ------------------------------*/
 
 updateProgressBar();
