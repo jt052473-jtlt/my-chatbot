@@ -1,249 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sleep Intake Assistant</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sleep Intake Assistant</title>
 
-    <style>
-        :root {
-            --bg: #ffffff;
-            --panel: #f7f7f7;
-            --border: #dcdcdc;
-            --text: #222;
-            --accent: #1976d2;
-            --accent-dark: #0f5ba8;
-            --gray: #9e9e9e;
-            --chat-bg: #fafafa;
-        }
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f2f2f7;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 30px;
+    }
 
-        body {
-            margin: 0;
-            padding: 0;
-            background: var(--bg);
-            font-family: Arial, sans-serif;
-            color: var(--text);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+    .app-container {
+        width: 95%;
+        max-width: 480px;
+        background: #ffffff;
+        border-radius: 22px;
+        padding: 20px;
+        box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    }
 
-        /* Sidebar */
-        #sidebar {
-            width: 200px;
-            background: var(--panel);
-            border-left: 1px solid var(--border);
-            padding: 15px;
-            box-sizing: border-box;
-            overflow-y: auto;
-        }
+    h2 {
+        text-align: center;
+        margin-top: 0;
+        font-weight: 700;
+        color: #1c1c1e;
+    }
 
-        #sidebar h2 {
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
+    /* Chat Window */
+    #chat {
+        height: 360px;
+        overflow-y: auto;
+        padding: 15px;
+        background: #f8f8fa;
+        border-radius: 16px;
+        margin-bottom: 20px;
+    }
 
-        .voiceSelect {
-            width: 100%;
-            padding: 6px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 13px;
-        }
+    .message {
+        padding: 10px 14px;
+        border-radius: 14px;
+        margin-bottom: 10px;
+        max-width: 80%;
+        line-height: 1.4;
+    }
 
-        .voiceToggle {
-            font-size: 13px;
-            display: block;
-            margin-bottom: 6px;
-        }
+    .bot {
+        background: #e5e5ea;
+        color: #000;
+        align-self: flex-start;
+    }
 
-        /* Buttons */
-        #sidebar button {
-            width: 100%;
-            padding: 8px;
-            margin-top: 6px;
-            border: none;
-            border-radius: 6px;
-            background: var(--accent);
-            color: white;
-            font-size: 13px;
-            cursor: pointer;
-        }
+    .user {
+        background: #007aff;
+        color: white;
+        align-self: flex-end;
+        margin-left: auto;
+    }
 
-        #sidebar button:hover {
-            background: var(--accent-dark);
-        }
+    /* Progress Bar */
+    .progress-container {
+        width: 100%;
+        height: 8px;
+        background: #e5e5ea;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
 
-        /* Chat */
-        #chatContainer {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--chat-bg);
-            border-right: 1px solid var(--border);
-        }
+    #progressBar {
+        height: 8px;
+        width: 0%;
+        background: #34c759;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
 
-        #chat {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
+    /* Controls Card */
+    .controls-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
 
-        .message {
-            margin-bottom: 14px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            max-width: 75%;
-            line-height: 1.4;
-        }
+    .controls-row {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
 
-        .bot {
-            background: #e8f0fe;
-            border-left: 4px solid var(--accent);
-        }
+    button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 14px;
+        background: #f2f2f7;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
 
-        .user {
-            background: #d1ffd6;
-            border-right: 4px solid #2e7d32;
-            margin-left: auto;
-        }
+    button:hover {
+        background: #e5e5ea;
+    }
 
-        /* Mic Button */
-        #micButton {
-            position: fixed;
-            bottom: 80px;
-            right: 220px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--gray);
-            color: white;
-            font-size: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.3s ease, box-shadow 0.3s ease;
-        }
+    /* Mic Button */
+    #micButton {
+        width: 60px;
+        height: 60px;
+        background: #ff3b30;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        margin: 0 auto 20px auto;
+        cursor: pointer;
+        transition: 0.2s;
+    }
 
-        #micButton.active {
-            background: var(--accent);
-            box-shadow: 0 0 12px rgba(25,118,210,0.7);
-            animation: pulse 1.4s infinite;
-        }
+    #micButton.active {
+        background: #ff453a;
+        box-shadow: 0 0 12px rgba(255,59,48,0.6);
+    }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 6px rgba(25,118,210,0.6); }
-            50% { box-shadow: 0 0 18px rgba(25,118,210,1); }
-            100% { box-shadow: 0 0 6px rgba(25,118,210,0.6); }
-        }
+    /* Input Row */
+    .input-row {
+        display: flex;
+        gap: 10px;
+    }
 
-        /* Input Bar */
-        #inputBar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 200px;
-            background: var(--bg);
-            border-top: 1px solid var(--border);
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+    #textInput {
+        flex: 1;
+        padding: 12px;
+        border-radius: 14px;
+        border: 1px solid #d1d1d6;
+        font-size: 15px;
+    }
 
-        #textInput {
-            flex: 1;
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 16px;
-        }
+    #sendBtn {
+        background: #007aff;
+        color: white;
+    }
 
-        #sendBtn {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: white;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            cursor: pointer;
-        }
+    /* Settings Row */
+    .settings-row {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
 
-        #sendBtn:hover {
-            background: var(--accent-dark);
-        }
-    </style>
+    select, label {
+        font-size: 14px;
+    }
+</style>
 </head>
 
 <body>
+<div class="app-container">
 
-    <!-- Progress Bar -->
-    <div id="progressBarWrapper">
+    <h2>Sleep Intake Assistant</h2>
+
+    <div class="progress-container">
         <div id="progressBar"></div>
     </div>
 
-    <!-- Chat Container -->
-    <div id="chatContainer">
-        <div id="chat"></div>
-    </div>
+    <div id="chat"></div>
 
-    <!-- Sidebar -->
-    <div id="sidebar">
-
-        <h2>Voice Settings</h2>
-
-        <label style="font-size: 13px; font-weight: bold;">Language</label>
-        <select id="languageSelect" class="voiceSelect">
-            <option value="en-US">English</option>
-            <option value="es-US">Spanish</option>
-            <option value="fr-FR">French</option>
-            <option value="ht-HT">Haitian Creole</option>
-            <option value="pt-BR">Portuguese</option>
-            <option value="vi-VN">Vietnamese</option>
-            <option value="ko-KR">Korean</option>
-            <option value="ru-RU">Russian</option>
-            <option value="ar-SA">Arabic</option>
-        </select>
-
-        <label class="voiceToggle">
-            <input type="checkbox" id="readAloudToggle"> Read questions out loud
-        </label>
-
-        <label class="voiceToggle">
-            <input type="checkbox" id="voiceModeToggle"> Voice Mode
-        </label>
-
-        <hr>
-
-        <h2>Controls</h2>
-        <button id="startBtn">Start Interview</button>
-        <button id="pauseBtn">Pause</button>
-        <button id="finishBtn">Finish</button>
-        <button id="repeatBtn">Repeat Question</button>
-        <button id="skipBtn">Skip Question</button>
-        <button id="resetBtn">Reset Interview</button>
-        <button id="exportBtn">Export PDF</button>
-
-    </div>
-
-    <!-- Mic Button -->
     <div id="micButton">🎤</div>
 
-    <!-- Input Bar -->
-    <div id="inputBar">
-        <input id="textInput" type="text" placeholder="Type your answer here...">
-        <button id="sendBtn">➤</button>
+    <div class="controls-card">
+        <div class="controls-row">
+            <button id="startBtn">▶️ Start</button>
+            <button id="pauseBtn">⏸️ Pause</button>
+            <button id="finishBtn">🛑 Finish</button>
+        </div>
+
+        <div class="controls-row">
+            <button id="repeatBtn">🔁 Repeat</button>
+            <button id="skipBtn">⏭️ Skip</button>
+            <button id="resetBtn">🔄 Reset</button>
+        </div>
     </div>
 
-    <!-- JS -->
-    <script src="script.js"></script>
+    <div class="input-row">
+        <input id="textInput" type="text" placeholder="Type your response...">
+        <button id="sendBtn">📨 Send</button>
+    </div>
 
+    <div class="settings-row">
+        <label>
+            🌐 Language:
+            <select id="languageSelect">
+                <option value="en-US">English (US)</option>
+                <option value="es-ES">Spanish</option>
+                <option value="fr-FR">French</option>
+            </select>
+        </label>
+
+        <label>
+            🔊 Read Aloud
+            <input type="checkbox" id="readAloudToggle">
+        </label>
+
+        <label>
+            🎙️ Voice Mode
+            <input type="checkbox" id="voiceModeToggle">
+        </label>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
-
