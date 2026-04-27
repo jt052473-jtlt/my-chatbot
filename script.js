@@ -1,4 +1,16 @@
 /* -----------------------------
+   DOM ELEMENTS
+------------------------------*/
+
+const micButton = document.getElementById("micButton");
+const languageSelect = document.getElementById("languageSelect");
+const readAloudToggle = document.getElementById("readAloudToggle");
+const voiceModeToggle = document.getElementById("voiceModeToggle");
+const chat = document.getElementById("chat");
+const textInput = document.getElementById("textInput");
+const progressBar = document.getElementById("progressBar");
+
+/* -----------------------------
    INTERVIEW QUESTIONS
 ------------------------------*/
 
@@ -27,7 +39,6 @@ let lastQuestion = "";
 ------------------------------*/
 
 function addMessage(text, sender) {
-    const chat = document.getElementById("chat");
     const msg = document.createElement("div");
     msg.className = `message ${sender}`;
     msg.textContent = text;
@@ -37,7 +48,7 @@ function addMessage(text, sender) {
 
 function updateProgressBar() {
     const percent = (currentIndex / questions.length) * 100;
-    document.getElementById("progressBar").style.width = percent + "%";
+    progressBar.style.width = percent + "%";
 }
 
 function askQuestion() {
@@ -60,7 +71,7 @@ document.getElementById("startBtn").onclick = () => {
     interviewActive = true;
     paused = false;
     currentIndex = 0;
-    document.getElementById("chat").innerHTML = "";
+    chat.innerHTML = "";
     askQuestion();
 };
 
@@ -78,7 +89,7 @@ document.getElementById("resetBtn").onclick = () => {
     interviewActive = false;
     paused = false;
     currentIndex = 0;
-    document.getElementById("chat").innerHTML = "";
+    chat.innerHTML = "";
     updateProgressBar();
     addMessage("Interview reset.", "bot");
 };
@@ -93,17 +104,21 @@ document.getElementById("skipBtn").onclick = () => {
     askQuestion();
 };
 
-document.getElementById("sendBtn").onclick = () => {
-    const input = document.getElementById("textInput");
-    const text = input.value.trim();
+document.getElementById("sendBtn").onclick = sendText;
+textInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendText();
+});
+
+function sendText() {
+    const text = textInput.value.trim();
     if (!text) return;
     addMessage(text, "user");
-    input.value = "";
+    textInput.value = "";
     if (interviewActive && !paused) {
         currentIndex++;
         askQuestion();
     }
-};
+}
 
 /* -----------------------------
    VOICE SYSTEM
@@ -114,10 +129,6 @@ let voiceMode = false;
 let silenceTimer = null;
 let silenceCountdown = 20;
 let displayCountdown = 15;
-
-const languageSelect = document.getElementById("languageSelect");
-const readAloudToggle = document.getElementById("readAloudToggle");
-const voiceModeToggle = document.getElementById("voiceModeToggle");
 
 function getSoftFemaleVoice(lang) {
     const voices = speechSynthesis.getVoices();
@@ -203,7 +214,7 @@ function resetSilenceCountdown() {
     micButton.textContent = "🎤 15";
 }
 
-document.getElementById("micButton").onclick = () => {
+micButton.onclick = () => {
     if (!voiceMode) {
         voiceMode = true;
         voiceModeToggle.checked = true;
