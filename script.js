@@ -1,7 +1,6 @@
-/* -----------------------------
+/* ---------------------------------------------------
    DOM ELEMENTS
-------------------------------*/
-
+--------------------------------------------------- */
 const micButton = document.getElementById("micButton");
 const languageSelect = document.getElementById("languageSelect");
 const languageSearch = document.getElementById("languageSearch");
@@ -12,10 +11,9 @@ const textInput = document.getElementById("textInput");
 const progressBar = document.getElementById("progressBar");
 const printBtn = document.getElementById("printBtn");
 
-/* -----------------------------
-   GEORGIA LANGUAGE LIST
-------------------------------*/
-
+/* ---------------------------------------------------
+   GEORGIA LANGUAGE LIST (ALL 20)
+--------------------------------------------------- */
 const georgiaLanguages = [
     { code: "en-US", name: "English" },
     { code: "es-US", name: "Spanish" },
@@ -39,10 +37,9 @@ const georgiaLanguages = [
     { code: "th-TH", name: "Thai" }
 ];
 
-/* -----------------------------
+/* ---------------------------------------------------
    POPULATE DROPDOWN
-------------------------------*/
-
+--------------------------------------------------- */
 function populateLanguageDropdown(list) {
     languageSelect.innerHTML = "";
     list.forEach(lang => {
@@ -52,13 +49,11 @@ function populateLanguageDropdown(list) {
         languageSelect.appendChild(option);
     });
 }
-
 populateLanguageDropdown(georgiaLanguages);
 
-/* -----------------------------
+/* ---------------------------------------------------
    SEARCH FILTER
-------------------------------*/
-
+--------------------------------------------------- */
 languageSearch.addEventListener("input", () => {
     const query = languageSearch.value.toLowerCase();
     const filtered = georgiaLanguages.filter(lang =>
@@ -67,10 +62,9 @@ languageSearch.addEventListener("input", () => {
     populateLanguageDropdown(filtered);
 });
 
-/* -----------------------------
+/* ---------------------------------------------------
    INTERVIEW QUESTIONS
-------------------------------*/
-
+--------------------------------------------------- */
 const questions = [
     "What is your full name?",
     "What is your date of birth?",
@@ -94,21 +88,35 @@ let lastQuestion = "";
 let originalResponses = [];
 let translatedResponses = [];
 
-/* -----------------------------
-   FREE TRANSLATION FUNCTION
-------------------------------*/
+/* ---------------------------------------------------
+   SMART B3 TRANSLATION
+   Detect → English → Selected Language
+--------------------------------------------------- */
+async function translateSmart(text, targetLang) {
+    // Detect language
+    const detectURL = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+    const detectRes = await fetch(detectURL);
+    const detectData = await detectRes.json();
+    const detectedLang = detectData[2];
 
-async function translateText(text, targetLang) {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    return data[0][0][0];
+    // Translate to English
+    const englishURL = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${detectedLang}&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+    const englishRes = await fetch(englishURL);
+    const englishData = await englishRes.json();
+    const english = englishData[0][0][0];
+
+    // Translate to selected language
+    const selectedURL = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${detectedLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const selectedRes = await fetch(selectedURL);
+    const selectedData = await selectedRes.json();
+    const selected = selectedData[0][0][0];
+
+    return { detectedLang, english, selected };
 }
 
-/* -----------------------------
+/* ---------------------------------------------------
    PROGRESS BAR
-------------------------------*/
-
+--------------------------------------------------- */
 function updateProgressBar() {
     const total = questions.length;
     const answered = Math.min(currentIndex, total);
@@ -126,10 +134,9 @@ function updateProgressBar() {
     progressBar.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
 }
 
-/* -----------------------------
+/* ---------------------------------------------------
    CHAT FUNCTIONS
-------------------------------*/
-
+--------------------------------------------------- */
 function addMessage(text, sender) {
     const msg = document.createElement("div");
     msg.className = `message ${sender}`;
@@ -149,17 +156,16 @@ async function askQuestion() {
 
     lastQuestion = questions[currentIndex];
 
-    const translated = await translateText(lastQuestion, languageSelect.value);
-    addMessage(translated, "bot");
-    speak(translated);
+    const translated = await translateSmart(lastQuestion, languageSelect.value);
+    addMessage(translated.selected, "bot");
+    speak(translated.selected);
 
     updateProgressBar();
 }
 
-/* -----------------------------
+/* ---------------------------------------------------
    BUTTON LOGIC
-------------------------------*/
-
+--------------------------------------------------- */
 document.getElementById("startBtn").onclick = () => {
     interviewActive = true;
     paused = false;
@@ -226,6 +232,9 @@ textInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendText();
 });
 
+/* ---------------------------------------------------
+   SEND TEXT (SMART B3 TRANSLATION)
+--------------------------------------------------- */
 async function sendText() {
     const text = textInput.value.trim();
     if (!text) return;
@@ -233,9 +242,13 @@ async function sendText() {
     addMessage(text, "user");
     textInput.value = "";
 
-    const english = await translateText(text, "en");
+    const result = await translateSmart(text, languageSelect.value);
+
     originalResponses.push(text);
-    translatedResponses.push(english);
+    translatedResponses.push({
+        english: result.english,
+        selected: result.selected
+    });
 
     if (interviewActive && !paused) {
         currentIndex++;
@@ -243,10 +256,9 @@ async function sendText() {
     }
 }
 
-/* -----------------------------
+/* ---------------------------------------------------
    PRINT SUMMARY
-------------------------------*/
-
+--------------------------------------------------- */
 function showPrintButton() {
     printBtn.style.display = "block";
 }
@@ -260,17 +272,17 @@ printBtn.onclick = () => {
 
     translatedResponses.forEach((resp, i) => {
         summary += `Q${i + 1}: ${questions[i]}\n`;
-        summary += `Answer (English): ${resp}\n`;
+        summary += `Answer (English): ${resp.english}\n`;
+        summary += `Answer (${languageSelect.options[languageSelect.selectedIndex].text}): ${resp.selected}\n`;
         summary += `Original: ${originalResponses[i]}\n\n`;
     });
 
     alert(summary);
 };
 
-/* -----------------------------
+/* ---------------------------------------------------
    VOICE SYSTEM
-------------------------------*/
-
+--------------------------------------------------- */
 let recognition = null;
 let voiceMode = false;
 let silenceTimer = null;
@@ -307,9 +319,13 @@ function initRecognition() {
         const transcript = event.results[0][0].transcript;
         addMessage(transcript, "user");
 
-        const english = await translateText(transcript, "en");
+        const result = await translateSmart(transcript, languageSelect.value);
+
         originalResponses.push(transcript);
-        translatedResponses.push(english);
+        translatedResponses.push({
+            english: result.english,
+            selected: result.selected
+        });
 
         if (interviewActive && !paused) {
             currentIndex++;
@@ -337,10 +353,9 @@ function startSilenceCountdown() {
     }, 20000);
 }
 
-/* -----------------------------
+/* ---------------------------------------------------
    MIC TOGGLE
-------------------------------*/
-
+--------------------------------------------------- */
 micButton.onclick = () => {
     if (!voiceMode) {
         voiceMode = true;
@@ -384,8 +399,7 @@ voiceModeToggle.onchange = () => {
     }
 };
 
-/* -----------------------------
+/* ---------------------------------------------------
    INIT
-------------------------------*/
-
+--------------------------------------------------- */
 updateProgressBar();
