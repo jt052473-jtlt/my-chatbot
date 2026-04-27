@@ -8,7 +8,6 @@ const readAloudToggle = document.getElementById("readAloudToggle");
 const voiceModeToggle = document.getElementById("voiceModeToggle");
 const chat = document.getElementById("chat");
 const textInput = document.getElementById("textInput");
-const progressBar = document.getElementById("progressBar");
 
 /* -----------------------------
    INTERVIEW QUESTIONS
@@ -46,11 +45,6 @@ function addMessage(text, sender) {
     chat.scrollTop = chat.scrollHeight;
 }
 
-function updateProgressBar() {
-    const percent = (currentIndex / questions.length) * 100;
-    progressBar.style.width = percent + "%";
-}
-
 function askQuestion() {
     if (currentIndex >= questions.length) {
         addMessage("Interview complete. Thank you.", "bot");
@@ -59,7 +53,6 @@ function askQuestion() {
     }
     lastQuestion = questions[currentIndex];
     addMessage(lastQuestion, "bot");
-    updateProgressBar();
     speak(lastQuestion);
 }
 
@@ -90,7 +83,6 @@ document.getElementById("resetBtn").onclick = () => {
     paused = false;
     currentIndex = 0;
     chat.innerHTML = "";
-    updateProgressBar();
     addMessage("Interview reset.", "bot");
 };
 
@@ -128,14 +120,10 @@ let recognition;
 let voiceMode = false;
 let silenceTimer = null;
 let silenceCountdown = 20;
-let displayCountdown = 15;
 
 function getSoftFemaleVoice(lang) {
     const voices = speechSynthesis.getVoices();
-    return voices.find(v =>
-        v.lang === lang &&
-        (v.name.includes("Female") || v.name.includes("Samantha") || v.name.includes("Google"))
-    ) || voices.find(v => v.lang === lang) || voices[0];
+    return voices.find(v => v.lang === lang) || voices[0];
 }
 
 function speak(text) {
@@ -160,16 +148,15 @@ function initRecognition() {
 
     recognition.onstart = () => {
         micButton.classList.add("active");
-        micButton.textContent = "🎤 15";
-        startSilenceCountdown();
     };
 
-    recognition.onspeechstart = () => resetSilenceCountdown();
+    recognition.onspeechend = () => {
+        startSilenceCountdown();
+    };
 
     recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         addMessage(transcript, "user");
-        resetSilenceCountdown();
         if (interviewActive && !paused) {
             currentIndex++;
             askQuestion();
@@ -177,47 +164,24 @@ function initRecognition() {
     };
 
     recognition.onend = () => {
-        clearInterval(silenceTimer);
-        if (voiceMode && interviewActive && !paused) recognition.start();
-        else {
-            micButton.classList.remove("active");
-            micButton.textContent = "🎤";
-        }
+        if (voiceMode) recognition.start();
+        else micButton.classList.remove("active");
     };
 }
 
 function startSilenceCountdown() {
-    clearInterval(silenceTimer);
-    silenceCountdown = 20;
-    displayCountdown = 15;
-
-    silenceTimer = setInterval(() => {
-        silenceCountdown--;
-        if (silenceCountdown <= 15) {
-            micButton.textContent = `🎤 ${displayCountdown}`;
-            displayCountdown--;
-        }
-        if (silenceCountdown <= 0) {
-            clearInterval(silenceTimer);
-            voiceMode = false;
-            micButton.classList.remove("active");
-            micButton.textContent = "🎤";
-            if (recognition) recognition.stop();
-            addMessage("Voice Mode turned off due to inactivity.", "bot");
-        }
-    }, 1000);
-}
-
-function resetSilenceCountdown() {
-    silenceCountdown = 20;
-    displayCountdown = 15;
-    micButton.textContent = "🎤 15";
+    clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(() => {
+        voiceMode = false;
+        micButton.classList.remove("active");
+        recognition.stop();
+        addMessage("Voice Mode turned off due to inactivity.", "bot");
+    }, 20000);
 }
 
 micButton.onclick = () => {
     if (!voiceMode) {
         voiceMode = true;
-        voiceModeToggle.checked = true;
         initRecognition();
         recognition.start();
     }
