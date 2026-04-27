@@ -7,12 +7,10 @@
 
 <style>
     :root {
-        --blue-main: #0050c8; /* darker blue */
+        --blue-main: #0050c8;
     }
 
-    * {
-        box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -33,7 +31,6 @@
         padding: 16px 0;
     }
 
-    /* LEFT PANEL */
     .left-panel {
         flex: 1;
         display: flex;
@@ -41,14 +38,12 @@
         min-width: 0;
     }
 
-    /* Title */
     .header-title {
         font-size: 20px;
         font-weight: 700;
         margin: 0 0 6px 0;
     }
 
-    /* Thin progress bar */
     .progress-container {
         width: 100%;
         height: 4px;
@@ -61,7 +56,7 @@
     .progress-bar {
         height: 100%;
         width: 0%;
-        background: #ffffff; /* starts white */
+        background: #ffffff;
         transition: width 0.25s ease, background-color 0.25s ease;
     }
 
@@ -86,18 +81,10 @@
         font-size: 14px;
     }
 
-    .bot {
-        background: #e5e5ea;
-        color: #000;
-    }
+    .bot { background: #e5e5ea; color: #000; }
+    .user { background: var(--blue-main); color: white; margin-left: auto; }
 
-    .user {
-        background: var(--blue-main);
-        color: white;
-        margin-left: auto;
-    }
-
-    /* Settings row – medium spacing */
+    /* SETTINGS ROW */
     .settings-row {
         display: flex;
         align-items: center;
@@ -107,22 +94,29 @@
         font-size: 13px;
     }
 
-    .settings-row .setting-group {
+    .setting-group {
         display: flex;
         align-items: center;
         gap: 6px;
         white-space: nowrap;
     }
 
-    .settings-row select {
+    select {
         padding: 4px 6px;
         border-radius: 10px;
         border: 1px solid #ccc;
         font-size: 13px;
     }
 
-    .settings-row input[type="checkbox"] {
-        transform: scale(1.1);
+    /* SEARCH BAR */
+    #languageSearch {
+        padding: 6px 10px 6px 28px;
+        border-radius: 14px;
+        border: 1px solid #ccc;
+        font-size: 13px;
+        width: 150px;
+        background: #fff url('data:image/svg+xml;utf8,<svg fill="gray" height="14" viewBox="0 0 24 24" width="14" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>') no-repeat 8px center;
+        background-size: 14px;
     }
 
     .input-row {
@@ -152,11 +146,8 @@
         cursor: pointer;
     }
 
-    #sendBtn:hover {
-        background: #003c96;
-    }
+    #sendBtn:hover { background: #003c96; }
 
-    /* RIGHT PANEL */
     .right-panel {
         width: 180px;
         display: flex;
@@ -176,16 +167,11 @@
         cursor: pointer;
     }
 
-    .control-btn:hover {
-        background: #f2f2f7;
-    }
-
-    /* Mic button */
     #micButton {
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        background: #c7c7cc; /* gray when off */
+        background: #c7c7cc;
         color: white;
         font-size: 26px;
         display: flex;
@@ -201,36 +187,8 @@
         box-shadow: 0 0 12px rgba(0,80,200,0.6);
     }
 
-    /* Print button (hidden until end) */
-    #printBtn {
-        display: none;
-        margin-top: 4px;
-    }
+    #printBtn { display: none; margin-top: 4px; }
 
-    /* Responsive tweaks */
-    @media (max-height: 750px) {
-        #chat {
-            max-height: 340px;
-        }
-        .control-btn {
-            padding: 6px;
-            font-size: 12px;
-        }
-        #micButton {
-            width: 52px;
-            height: 52px;
-            font-size: 22px;
-        }
-    }
-
-    @media (max-width: 800px) {
-        .layout {
-            max-width: 100%;
-        }
-        .right-panel {
-            width: 160px;
-        }
-    }
 </style>
 </head>
 
@@ -238,7 +196,6 @@
 
 <div class="layout">
 
-    <!-- LEFT SIDE -->
     <div class="left-panel">
 
         <h2 class="header-title">Sleep Intake Assistant</h2>
@@ -250,14 +207,13 @@
         <div id="chat"></div>
 
         <div class="settings-row">
+
             <div class="setting-group">
                 <span>🌐 Language:</span>
-                <select id="languageSelect">
-                    <option value="en-US">English (US)</option>
-                    <option value="es-US">Spanish (US)</option>
-                    <option value="ko-KR">Korean</option>
-                </select>
+                <select id="languageSelect"></select>
             </div>
+
+            <input id="languageSearch" type="text" placeholder="Search languages…">
 
             <div class="setting-group">
                 <span>🔊 Read Aloud</span>
@@ -268,26 +224,24 @@
                 <span>🎙️ Voice Mode</span>
                 <input type="checkbox" id="voiceModeToggle">
             </div>
+
         </div>
 
         <div class="input-row">
             <input id="textInput" type="text" placeholder="Type your response...">
             <button id="sendBtn">➤</button>
         </div>
+
     </div>
 
-    <!-- RIGHT SIDE -->
     <div class="right-panel">
         <button class="control-btn" id="startBtn">▶️ Start</button>
         <button class="control-btn" id="pauseBtn">⏸️ Pause</button>
         <button class="control-btn" id="finishBtn">🛑 Finish</button>
-
         <button class="control-btn" id="repeatBtn">🔁 Repeat</button>
         <button class="control-btn" id="skipBtn">⏭️ Skip</button>
         <button class="control-btn" id="resetBtn">🔄 Reset</button>
-
         <div id="micButton">🎤</div>
-
         <button class="control-btn" id="printBtn">🖨️ Print Summary</button>
     </div>
 
