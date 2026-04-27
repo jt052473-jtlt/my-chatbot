@@ -10,8 +10,6 @@
         --blue-main: #0050c8;
     }
 
-    * { box-sizing: border-box; }
-
     body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         background: #f2f2f7;
@@ -35,13 +33,12 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        min-width: 0;
     }
 
     .header-title {
         font-size: 20px;
         font-weight: 700;
-        margin: 0 0 6px 0;
+        margin-bottom: 6px;
     }
 
     .progress-container {
@@ -81,42 +78,45 @@
         font-size: 14px;
     }
 
-    .bot { background: #e5e5ea; color: #000; }
+    .bot { background: #e5e5ea; }
     .user { background: var(--blue-main); color: white; margin-left: auto; }
 
     /* SETTINGS ROW */
     .settings-row {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 8px;
+        gap: 10px;
         flex-wrap: wrap;
+        margin-bottom: 8px;
         font-size: 13px;
     }
 
     .setting-group {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
         white-space: nowrap;
     }
 
-    select {
-        padding: 4px 6px;
+    /* LANGUAGE DROPDOWN — NARROW + SCROLLABLE */
+    #languageSelect {
+        width: 135px;                 /* Narrow enough to fit everything */
+        max-height: 200px;            /* Shows ~10 languages */
+        overflow-y: auto;             /* Scroll for the rest */
         border-radius: 10px;
-        border: 1px solid #ccc;
+        padding: 4px 6px;
         font-size: 13px;
     }
 
-    /* SEARCH BAR */
+    /* SEARCH BAR — SHORTER */
     #languageSearch {
-        padding: 6px 10px 6px 28px;
+        width: 95px;                  /* Shorter to fit on same line */
+        padding: 5px 8px 5px 26px;
         border-radius: 14px;
         border: 1px solid #ccc;
-        font-size: 13px;
-        width: 150px;
-        background: #fff url('data:image/svg+xml;utf8,<svg fill="gray" height="14" viewBox="0 0 24 24" width="14" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>') no-repeat 8px center;
-        background-size: 14px;
+        font-size: 12px;
+        background: #fff url('data:image/svg+xml;utf8,<svg fill="gray" height="12" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>') no-repeat 8px center;
+        background-size: 12px;
     }
 
     .input-row {
@@ -139,14 +139,9 @@
         background: var(--blue-main);
         color: white;
         font-size: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         border: none;
         cursor: pointer;
     }
-
-    #sendBtn:hover { background: #003c96; }
 
     .right-panel {
         width: 180px;
@@ -156,15 +151,14 @@
     }
 
     .control-btn {
-        width: 100%;
         padding: 8px;
-        border: none;
         border-radius: 10px;
         background: #ffffff;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
+        border: none;
     }
 
     #micButton {
@@ -179,7 +173,6 @@
         justify-content: center;
         margin: 10px auto 0 auto;
         cursor: pointer;
-        transition: 0.2s;
     }
 
     #micButton.active {
@@ -187,7 +180,7 @@
         box-shadow: 0 0 12px rgba(0,80,200,0.6);
     }
 
-    #printBtn { display: none; margin-top: 4px; }
+    #printBtn { display: none; }
 
 </style>
 </head>
@@ -206,6 +199,7 @@
 
         <div id="chat"></div>
 
+        <!-- SETTINGS ROW -->
         <div class="settings-row">
 
             <div class="setting-group">
@@ -213,16 +207,16 @@
                 <select id="languageSelect"></select>
             </div>
 
-            <input id="languageSearch" type="text" placeholder="Search languages…">
+            <input id="languageSearch" type="text" placeholder="Search…">
 
             <div class="setting-group">
-                <span>🔊 Read Aloud</span>
-                <input type="checkbox" id="readAloudToggle">
+                <span>🎙️ Voice</span>
+                <input type="checkbox" id="voiceModeToggle">
             </div>
 
             <div class="setting-group">
-                <span>🎙️ Voice Mode</span>
-                <input type="checkbox" id="voiceModeToggle">
+                <span>🔊 Read</span>
+                <input type="checkbox" id="readAloudToggle">
             </div>
 
         </div>
