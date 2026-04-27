@@ -8,6 +8,8 @@ const readAloudToggle = document.getElementById("readAloudToggle");
 const voiceModeToggle = document.getElementById("voiceModeToggle");
 const chat = document.getElementById("chat");
 const textInput = document.getElementById("textInput");
+const progressBar = document.getElementById("progressBar");
+const printBtn = document.getElementById("printBtn");
 
 /* -----------------------------
    INTERVIEW QUESTIONS
@@ -34,6 +36,29 @@ let paused = false;
 let lastQuestion = "";
 
 /* -----------------------------
+   PROGRESS BAR LOGIC
+------------------------------*/
+
+function updateProgressBar() {
+    const total = questions.length;
+    const answered = Math.min(currentIndex, total);
+    const percent = (answered / total) * 100;
+    progressBar.style.width = `${percent}%`;
+
+    // Color: start white, darken to #007AFF
+    // Simple interpolation on lightness
+    const startColor = { r: 255, g: 255, b: 255 };   // white
+    const endColor = { r: 0, g: 122, b: 255 };       // iOS blue
+
+    const t = answered / total;
+    const r = Math.round(startColor.r + (endColor.r - startColor.r) * t);
+    const g = Math.round(startColor.g + (endColor.g - startColor.g) * t);
+    const b = Math.round(startColor.b + (endColor.b - startColor.b) * t);
+
+    progressBar.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+}
+
+/* -----------------------------
    CHAT FUNCTIONS
 ------------------------------*/
 
@@ -49,11 +74,14 @@ function askQuestion() {
     if (currentIndex >= questions.length) {
         addMessage("Interview complete. Thank you.", "bot");
         interviewActive = false;
+        updateProgressBar();
+        showPrintButton();
         return;
     }
     lastQuestion = questions[currentIndex];
     addMessage(lastQuestion, "bot");
     speak(lastQuestion);
+    updateProgressBar();
 }
 
 /* -----------------------------
@@ -65,17 +93,24 @@ document.getElementById("startBtn").onclick = () => {
     paused = false;
     currentIndex = 0;
     chat.innerHTML = "";
+    hidePrintButton();
+    addMessage("Interview started.", "bot");
+    updateProgressBar();
     askQuestion();
 };
 
 document.getElementById("pauseBtn").onclick = () => {
+    if (!interviewActive) return;
     paused = !paused;
     addMessage(paused ? "Interview paused." : "Interview resumed.", "bot");
 };
 
 document.getElementById("finishBtn").onclick = () => {
+    if (!interviewActive) return;
     interviewActive = false;
     addMessage("Interview finished.", "bot");
+    updateProgressBar();
+    showPrintButton();
 };
 
 document.getElementById("resetBtn").onclick = () => {
@@ -83,11 +118,16 @@ document.getElementById("resetBtn").onclick = () => {
     paused = false;
     currentIndex = 0;
     chat.innerHTML = "";
+    hidePrintButton();
     addMessage("Interview reset.", "bot");
+    updateProgressBar();
 };
 
 document.getElementById("repeatBtn").onclick = () => {
-    if (lastQuestion) addMessage(lastQuestion, "bot");
+    if (lastQuestion) {
+        addMessage(lastQuestion, "bot");
+        speak(lastQuestion);
+    }
 };
 
 document.getElementById("skipBtn").onclick = () => {
@@ -113,13 +153,28 @@ function sendText() {
 }
 
 /* -----------------------------
+   PRINT SUMMARY
+------------------------------*/
+
+function showPrintButton() {
+    printBtn.style.display = "block";
+}
+
+function hidePrintButton() {
+    printBtn.style.display = "none";
+}
+
+printBtn.onclick = () => {
+    window.print();
+};
+
+/* -----------------------------
    VOICE SYSTEM
 ------------------------------*/
 
-let recognition;
+let recognition = null;
 let voiceMode = false;
 let silenceTimer = null;
-let silenceCountdown = 20;
 
 function getSoftFemaleVoice(lang) {
     const voices = speechSynthesis.getVoices();
@@ -137,7 +192,7 @@ function speak(text) {
 
 function initRecognition() {
     if (!("webkitSpeechRecognition" in window)) {
-        addMessage("Voice recognition not supported.", "bot");
+        addMessage("Voice recognition not supported in this browser.", "bot");
         return;
     }
 
@@ -164,8 +219,16 @@ function initRecognition() {
     };
 
     recognition.onend = () => {
-        if (voiceMode) recognition.start();
-        else micButton.classList.remove("active");
+        // If voiceMode is still true, auto-restart; otherwise turn mic off
+        if (voiceMode) {
+            try {
+                recognition.start();
+            } catch (e) {
+                // ignore restart errors
+            }
+        } else {
+            micButton.classList.remove("active");
+        }
     };
 }
 
@@ -173,17 +236,37 @@ function startSilenceCountdown() {
     clearTimeout(silenceTimer);
     silenceTimer = setTimeout(() => {
         voiceMode = false;
+        voiceModeToggle.checked = false;
+        if (recognition) recognition.stop();
         micButton.classList.remove("active");
-        recognition.stop();
         addMessage("Voice Mode turned off due to inactivity.", "bot");
     }, 20000);
 }
 
+/* -----------------------------
+   MIC TOGGLE BEHAVIOR
+------------------------------*/
+
 micButton.onclick = () => {
+    // Toggle mic on/off
     if (!voiceMode) {
+        // Turn ON
         voiceMode = true;
-        initRecognition();
-        recognition.start();
+        voiceModeToggle.checked = true;
+        if (!recognition) initRecognition();
+        try {
+            recognition.start();
+        } catch (e) {
+            // ignore if already started
+        }
+        micButton.classList.add("active");
+    } else {
+        // Turn OFF
+        voiceMode = false;
+        voiceModeToggle.checked = false;
+        clearTimeout(silenceTimer);
+        if (recognition) recognition.stop();
+        micButton.classList.remove("active");
     }
 };
 
@@ -192,6 +275,23 @@ languageSelect.onchange = () => {
 };
 
 voiceModeToggle.onchange = () => {
+    // Keep toggle and internal state in sync
     voiceMode = voiceModeToggle.checked;
-    if (!voiceMode && recognition) recognition.stop();
+    if (!voiceMode) {
+        clearTimeout(silenceTimer);
+        if (recognition) recognition.stop();
+        micButton.classList.remove("active");
+    } else {
+        if (!recognition) initRecognition();
+        try {
+            recognition.start();
+        } catch (e) {}
+        micButton.classList.add("active");
+    }
 };
+
+/* -----------------------------
+   INITIALIZE
+------------------------------*/
+
+updateProgressBar();
