@@ -45,10 +45,9 @@ function updateProgressBar() {
     const percent = (answered / total) * 100;
     progressBar.style.width = `${percent}%`;
 
-    // Color: start white, darken to #007AFF
-    // Simple interpolation on lightness
+    // White → Dark Blue
     const startColor = { r: 255, g: 255, b: 255 };   // white
-    const endColor = { r: 0, g: 122, b: 255 };       // iOS blue
+    const endColor = { r: 0, g: 80, b: 200 };        // darker blue
 
     const t = answered / total;
     const r = Math.round(startColor.r + (endColor.r - startColor.r) * t);
@@ -105,12 +104,27 @@ document.getElementById("pauseBtn").onclick = () => {
     addMessage(paused ? "Interview paused." : "Interview resumed.", "bot");
 };
 
+/* -----------------------------
+   FINISH BUTTON WITH CONFIRMATION
+------------------------------*/
+
 document.getElementById("finishBtn").onclick = () => {
     if (!interviewActive) return;
-    interviewActive = false;
-    addMessage("Interview finished.", "bot");
-    updateProgressBar();
-    showPrintButton();
+
+    const confirmFinish = confirm("Are you sure you want to finish the interview?");
+
+    if (confirmFinish) {
+        interviewActive = false;
+        addMessage("Interview finished.", "bot");
+        updateProgressBar();
+        showPrintButton();
+    } else {
+        addMessage("Returning to the last question.", "bot");
+        if (lastQuestion) {
+            addMessage(lastQuestion, "bot");
+            speak(lastQuestion);
+        }
+    }
 };
 
 document.getElementById("resetBtn").onclick = () => {
@@ -219,13 +233,8 @@ function initRecognition() {
     };
 
     recognition.onend = () => {
-        // If voiceMode is still true, auto-restart; otherwise turn mic off
         if (voiceMode) {
-            try {
-                recognition.start();
-            } catch (e) {
-                // ignore restart errors
-            }
+            try { recognition.start(); } catch (e) {}
         } else {
             micButton.classList.remove("active");
         }
@@ -248,20 +257,13 @@ function startSilenceCountdown() {
 ------------------------------*/
 
 micButton.onclick = () => {
-    // Toggle mic on/off
     if (!voiceMode) {
-        // Turn ON
         voiceMode = true;
         voiceModeToggle.checked = true;
         if (!recognition) initRecognition();
-        try {
-            recognition.start();
-        } catch (e) {
-            // ignore if already started
-        }
+        try { recognition.start(); } catch (e) {}
         micButton.classList.add("active");
     } else {
-        // Turn OFF
         voiceMode = false;
         voiceModeToggle.checked = false;
         clearTimeout(silenceTimer);
@@ -275,7 +277,6 @@ languageSelect.onchange = () => {
 };
 
 voiceModeToggle.onchange = () => {
-    // Keep toggle and internal state in sync
     voiceMode = voiceModeToggle.checked;
     if (!voiceMode) {
         clearTimeout(silenceTimer);
@@ -283,9 +284,7 @@ voiceModeToggle.onchange = () => {
         micButton.classList.remove("active");
     } else {
         if (!recognition) initRecognition();
-        try {
-            recognition.start();
-        } catch (e) {}
+        try { recognition.start(); } catch (e) {}
         micButton.classList.add("active");
     }
 };
