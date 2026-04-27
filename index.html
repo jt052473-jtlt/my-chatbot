@@ -7,7 +7,7 @@
 
 <style>
     :root {
-        --blue-main: #007aff;
+        --blue-main: #0050c8; /* darker blue */
     }
 
     * {
@@ -39,6 +39,13 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
+    }
+
+    /* Title */
+    .header-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0 0 6px 0;
     }
 
     /* Thin progress bar */
@@ -85,12 +92,12 @@
     }
 
     .user {
-        background: #007aff;
+        background: var(--blue-main);
         color: white;
         margin-left: auto;
     }
 
-    /* Settings row – side by side, medium spacing */
+    /* Settings row – medium spacing */
     .settings-row {
         display: flex;
         align-items: center;
@@ -135,7 +142,7 @@
         width: 42px;
         height: 42px;
         border-radius: 14px;
-        background: #007aff;
+        background: var(--blue-main);
         color: white;
         font-size: 18px;
         display: flex;
@@ -146,7 +153,7 @@
     }
 
     #sendBtn:hover {
-        background: #005fcc;
+        background: #003c96;
     }
 
     /* RIGHT PANEL */
@@ -190,8 +197,8 @@
     }
 
     #micButton.active {
-        background: #007aff; /* blue when on */
-        box-shadow: 0 0 12px rgba(0,122,255,0.6);
+        background: var(--blue-main);
+        box-shadow: 0 0 12px rgba(0,80,200,0.6);
     }
 
     /* Print button (hidden until end) */
@@ -233,6 +240,9 @@
 
     <!-- LEFT SIDE -->
     <div class="left-panel">
+
+        <h2 class="header-title">Sleep Intake Assistant</h2>
+
         <div class="progress-container">
             <div class="progress-bar" id="progressBar"></div>
         </div>
