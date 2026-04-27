@@ -1,1 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Intake Assistant</title>
 
+    <!-- Light Mode Clinical Theme -->
+    <style>
+        :root {
+            --bg: #ffffff;
+            --panel: #f7f7f7;
+            --border: #dcdcdc;
+            --text: #222;
+            --accent: #1976d2;
+            --accent-dark: #0f5ba8;
+            --gray: #9e9e9e;
+            --chat-bg: #fafafa;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            font-family: Arial, sans-serif;
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Layout */
+        #chatContainer {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            background: var(--chat-bg);
+            overflow: hidden;
+        }
+
+        #sidebar {
+            width: 260px;
+            background: var(--panel);
+            border-left: 1px solid var(--border);
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        /* Progress Bar */
+        #progressBarWrapper {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+        }
+
+        #progressBar {
+            height: 6px;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        /* Chat Area */
+        #chat {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 14px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 75%;
+            line-height: 1.4;
+        }
+
+        .bot {
+            background: #e8f0fe;
+            border-left: 4px solid var(--accent);
+        }
+
+        .user {
+            background: #d1ffd6;
+            border-right: 4px solid #2e7d32;
+            margin-left: auto;
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 6px;
+            background: var(--accent);
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: var(--accent-dark);
+        }
+
+        /* Mic Button */
+        #micButton {
+            position: fixed;
+            bottom: 80px;
+            right: 300px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gray);
+            color: white;
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Blue pulse when active */
+        #micButton.active {
+            background: var(--accent);
+            box-shadow: 0 0 12px rgba(25,118,210,0.7);
+            animation: pulse 1.4s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 6px rgba(25,118,210,0.6); }
+            50% { box-shadow: 0 0 18px rgba(25,118,210,1); }
+            100% { box-shadow: 0 0 6px rgba(25,118,210,0.6); }
+        }
+
+        /* Typing Bar */
+        #inputBar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 260px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            box-sizing: border-box;
+        }
+
+        #textInput {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        #sendBtn {
+            padding: 12px 18px;
+            background: var(--accent);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #sendBtn:hover {
+            background: var(--accent-dark);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress Bar -->
+    <div id="progressBarWrapper">
+        <div id="progressBar"></div>
+    </div>
+
+    <!-- Chat Container (Left Side) -->
+    <div id="chatContainer">
+        <div id="chat"></div>
+    </div>
+
+    <!-- Sidebar Controls (Right Side) -->
+    <div id="sidebar">
+
+        <h2>Controls</h2>
+
+        <button id="startBtn">Start Interview</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="finishBtn">Finish</button>
+
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border);">
+
+        <button id="repeatBtn">Repeat Question</button>
+        <button id="skipBtn">Skip Question</button>
+
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border);">
+
+        <button id="resetBtn">Reset Interview</button>
+        <button id="exportBtn">Export PDF</button>
+
+    </div>
+
+    <!-- Mic Button -->
+    <div id="micButton">🎤</div>
+
+    <!-- Typing Bar -->
+    <div id="inputBar">
+        <input id="textInput" type="text" placeholder="Type your answer here...">
+        <button id="sendBtn">Send</button>
+    </div>
+<script>
+/* -----------------------------
+   INTERVIEW QUESTIONS
+------------------------------*/
+const questions = [
+    "What is your full name?",
+    "What is your date of birth?",
+    "What brings you in today?",
+    "How long have you been experiencing these symptoms?",
+    "Do you have any diagnosed sleep disorders?",
+    "Do you snore or has anyone told you that you snore?",
+    "Do you wake up feeling rested?",
+    "Do you take naps during the day?",
+    "Do you consume caffeine? If so, how much?",
+    "Do you take any sleep medications?",
+    "Do you have any other medical conditions?",
+    "Is there anything else you would like to share?"
+];
+
+let currentIndex = 0;
+let interviewActive = false;
+let paused = false;
+let lastQuestion = "";
+
+/* -----------------------------
+   CHAT MESSAGE HANDLING
+------------------------------*/
+function addMessage(text, sender) {
+    const chat = document.getElementById("chat");
+    const msg = document.createElement("div");
+    msg.className = `message ${sender}`;
+    msg.textContent = text;
+    chat.appendChild(msg);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+/* -----------------------------
+   ASK NEXT QUESTION
+------------------------------*/
+function askQuestion() {
+    if (currentIndex >= questions.length) {
+        addMessage("Interview complete. Thank you.", "bot");
+        interviewActive = false;
+        return;
+    }
+
+    lastQuestion = questions[currentIndex];
+    addMessage(lastQuestion, "bot");
+    updateProgressBar();
+}
+
+/* -----------------------------
+   PROGRESS BAR
+------------------------------*/
+function updateProgressBar() {
+    const percent = ((currentIndex) / questions.length) * 100;
+    document.getElementById("progressBar").style.width = percent + "%";
+}
+
+/* -----------------------------
+   BUTTON LOGIC
+------------------------------*/
+document.getElementById("startBtn").onclick = () => {
+    if (!interviewActive) {
+        interviewActive = true;
+        paused = false;
+        currentIndex = 0;
+        document.getElementById("chat").innerHTML = "";
+        askQuestion();
+    }
+};
+
+document.getElementById("pauseBtn").onclick = () => {
+    paused = !paused;
+    addMessage(paused ? "Interview paused." : "Interview resumed.", "bot");
+};
+
+document.getElementById("finishBtn").onclick = () => {
+    interviewActive = false;
+    addMessage("Interview finished.", "bot");
+};
+
+document.getElementById("resetBtn").onclick = () => {
+    interviewActive = false;
+    paused = false;
+    currentIndex = 0;
+    document.getElementById("chat").innerHTML = "";
+    updateProgressBar();
+    addMessage("Interview reset.", "bot");
+};
+
+/* -----------------------------
+   REPEAT QUESTION
+------------------------------*/
+document.getElementById("repeatBtn").onclick = () => {
+    if (lastQuestion) {
+        addMessage(lastQuestion, "bot");
+    }
+};
+
+/* -----------------------------
+   SKIP QUESTION
+------------------------------*/
+document.getElementById("skipBtn").onclick = () => {
+    if (!interviewActive || paused) return;
+    currentIndex++;
+    askQuestion();
+};
+
+/* -----------------------------
+   TEXT INPUT SEND
+------------------------------*/
+document.getElementById("sendBtn").onclick = () => {
+    const input = document.getElementById("textInput");
+    const text = input.value.trim();
+    if (text === "") return;
+
+    addMessage(text, "user");
+    input.value = "";
+
+    if (interviewActive && !paused) {
+        currentIndex++;
+        askQuestion();
+    }
+};
+</script>
+<script>
+/* -----------------------------
+   VOICE RECOGNITION SETUP
+------------------------------*/
+let recognition;
+let voiceMode = false;
+let silenceTimer = null;
+let silenceCountdown = 20;
+let displayCountdown = 15;
+
+function initRecognition() {
+    if (!("webkitSpeechRecognition" in window)) {
+        addMessage("Voice recognition not supported on this device.", "bot");
+        return;
+    }
+
+    recognition = new webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+
+    recognition.onstart = () => {
+        micButton.classList.add("active");
+        micButton.textContent = "🎤 15";
+        startSilenceCountdown();
+    };
+
+    recognition.onspeechstart = () => {
+        resetSilenceCountdown();
+    };
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        addMessage(transcript, "user");
+        resetSilenceCountdown();
+
+        if (interviewActive && !paused) {
+            currentIndex++;
+            askQuestion();
+        }
+    };
+
+    recognition.onend = () => {
+        clearInterval(silenceTimer);
+
+        if (voiceMode && interviewActive && !paused) {
+            recognition.start();
+        } else {
+            micButton.classList.remove("active");
+            micButton.textContent = "🎤";
+        }
+    };
+}
+
+/* -----------------------------
+   SILENCE COUNTDOWN
+------------------------------*/
+function startSilenceCountdown() {
+    clearInterval(silenceTimer);
+    silenceCountdown = 20;
+    displayCountdown = 15;
+
+    silenceTimer = setInterval(() => {
+        silenceCountdown--;
+
+        if (silenceCountdown <= 15) {
+            micButton.textContent = `🎤 ${displayCountdown}`;
+            displayCountdown--;
+        }
+
+        if (silenceCountdown <= 0) {
+            clearInterval(silenceTimer);
+
+            voiceMode = false;
+            micButton.classList.remove("active");
+            micButton.textContent = "🎤";
+
+            if (recognition) recognition.stop();
+
+            addMessage("Voice Mode turned off due to inactivity.", "bot");
+        }
+    }, 1000);
+}
+
+function resetSilenceCountdown() {
+    silenceCountdown = 20;
+    displayCountdown = 15;
+    micButton.textContent = "🎤 15";
+}
+
+/* -----------------------------
+   MIC BUTTON CLICK
+------------------------------*/
+document.getElementById("micButton").onclick = () => {
+    if (!voiceMode) {
+        voiceMode = true;
+        initRecognition();
+        recognition.start();
+    }
+};
+
+/* -----------------------------
+   PDF EXPORT (HIPAA-SAFE)
+------------------------------*/
+document.getElementById("exportBtn").onclick = () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let y = 10;
+    doc.setFontSize(14);
+    doc.text("Sleep Intake Summary", 10, y);
+    y += 10;
+
+    const messages = document.querySelectorAll(".message");
+    messages.forEach(msg => {
+        const text = msg.textContent;
+        const lines = doc.splitTextToSize(text, 180);
+        doc.text(lines, 10, y);
+        y += lines.length * 7;
+
+        if (y > 270) {
+            doc.addPage();
+            y = 10;
+        }
+    });
+
+    doc.save("sleep_intake_summary.pdf");
+};
+</script>
+
+<!-- PDF Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>
