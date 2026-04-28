@@ -14,10 +14,22 @@
             <h1>Clinical Intake Assistant</h1>
             <p>
                 This demo showcases a sleep intake workflow, but the underlying engine is designed
-                to support multi‑department clinical intake across cardiology, pulmonary, neurology,
-                pain management, behavioral health, and more.
+                to support multi‑department clinical intake across Cardiology, Pulmonary, Neurology,
+                Pain Management, Behavioral Health, and more.
             </p>
             <button id="startDemoBtn">Start Demo</button>
+        </div>
+    </div>
+
+    <!-- Guided overview overlay -->
+    <div id="tourOverlay" class="tour-overlay hidden">
+        <div id="tourTooltip" class="tour-tooltip">
+            <h3 id="tourTitle"></h3>
+            <p id="tourText"></p>
+            <div class="tour-buttons">
+                <button id="tourNextBtn" class="btn-primary">Next</button>
+                <button id="tourExitBtn" class="btn-danger">Exit Overview</button>
+            </div>
         </div>
     </div>
 
