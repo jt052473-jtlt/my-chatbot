@@ -1,405 +1,320 @@
-/* ---------------------------------------------------
-   DOM ELEMENTS
---------------------------------------------------- */
-const micButton = document.getElementById("micButton");
-const languageSelect = document.getElementById("languageSelect");
-const languageSearch = document.getElementById("languageSearch");
-const readAloudToggle = document.getElementById("readAloudToggle");
-const voiceModeToggle = document.getElementById("voiceModeToggle");
-const chat = document.getElementById("chat");
-const textInput = document.getElementById("textInput");
-const progressBar = document.getElementById("progressBar");
-const printBtn = document.getElementById("printBtn");
+/* ========================================================= */
+/*   SPLASH SCREEN + INTRO + TOUR CONFIRMATION (TOP OF JS)   */
+/* ========================================================= */
 
-/* ---------------------------------------------------
-   GEORGIA LANGUAGE LIST (ALL 20)
---------------------------------------------------- */
-const georgiaLanguages = [
-    { code: "en-US", name: "English" },
-    { code: "es-US", name: "Spanish" },
-    { code: "ko-KR", name: "Korean" },
-    { code: "vi-VN", name: "Vietnamese" },
-    { code: "zh-CN", name: "Chinese (Mandarin)" },
-    { code: "hi-IN", name: "Hindi" },
-    { code: "gu-IN", name: "Gujarati" },
-    { code: "ar-SA", name: "Arabic" },
-    { code: "fr-FR", name: "French" },
-    { code: "pt-BR", name: "Portuguese" },
-    { code: "ru-RU", name: "Russian" },
-    { code: "tl-PH", name: "Tagalog (Filipino)" },
-    { code: "am-ET", name: "Amharic" },
-    { code: "yo-NG", name: "Yoruba" },
-    { code: "de-DE", name: "German" },
-    { code: "sw-KE", name: "Swahili" },
-    { code: "ja-JP", name: "Japanese" },
-    { code: "fa-IR", name: "Persian (Farsi)" },
-    { code: "tr-TR", name: "Turkish" },
-    { code: "th-TH", name: "Thai" }
-];
+document.addEventListener("DOMContentLoaded", () => {
 
-/* ---------------------------------------------------
-   POPULATE DROPDOWN
---------------------------------------------------- */
-function populateLanguageDropdown(list) {
-    languageSelect.innerHTML = "";
-    list.forEach(lang => {
-        const option = document.createElement("option");
-        option.value = lang.code;
-        option.textContent = lang.name;
-        languageSelect.appendChild(option);
+    const splash = document.getElementById("splashScreen");
+    const startDemoBtn = document.getElementById("startDemoBtn");
+    const tourBtn = document.getElementById("tourBtn");
+    const aboutBtn = document.getElementById("aboutBtn");
+
+    /* ----------------------------- */
+    /*   START DEMO → INTRO MESSAGE  */
+    /* ----------------------------- */
+    startDemoBtn.addEventListener("click", () => {
+        splash.style.display = "none";
+        startIntroMessage();
     });
-}
-populateLanguageDropdown(georgiaLanguages);
 
-/* ---------------------------------------------------
-   SEARCH FILTER
---------------------------------------------------- */
-languageSearch.addEventListener("input", () => {
-    const query = languageSearch.value.toLowerCase();
-    const filtered = georgiaLanguages.filter(lang =>
-        lang.name.toLowerCase().includes(query)
-    );
-    populateLanguageDropdown(filtered);
+    /* ----------------------------- */
+    /*   TAKE A TOUR → YES/NO POPUP  */
+    /* ----------------------------- */
+    tourBtn.addEventListener("click", () => {
+        const wantsTour = confirm(
+            "Would you like a quick tour of the buttons?\n\n" +
+            "This will highlight Start, Pause, Finish, Repeat, Skip, and Reset."
+        );
+
+        splash.style.display = "none";
+
+        if (wantsTour) {
+            startGuidedTour(); // Added in Block 6
+        } else {
+            startIntroMessage();
+        }
+    });
+
+    /* ----------------------------- */
+    /*   ABOUT PROTOTYPE BUTTON      */
+    /* ----------------------------- */
+    aboutBtn.addEventListener("click", () => {
+        alert(
+            "ABOUT THIS PROTOTYPE\n\n" +
+            "This Clinical Intake Assistant demonstrates how conversational AI can streamline " +
+            "patient intake before the patient reaches the clinic.\n\n" +
+            "Although this demo uses a sleep intake workflow, the underlying engine supports " +
+            "multi‑department intake including cardiology, pulmonary, neurology, pain management, " +
+            "behavioral health, and more.\n\n" +
+            "The goal is to reduce staff workload, improve data quality, and modernize the " +
+            "patient experience using structured conversational flows."
+        );
+    });
 });
 
-/* ---------------------------------------------------
-   INTERVIEW QUESTIONS
---------------------------------------------------- */
-const questions = [
-    "What is your full name?",
-    "What is your date of birth?",
-    "What brings you in today?",
-    "How long have you been experiencing these symptoms?",
-    "Do you have any diagnosed sleep disorders?",
-    "Do you snore or has anyone told you that you snore?",
-    "Do you wake up feeling rested?",
-    "Do you take naps during the day?",
-    "Do you consume caffeine? If so, how much?",
-    "Do you take any sleep medications?",
-    "Do you have any other medical conditions?",
-    "Is there anything else you would like to share?"
-];
 
-let currentIndex = 0;
-let interviewActive = false;
-let paused = false;
-let lastQuestion = "";
+/* ========================================================= */
+/*                INTRO MESSAGE (DETAILED)                   */
+/* ========================================================= */
 
-let originalResponses = [];
-let translatedResponses = [];
+function startIntroMessage() {
+    addBotMessage(
+        "<strong>Welcome to the Clinical Intake Assistant.</strong><br><br>" +
+        "This prototype demonstrates how conversational AI can guide patients through structured " +
+        "intake workflows before they arrive at the clinic. While this demo uses a " +
+        "<strong>sleep intake</strong> example, the underlying system is designed to support " +
+        "<strong>multiple departments</strong> including cardiology, pulmonary, neurology, " +
+        "pain management, behavioral health, and more.<br><br>" +
+        "The goal is to reduce staff workload, improve data accuracy, and create a smoother, " +
+        "more modern patient experience. You can respond by typing or using voice. " +
+        "When you're ready, we'll begin."
+    );
 
-/* ---------------------------------------------------
-   SMART B3 TRANSLATION
-   Detect → English → Selected Language
---------------------------------------------------- */
-async function translateSmart(text, targetLang) {
-    // Detect language
-    const detectURL = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`;
-    const detectRes = await fetch(detectURL);
-    const detectData = await detectRes.json();
-    const detectedLang = detectData[2];
-
-    // Translate to English
-    const englishURL = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${detectedLang}&tl=en&dt=t&q=${encodeURIComponent(text)}`;
-    const englishRes = await fetch(englishURL);
-    const englishData = await englishRes.json();
-    const english = englishData[0][0][0];
-
-    // Translate to selected language
-    const selectedURL = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${detectedLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-    const selectedRes = await fetch(selectedURL);
-    const selectedData = await selectedRes.json();
-    const selected = selectedData[0][0][0];
-
-    return { detectedLang, english, selected };
+    // Wait 3 seconds, then start the first question
+    setTimeout(() => {
+        if (typeof askNextQuestion === "function") {
+            askNextQuestion();
+        }
+    }, 3000);
 }
 
-/* ---------------------------------------------------
-   PROGRESS BAR
---------------------------------------------------- */
-function updateProgressBar() {
-    const total = questions.length;
-    const answered = Math.min(currentIndex, total);
-    const percent = (answered / total) * 100;
-    progressBar.style.width = `${percent}%`;
 
-    const startColor = { r: 255, g: 255, b: 255 };
-    const endColor = { r: 0, g: 80, b: 200 };
+/* ========================================================= */
+/*                BASIC BOT MESSAGE HELPER                   */
+/* ========================================================= */
 
-    const t = answered / total;
-    const r = Math.round(startColor.r + (endColor.r - startColor.r) * t);
-    const g = Math.round(startColor.g + (endColor.g - startColor.g) * t);
-    const b = Math.round(startColor.b + (endColor.b - startColor.b) * t);
-
-    progressBar.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-}
-
-/* ---------------------------------------------------
-   CHAT FUNCTIONS
---------------------------------------------------- */
-function addMessage(text, sender) {
+function addBotMessage(text) {
+    const chat = document.getElementById("chat");
     const msg = document.createElement("div");
-    msg.className = `message ${sender}`;
-    msg.textContent = text;
+    msg.className = "message bot";
+    msg.innerHTML = text;
     chat.appendChild(msg);
     chat.scrollTop = chat.scrollHeight;
 }
+<!-- =============================== -->
+<!--   BUTTON EXPLANATION PANEL     -->
+<!-- =============================== -->
+<div id="buttonHelpPanel" class="help-panel">
+    <div class="help-header">
+        <span>❓ What do these buttons do?</span>
+        <button id="toggleHelpBtn" class="help-toggle">▼</button>
+    </div>
 
-async function askQuestion() {
-    if (currentIndex >= questions.length) {
-        addMessage("Interview complete. Thank you.", "bot");
-        interviewActive = false;
-        updateProgressBar();
-        showPrintButton();
-        return;
-    }
+    <div class="help-body">
+        <p><strong>▶ Start</strong> — Begins the intake session.</p>
+        <p><strong>⏸ Pause</strong> — Temporarily stops the conversation.</p>
+        <p><strong>🛑 Finish</strong> — Ends the session immediately.</p>
+        <p><strong>🔁 Repeat</strong> — Repeats the last question.</p>
+        <p><strong>⏭ Skip</strong> — Skips the current question.</p>
+        <p><strong>🔄 Reset</strong> — Restarts the entire intake from the beginning.</p>
+    </div>
+</div>
+/* =============================== */
+/*     BUTTON EXPLANATION PANEL    */
+/* =============================== */
 
-    lastQuestion = questions[currentIndex];
-
-    const translated = await translateSmart(lastQuestion, languageSelect.value);
-    addMessage(translated.selected, "bot");
-    speak(translated.selected);
-
-    updateProgressBar();
+.help-panel {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 13px;
 }
 
-/* ---------------------------------------------------
-   BUTTON LOGIC
---------------------------------------------------- */
-document.getElementById("startBtn").onclick = () => {
-    interviewActive = true;
-    paused = false;
-    currentIndex = 0;
-    chat.innerHTML = "";
-    originalResponses = [];
-    translatedResponses = [];
-    hidePrintButton();
-    addMessage("Interview started.", "bot");
-    updateProgressBar();
-    askQuestion();
-};
+.help-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 600;
+}
 
-document.getElementById("pauseBtn").onclick = () => {
-    if (!interviewActive) return;
-    paused = !paused;
-    addMessage(paused ? "Interview paused." : "Interview resumed.", "bot");
-};
+.help-toggle {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
 
-document.getElementById("finishBtn").onclick = () => {
-    if (!interviewActive) return;
+.help-body {
+    margin-top: 10px;
+    display: none; /* Hidden until toggled */
+    line-height: 1.45;
+}
 
-    const confirmFinish = confirm("Are you sure you want to finish the interview?");
+.help-body p {
+    margin: 6px 0;
+}
+/* =============================== */
+/*   BUTTON EXPLANATION PANEL JS   */
+/* =============================== */
 
-    if (confirmFinish) {
-        interviewActive = false;
-        addMessage("Interview finished.", "bot");
-        updateProgressBar();
-        showPrintButton();
+document.addEventListener("DOMContentLoaded", () => {
+    const helpPanel = document.getElementById("buttonHelpPanel");
+    const helpBody = helpPanel.querySelector(".help-body");
+    const toggleBtn = document.getElementById("toggleHelpBtn");
+
+    toggleBtn.addEventListener("click", () => {
+        const isOpen = helpBody.style.display === "block";
+
+        helpBody.style.display = isOpen ? "none" : "block";
+        toggleBtn.textContent = isOpen ? "▼" : "▲";
+    });
+
+    // Clicking the header also toggles the panel
+    helpPanel.querySelector(".help-header").addEventListener("click", () => {
+        toggleBtn.click();
+    });
+});
+<!-- ===================================== -->
+<!--        GUIDED TOUR OVERLAY           -->
+<!-- ===================================== -->
+<div id="tourOverlay" class="tour-overlay" style="display:none;">
+    <div id="tourSpotlight" class="tour-spotlight"></div>
+
+    <div id="tourTooltip" class="tour-tooltip">
+        <div id="tourText"></div>
+
+        <div class="tour-controls">
+            <button id="tourNextBtn" class="tour-btn">Next</button>
+            <button id="tourSkipBtn" class="tour-btn secondary">Skip</button>
+        </div>
+    </div>
+</div>
+/* ===================================== */
+/*        GUIDED TOUR ENGINE (JS)        */
+/* ===================================== */
+
+let tourSteps = [];
+let currentStep = 0;
+
+function startGuidedTour() {
+    // Define the steps of the tour
+    tourSteps = [
+        {
+            element: document.getElementById("startBtn"),
+            text: "This is the <strong>Start</strong> button. It begins the intake session."
+        },
+        {
+            element: document.getElementById("pauseBtn"),
+            text: "The <strong>Pause</strong> button temporarily stops the conversation."
+        },
+        {
+            element: document.getElementById("finishBtn"),
+            text: "The <strong>Finish</strong> button ends the session immediately."
+        },
+        {
+            element: document.getElementById("repeatBtn"),
+            text: "The <strong>Repeat</strong> button repeats the last question."
+        },
+        {
+            element: document.getElementById("skipBtn"),
+            text: "The <strong>Skip</strong> button skips the current question."
+        },
+        {
+            element: document.getElementById("resetBtn"),
+            text: "The <strong>Reset</strong> button restarts the entire intake from the beginning."
+        }
+    ];
+
+    currentStep = 0;
+    document.getElementById("tourOverlay").style.display = "block";
+    showTourStep();
+}
+
+function showTourStep() {
+    const step = tourSteps[currentStep];
+    if (!step) return endTour();
+
+    const spotlight = document.getElementById("tourSpotlight");
+    const tooltip = document.getElementById("tourTooltip");
+    const textBox = document.getElementById("tourText");
+
+    const rect = step.element.getBoundingClientRect();
+
+    // Position spotlight
+    spotlight.style.top = rect.top + window.scrollY - 50 + "px";
+    spotlight.style.left = rect.left + window.scrollX - 50 + "px";
+
+    // Update tooltip text
+    textBox.innerHTML = step.text;
+
+    // Position tooltip under the spotlight
+    tooltip.style.top = rect.bottom + window.scrollY + 20 + "px";
+    tooltip.style.left = rect.left + window.scrollX + "px";
+}
+
+// NEXT button
+document.getElementById("tourNextBtn").addEventListener("click", () => {
+    currentStep++;
+    if (currentStep >= tourSteps.length) {
+        endTour();
     } else {
-        addMessage("Returning to the last question.", "bot");
-        addMessage(lastQuestion, "bot");
-        speak(lastQuestion);
+        showTourStep();
     }
-};
-
-document.getElementById("resetBtn").onclick = () => {
-    interviewActive = false;
-    paused = false;
-    currentIndex = 0;
-    chat.innerHTML = "";
-    originalResponses = [];
-    translatedResponses = [];
-    hidePrintButton();
-    addMessage("Interview reset.", "bot");
-    updateProgressBar();
-};
-
-document.getElementById("repeatBtn").onclick = () => {
-    if (lastQuestion) {
-        addMessage(lastQuestion, "bot");
-        speak(lastQuestion);
-    }
-};
-
-document.getElementById("skipBtn").onclick = () => {
-    if (!interviewActive || paused) return;
-    currentIndex++;
-    askQuestion();
-};
-
-document.getElementById("sendBtn").onclick = sendText;
-textInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendText();
 });
 
-/* ---------------------------------------------------
-   SEND TEXT (SMART B3 TRANSLATION)
---------------------------------------------------- */
-async function sendText() {
-    const text = textInput.value.trim();
-    if (!text) return;
+// SKIP button
+document.getElementById("tourSkipBtn").addEventListener("click", () => {
+    endTour();
+});
 
-    addMessage(text, "user");
-    textInput.value = "";
-
-    const result = await translateSmart(text, languageSelect.value);
-
-    originalResponses.push(text);
-    translatedResponses.push({
-        english: result.english,
-        selected: result.selected
-    });
-
-    if (interviewActive && !paused) {
-        currentIndex++;
-        askQuestion();
-    }
+function endTour() {
+    document.getElementById("tourOverlay").style.display = "none";
+    startIntroMessage(); // After tour, begin intro
 }
+function startIntroMessage() {
+    addBotMessage(
+        "<strong>Welcome to the Clinical Intake Assistant.</strong><br><br>" +
+        "This prototype demonstrates how conversational AI can guide patients through structured " +
+        "intake workflows before they arrive at the clinic. While this demo uses a " +
+        "<strong>sleep intake</strong> example, the underlying system is designed to support " +
+        "<strong>multiple clinical departments</strong> including cardiology, pulmonary, neurology, " +
+        "pain management, behavioral health, and more.<br><br>" +
+        "The goal is to reduce staff workload, improve data accuracy, and create a smoother, " +
+        "more modern patient experience. You can respond by typing or using voice. " +
+        "When you're ready, we'll begin."
+    );
 
-/* ---------------------------------------------------
-   PRINT SUMMARY
---------------------------------------------------- */
-function showPrintButton() {
-    printBtn.style.display = "block";
-}
-
-function hidePrintButton() {
-    printBtn.style.display = "none";
-}
-
-printBtn.onclick = () => {
-    let summary = "=== Sleep Intake Summary ===\n\n";
-
-    translatedResponses.forEach((resp, i) => {
-        summary += `Q${i + 1}: ${questions[i]}\n`;
-        summary += `Answer (English): ${resp.english}\n`;
-        summary += `Answer (${languageSelect.options[languageSelect.selectedIndex].text}): ${resp.selected}\n`;
-        summary += `Original: ${originalResponses[i]}\n\n`;
-    });
-
-    alert(summary);
-};
-
-/* ---------------------------------------------------
-   VOICE SYSTEM
---------------------------------------------------- */
-let recognition = null;
-let voiceMode = false;
-let silenceTimer = null;
-
-function getSoftFemaleVoice(lang) {
-    const voices = speechSynthesis.getVoices();
-    return voices.find(v => v.lang === lang) || voices[0];
-}
-
-function speak(text) {
-    if (!readAloudToggle.checked) return;
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = languageSelect.value;
-    utter.voice = getSoftFemaleVoice(languageSelect.value);
-    utter.rate = 0.95;
-    speechSynthesis.speak(utter);
-}
-
-function initRecognition() {
-    if (!("webkitSpeechRecognition" in window)) {
-        addMessage("Voice recognition not supported in this browser.", "bot");
-        return;
-    }
-
-    recognition = new webkitSpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = languageSelect.value;
-
-    recognition.onstart = () => micButton.classList.add("active");
-    recognition.onspeechend = () => startSilenceCountdown();
-
-    recognition.onresult = async (event) => {
-        const transcript = event.results[0][0].transcript;
-        addMessage(transcript, "user");
-
-        const result = await translateSmart(transcript, languageSelect.value);
-
-        originalResponses.push(transcript);
-        translatedResponses.push({
-            english: result.english,
-            selected: result.selected
-        });
-
-        if (interviewActive && !paused) {
-            currentIndex++;
-            askQuestion();
-        }
-    };
-
-    recognition.onend = () => {
-        if (voiceMode) {
-            try { recognition.start(); } catch (e) {}
-        } else {
-            micButton.classList.remove("active");
-        }
-    };
-}
-
-function startSilenceCountdown() {
-    clearTimeout(silenceTimer);
-    silenceTimer = setTimeout(() => {
-        voiceMode = false;
-        voiceModeToggle.checked = false;
-        if (recognition) recognition.stop();
-        micButton.classList.remove("active");
-        addMessage("Voice Mode turned off due to inactivity.", "bot");
-    }, 20000);
-}
-
-/* ---------------------------------------------------
-   MIC TOGGLE
---------------------------------------------------- */
-micButton.onclick = () => {
-    if (!voiceMode) {
-        voiceMode = true;
-        voiceModeToggle.checked = true;
-        if (!recognition) initRecognition();
-        try { recognition.start(); } catch (e) {}
-        micButton.classList.add("active");
-    } else {
-        voiceMode = false;
-        voiceModeToggle.checked = false;
-        clearTimeout(silenceTimer);
-        if (recognition) recognition.stop();
-        micButton.classList.remove("active");
-    }
-};
-
-languageSelect.onchange = () => {
-    if (recognition) recognition.lang = languageSelect.value;
-
-    speechSynthesis.cancel();
     setTimeout(() => {
-        const testVoice = getSoftFemaleVoice(languageSelect.value);
-        const utter = new SpeechSynthesisUtterance("Language updated.");
-        utter.lang = languageSelect.value;
-        utter.voice = testVoice;
-        utter.rate = 0.95;
-        if (readAloudToggle.checked) speechSynthesis.speak(utter);
-    }, 200);
-};
+        if (typeof askNextQuestion === "function") {
+            askNextQuestion();
+        }
+    }, 3000);
+}
+/* =============================== */
+/*         TYPING INDICATOR        */
+/* =============================== */
 
-voiceModeToggle.onchange = () => {
-    voiceMode = voiceModeToggle.checked;
-    if (!voiceMode) {
-        clearTimeout(silenceTimer);
-        if (recognition) recognition.stop();
-        micButton.classList.remove("active");
-    } else {
-        if (!recognition) initRecognition();
-        try { recognition.start(); } catch (e) {}
-        micButton.classList.add("active");
-    }
-};
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 10px 14px;
+    margin: 6px;
+    background: #e5e5ea;
+    border-radius: 12px;
+    width: fit-content;
+}
 
-/* ---------------------------------------------------
-   INIT
---------------------------------------------------- */
-updateProgressBar();
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: #888;
+    border-radius: 50%;
+    animation: blink 1.4s infinite both;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0% { opacity: .2; }
+    20% { opacity: 1; }
+    100% { opacity: .2; }
+}
