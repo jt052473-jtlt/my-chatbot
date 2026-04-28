@@ -85,7 +85,7 @@ html, body {
     color: white;
 }
 
-/* Chat window (shrunk to fit screen) */
+/* Chat window */
 .chat-window {
     flex: 1;
     height: calc(100vh - 350px);
