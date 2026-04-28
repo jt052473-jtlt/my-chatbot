@@ -1,179 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sleep Intake Assistant | The 423 Initiative</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  
-  <style>
-    body {
-      background-color: #f4f7f6;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    /* Progress Bar Styles */
-    .progress-container {
-      background-color: white !important;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    
-    #mainProgressBar {
-      background-color: #0056b3; /* Dark Blue */
-      width: 0%;
-      transition: width 0.5s ease-in-out;
-    }
-
-    /* Chat Window */
-    #chat-window {
-      height: 450px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      background: #ffffff;
-      overflow-y: auto;
-      padding: 20px;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    /* Mic Button Toggles */
-    .btn-mic {
-      background-color: #e9ecef;
-      color: #6c757d;
-      border: 1px solid #ced4da;
-      transition: all 0.3s ease;
-    }
-
-    .btn-mic.active {
-      background-color: #0056b3 !important;
-      color: white !important;
-      border-color: #004494;
-    }
-
-    /* Controls Sidebar */
-    .controls-card {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .btn-send {
-      background-color: #0056b3;
-      border: none;
-    }
-
-    .btn-send:hover {
-      background-color: #004494;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Intake Assistant | The 423 Initiative</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container py-5">
-  <div class="row mb-4">
-    <div class="col-12 text-center">
-      <h2 class="fw-bold mb-3">Sleep Intake Assistant</h2>
-      <div class="progress progress-container mx-auto" style="height: 14px; max-width: 85%;">
-        <div id="mainProgressBar" class="progress-bar" role="progressbar"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-9">
-      <div id="chat-window" class="mb-3">
-        <div class="text-muted small text-center">Assistant initialized. Click "Start" to begin.</div>
-      </div>
-
-      <div class="d-flex align-items-center mb-3 p-3 bg-white rounded shadow-sm flex-wrap gap-3">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="checkReadAloud">
-          <label class="form-check-label fw-semibold" for="checkReadAloud">Read Aloud</label>
+    <div id="demoOverlay">
+        <div class="demo-content">
+            <h1>Clinical Intake Assistant</h1>
+            <p>
+                This demo showcases a sleep intake workflow. The underlying engine supports 
+                multi‑department clinical intake for Cardiology, Neurology, and more.
+            </p>
+            <button id="startDemoBtn">Start Demo</button>
         </div>
-        
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="checkVoiceMode">
-          <label class="form-check-label fw-semibold" for="checkVoiceMode">Voice Mode</label>
-        </div>
-
-        <select class="form-select w-auto" id="langSelect">
-          <option selected>Select Language</option>
-          <option>English</option>
-          <option>Mandarin Chinese</option>
-          <option>Hindi</option>
-          <option>Spanish</option>
-          <option>French</option>
-          <option>Arabic</option>
-          <option>Bengali</option>
-          <option>Portuguese</option>
-          <option>Russian</option>
-          <option>Urdu</option>
-        </select>
-
-        <input type="text" class="form-control w-auto flex-grow-1" placeholder="Search language...">
-
-        <button class="btn btn-mic" id="micBtn">
-          <i class="fas fa-microphone"></i>
-        </button>
-      </div>
-
-      <div class="input-group">
-        <input type="text" class="form-control form-control-lg" id="userInput" placeholder="Type your response here...">
-        <button class="btn btn-primary btn-send px-4" id="sendBtn">Send</button>
-      </div>
     </div>
 
-    <div class="col-md-3">
-      <div class="card controls-card p-3">
-        <h6 class="text-center text-uppercase fw-bold text-secondary mb-3">Workflow Controls</h6>
-        <div class="d-grid gap-2">
-          <button class="btn btn-primary" onclick="updateProgress(10)" style="background-color: #0056b3;">Start</button>
-          <button class="btn btn-outline-secondary">Pause</button>
-          <button class="btn btn-outline-success">Finish</button>
-          <button class="btn btn-outline-dark">Repeat</button>
-          <button class="btn btn-outline-info">Skip</button>
-          <button class="btn btn-outline-danger" onclick="updateProgress(0)">Reset</button>
-        </div>
-      </div>
+    <div class="app-container">
+        <header class="app-header">
+            <h2>Sleep Intake Assistant</h2>
+        </header>
+
+        <main class="app-main">
+            <section class="left-panel">
+                <div class="control-buttons">
+                    <button id="startBtn" class="btn-primary">Start</button>
+                    <button id="pauseBtn">Pause</button>
+                    <button id="finishBtn">Finish</button>
+                    <button id="repeatBtn">Repeat</button>
+                    <button id="skipBtn">Skip</button>
+                    <button id="resetBtn">Reset</button>
+                </div>
+
+                <div class="accessibility-controls">
+                    <button id="readAloudBtn">Read Aloud</button>
+                    <button id="voiceModeBtn">Voice Mode</button>
+                    <button id="micBtn" class="mic-button">🎤</button>
+                </div>
+            </section>
+
+            <section class="right-panel">
+                <div id="chatWindow" class="chat-window">
+                    </div>
+
+                <div class="input-area">
+                    <input type="text" id="userInput" placeholder="Type your response here..." autofocus>
+                    <button id="sendBtn">Send</button>
+                </div>
+            </section>
+        </main>
     </div>
-  </div>
-</div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const micBtn = document.getElementById('micBtn');
-    const sendBtn = document.getElementById('sendBtn');
-    const progressBar = document.getElementById('mainProgressBar');
-    
-    // 1. Microphone Toggle Logic (Gray to Blue)
-    if(micBtn) {
-      micBtn.addEventListener('click', function() {
-        this.classList.toggle('active');
-      });
-    }
-
-    // 2. Progress Bar Logic
-    // Usage: Call updateProgress(number) where number is 0-100
-    window.updateProgress = function(percentage) {
-      if(progressBar) {
-        progressBar.style.width = percentage + '%';
-      }
-    };
-
-    // 3. Simple Send Interaction
-    sendBtn.addEventListener('click', function() {
-      const input = document.getElementById('userInput');
-      if(input.value.trim() !== "") {
-        // Here you would normally trigger your Azure API or Chat logic
-        console.log("User sent: " + input.value);
-        input.value = "";
-      }
-    });
-  });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
