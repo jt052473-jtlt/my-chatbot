@@ -215,18 +215,20 @@ html, body {
     cursor: pointer;
 }
 
-/* Guided tour overlay */
+/* Utility hidden */
 .hidden {
     display: none;
 }
 
+/* Guided tour overlay */
 .tour-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.35);
-    z-index: 998;
+    z-index: 9999;
 }
 
+/* Tooltip box */
 .tour-tooltip {
     position: absolute;
     max-width: 320px;
@@ -235,9 +237,10 @@ html, body {
     padding: 14px 16px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
     font-size: 14px;
+    z-index: 10000;
 }
 
-/* Simple arrow (clean line) from tooltip to target */
+/* Clean line arrow from tooltip to target (upward) */
 .tour-tooltip::before {
     content: "";
     position: absolute;
@@ -271,16 +274,27 @@ html, body {
     color: #444;
 }
 
+/* Tour buttons */
 .tour-buttons {
     display: flex;
     gap: 8px;
     justify-content: flex-end;
 }
 
-.tour-buttons button {
+#tourNextBtn {
+    background: #cccccc; /* gray */
+    color: black;
     padding: 6px 12px;
     border-radius: 6px;
     border: none;
     cursor: pointer;
-    font-size: 13px;
+}
+
+#tourExitBtn {
+    background: #cc0033;
+    color: black;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
 }
