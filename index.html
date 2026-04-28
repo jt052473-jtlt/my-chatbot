@@ -14,18 +14,18 @@
         }
 
         .app-container {
-            display: flex;
+            display: none; /* Hidden until start screen fades out */
             height: 100vh;
+            display: flex;
         }
 
-        /* LEFT SIDE — CHAT */
+        /* CHAT AREA */
         .chat-container {
             flex: 2;
             display: flex;
             flex-direction: column;
             border-right: 1px solid #ddd;
             background: #ffffff;
-            position: relative;
         }
 
         #chatWindow {
@@ -59,7 +59,7 @@
             color: #666;
         }
 
-        /* RIGHT SIDE — BUTTON PANEL */
+        /* RIGHT PANEL */
         .control-panel {
             flex: 1;
             background: #fafafa;
@@ -67,7 +67,6 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            position: relative;
         }
 
         .control-panel button {
@@ -91,14 +90,6 @@
             border-top: 1px solid #ddd;
         }
 
-        #voiceModeLabel {
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
         #micButton {
             width: 60px;
             height: 60px;
@@ -114,8 +105,8 @@
             background: #007bff;
         }
 
-        /* SPLASH SCREEN */
-        #splashScreen {
+        /* APPLE‑STYLE START SCREEN */
+        #startScreen {
             position: fixed;
             inset: 0;
             background: white;
@@ -124,18 +115,16 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 30px;
             text-align: center;
+            animation: fadeIn 0.5s ease-out;
         }
 
-        #splashScreen p {
-            max-width: 600px;
-            font-size: 18px;
-            line-height: 1.5;
+        #startScreen h1 {
+            font-size: 32px;
+            margin-bottom: 40px;
         }
 
-        #startDemoBtn {
-            margin-top: 20px;
+        #startDemoSession {
             padding: 14px 22px;
             font-size: 18px;
             background: #0057ff;
@@ -143,6 +132,16 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         /* GUIDED TOUR */
@@ -199,27 +198,10 @@
 
 <body>
 
-    <!-- SPLASH SCREEN -->
-    <div id="splashScreen">
-        <h2>Clinical Intake Assistant</h2>
-
-        <p>
-            This demo showcases a <strong>sleep intake workflow</strong>, but the underlying 
-            engine is designed to support <strong>multi‑department clinical intake</strong> 
-            across cardiology, pulmonary, neurology, pain management, behavioral health, 
-            and more.
-            <br><br>
-            In our service area, more than <strong>1 in 5 adults struggle with low literacy</strong>, 
-            which makes traditional medical forms difficult to understand.
-            <br><br>
-            To support these patients, this assistant includes <strong>Read‑Aloud</strong> and 
-            <strong>Voice Input</strong> options.
-            <br><br>
-            You may click <strong>“What do these buttons do?”</strong> to learn the controls, 
-            or click <strong>Start Demo Session</strong> to begin.
-        </p>
-
-        <button id="startDemoBtn">Start Demo Session</button>
+    <!-- APPLE‑SIMPLE START SCREEN -->
+    <div id="startScreen">
+        <h1>Clinical Intake Assistant</h1>
+        <button id="startDemoSession">Start Demo Session</button>
     </div>
 
     <!-- MAIN APP -->
@@ -239,16 +221,11 @@
             <button id="btnRepeat">Repeat</button>
             <button id="btnSkip">Skip</button>
             <button id="btnReset">Reset</button>
-            <button id="btnAbout">About</button>
             <button id="btnTour">What do these buttons do?</button>
 
-            <!-- VOICE CONTROLS AT BOTTOM -->
             <div id="voiceControls">
-                <label id="voiceModeLabel">
-                    <input type="checkbox" id="voiceModeCheckbox">
-                    Enable Voice Mode
-                </label>
-
+                <button id="readAloudBtn">🔊 Read Aloud</button>
+                <label><input type="checkbox" id="voiceModeCheckbox"> Voice Mode</label>
                 <button id="micButton">🎤</button>
             </div>
         </div>
