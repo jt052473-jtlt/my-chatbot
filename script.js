@@ -1,206 +1,405 @@
-// -------------------------------
-// START SCREEN → FADE OUT
-// -------------------------------
-document.getElementById("startDemoSession").addEventListener("click", () => {
-    const screen = document.getElementById("startScreen");
-    screen.style.animation = "fadeOut 0.8s ease-out forwards";
+/* ---------------------------------------------------
+   DOM ELEMENTS
+--------------------------------------------------- */
+const micButton = document.getElementById("micButton");
+const languageSelect = document.getElementById("languageSelect");
+const languageSearch = document.getElementById("languageSearch");
+const readAloudToggle = document.getElementById("readAloudToggle");
+const voiceModeToggle = document.getElementById("voiceModeToggle");
+const chat = document.getElementById("chat");
+const textInput = document.getElementById("textInput");
+const progressBar = document.getElementById("progressBar");
+const printBtn = document.getElementById("printBtn");
 
-    setTimeout(() => {
-        screen.style.display = "none";
-        document.querySelector(".app-container").style.display = "flex";
-        initializeChat();
-    }, 800);
-});
-
-// -------------------------------
-// INITIAL CHAT SETUP
-// -------------------------------
-function initializeChat() {
-    addBotMessage("Click the button below to begin.");
-    insertStartDemoButton();
-}
-
-function insertStartDemoButton() {
-    const chat = document.getElementById("chatWindow");
-
-    const btn = document.createElement("button");
-    btn.textContent = "Start Demo";
-    btn.style.padding = "10px 16px";
-    btn.style.fontSize = "16px";
-    btn.style.marginTop = "10px";
-    btn.style.cursor = "pointer";
-    btn.style.background = "#0057ff";
-    btn.style.color = "white";
-    btn.style.border = "none";
-    btn.style.borderRadius = "6px";
-
-    btn.onclick = () => {
-        addBotMessage("Great. Let’s begin.");
-        startIntake();
-        btn.remove();
-    };
-
-    chat.appendChild(btn);
-    chat.scrollTop = chat.scrollHeight;
-}
-
-// -------------------------------
-// BASIC CHAT FUNCTIONS
-// -------------------------------
-function addBotMessage(text) {
-    const chat = document.getElementById("chatWindow");
-    const msg = document.createElement("div");
-    msg.className = "message bot";
-    msg.textContent = text;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-}
-
-function addUserMessage(text) {
-    const chat = document.getElementById("chatWindow");
-    const msg = document.createElement("div");
-    msg.className = "message user";
-    msg.textContent = text;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-}
-
-// -------------------------------
-// INTAKE LOGIC (RESTORED ORIGINAL)
-// -------------------------------
-let currentQuestion = 0;
-
-const questions = [
-    "What brings you in today?",
-    "How long have you been experiencing this?",
-    "Does anything make it better or worse?",
-    "Have you had this issue before?",
-    "Are you currently taking any medications?"
+/* ---------------------------------------------------
+   GEORGIA LANGUAGE LIST (ALL 20)
+--------------------------------------------------- */
+const georgiaLanguages = [
+    { code: "en-US", name: "English" },
+    { code: "es-US", name: "Spanish" },
+    { code: "ko-KR", name: "Korean" },
+    { code: "vi-VN", name: "Vietnamese" },
+    { code: "zh-CN", name: "Chinese (Mandarin)" },
+    { code: "hi-IN", name: "Hindi" },
+    { code: "gu-IN", name: "Gujarati" },
+    { code: "ar-SA", name: "Arabic" },
+    { code: "fr-FR", name: "French" },
+    { code: "pt-BR", name: "Portuguese" },
+    { code: "ru-RU", name: "Russian" },
+    { code: "tl-PH", name: "Tagalog (Filipino)" },
+    { code: "am-ET", name: "Amharic" },
+    { code: "yo-NG", name: "Yoruba" },
+    { code: "de-DE", name: "German" },
+    { code: "sw-KE", name: "Swahili" },
+    { code: "ja-JP", name: "Japanese" },
+    { code: "fa-IR", name: "Persian (Farsi)" },
+    { code: "tr-TR", name: "Turkish" },
+    { code: "th-TH", name: "Thai" }
 ];
 
-function startIntake() {
-    currentQuestion = 0;
-    askNextQuestion();
+/* ---------------------------------------------------
+   POPULATE DROPDOWN
+--------------------------------------------------- */
+function populateLanguageDropdown(list) {
+    languageSelect.innerHTML = "";
+    list.forEach(lang => {
+        const option = document.createElement("option");
+        option.value = lang.code;
+        option.textContent = lang.name;
+        languageSelect.appendChild(option);
+    });
+}
+populateLanguageDropdown(georgiaLanguages);
+
+/* ---------------------------------------------------
+   SEARCH FILTER
+--------------------------------------------------- */
+languageSearch.addEventListener("input", () => {
+    const query = languageSearch.value.toLowerCase();
+    const filtered = georgiaLanguages.filter(lang =>
+        lang.name.toLowerCase().includes(query)
+    );
+    populateLanguageDropdown(filtered);
+});
+
+/* ---------------------------------------------------
+   INTERVIEW QUESTIONS
+--------------------------------------------------- */
+const questions = [
+    "What is your full name?",
+    "What is your date of birth?",
+    "What brings you in today?",
+    "How long have you been experiencing these symptoms?",
+    "Do you have any diagnosed sleep disorders?",
+    "Do you snore or has anyone told you that you snore?",
+    "Do you wake up feeling rested?",
+    "Do you take naps during the day?",
+    "Do you consume caffeine? If so, how much?",
+    "Do you take any sleep medications?",
+    "Do you have any other medical conditions?",
+    "Is there anything else you would like to share?"
+];
+
+let currentIndex = 0;
+let interviewActive = false;
+let paused = false;
+let lastQuestion = "";
+
+let originalResponses = [];
+let translatedResponses = [];
+
+/* ---------------------------------------------------
+   SMART B3 TRANSLATION
+   Detect → English → Selected Language
+--------------------------------------------------- */
+async function translateSmart(text, targetLang) {
+    // Detect language
+    const detectURL = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+    const detectRes = await fetch(detectURL);
+    const detectData = await detectRes.json();
+    const detectedLang = detectData[2];
+
+    // Translate to English
+    const englishURL = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${detectedLang}&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+    const englishRes = await fetch(englishURL);
+    const englishData = await englishRes.json();
+    const english = englishData[0][0][0];
+
+    // Translate to selected language
+    const selectedURL = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${detectedLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const selectedRes = await fetch(selectedURL);
+    const selectedData = await selectedRes.json();
+    const selected = selectedData[0][0][0];
+
+    return { detectedLang, english, selected };
 }
 
-function askNextQuestion() {
-    if (currentQuestion < questions.length) {
-        addBotMessage(questions[currentQuestion]);
+/* ---------------------------------------------------
+   PROGRESS BAR
+--------------------------------------------------- */
+function updateProgressBar() {
+    const total = questions.length;
+    const answered = Math.min(currentIndex, total);
+    const percent = (answered / total) * 100;
+    progressBar.style.width = `${percent}%`;
+
+    const startColor = { r: 255, g: 255, b: 255 };
+    const endColor = { r: 0, g: 80, b: 200 };
+
+    const t = answered / total;
+    const r = Math.round(startColor.r + (endColor.r - startColor.r) * t);
+    const g = Math.round(startColor.g + (endColor.g - startColor.g) * t);
+    const b = Math.round(startColor.b + (endColor.b - startColor.b) * t);
+
+    progressBar.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+}
+
+/* ---------------------------------------------------
+   CHAT FUNCTIONS
+--------------------------------------------------- */
+function addMessage(text, sender) {
+    const msg = document.createElement("div");
+    msg.className = `message ${sender}`;
+    msg.textContent = text;
+    chat.appendChild(msg);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+async function askQuestion() {
+    if (currentIndex >= questions.length) {
+        addMessage("Interview complete. Thank you.", "bot");
+        interviewActive = false;
+        updateProgressBar();
+        showPrintButton();
+        return;
+    }
+
+    lastQuestion = questions[currentIndex];
+
+    const translated = await translateSmart(lastQuestion, languageSelect.value);
+    addMessage(translated.selected, "bot");
+    speak(translated.selected);
+
+    updateProgressBar();
+}
+
+/* ---------------------------------------------------
+   BUTTON LOGIC
+--------------------------------------------------- */
+document.getElementById("startBtn").onclick = () => {
+    interviewActive = true;
+    paused = false;
+    currentIndex = 0;
+    chat.innerHTML = "";
+    originalResponses = [];
+    translatedResponses = [];
+    hidePrintButton();
+    addMessage("Interview started.", "bot");
+    updateProgressBar();
+    askQuestion();
+};
+
+document.getElementById("pauseBtn").onclick = () => {
+    if (!interviewActive) return;
+    paused = !paused;
+    addMessage(paused ? "Interview paused." : "Interview resumed.", "bot");
+};
+
+document.getElementById("finishBtn").onclick = () => {
+    if (!interviewActive) return;
+
+    const confirmFinish = confirm("Are you sure you want to finish the interview?");
+
+    if (confirmFinish) {
+        interviewActive = false;
+        addMessage("Interview finished.", "bot");
+        updateProgressBar();
+        showPrintButton();
     } else {
-        addBotMessage("Thank you. Your intake is complete.");
+        addMessage("Returning to the last question.", "bot");
+        addMessage(lastQuestion, "bot");
+        speak(lastQuestion);
+    }
+};
+
+document.getElementById("resetBtn").onclick = () => {
+    interviewActive = false;
+    paused = false;
+    currentIndex = 0;
+    chat.innerHTML = "";
+    originalResponses = [];
+    translatedResponses = [];
+    hidePrintButton();
+    addMessage("Interview reset.", "bot");
+    updateProgressBar();
+};
+
+document.getElementById("repeatBtn").onclick = () => {
+    if (lastQuestion) {
+        addMessage(lastQuestion, "bot");
+        speak(lastQuestion);
+    }
+};
+
+document.getElementById("skipBtn").onclick = () => {
+    if (!interviewActive || paused) return;
+    currentIndex++;
+    askQuestion();
+};
+
+document.getElementById("sendBtn").onclick = sendText;
+textInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendText();
+});
+
+/* ---------------------------------------------------
+   SEND TEXT (SMART B3 TRANSLATION)
+--------------------------------------------------- */
+async function sendText() {
+    const text = textInput.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    textInput.value = "";
+
+    const result = await translateSmart(text, languageSelect.value);
+
+    originalResponses.push(text);
+    translatedResponses.push({
+        english: result.english,
+        selected: result.selected
+    });
+
+    if (interviewActive && !paused) {
+        currentIndex++;
+        askQuestion();
     }
 }
 
-document.getElementById("btnStart").onclick = () => askNextQuestion();
-document.getElementById("btnPause").onclick = () => addBotMessage("Paused.");
-document.getElementById("btnFinish").onclick = () => addBotMessage("Session finished.");
-document.getElementById("btnRepeat").onclick = () => addBotMessage(questions[currentQuestion]);
-document.getElementById("btnSkip").onclick = () => { currentQuestion++; askNextQuestion(); };
-document.getElementById("btnReset").onclick = () => {
-    document.getElementById("chatWindow").innerHTML = "";
-    initializeChat();
+/* ---------------------------------------------------
+   PRINT SUMMARY
+--------------------------------------------------- */
+function showPrintButton() {
+    printBtn.style.display = "block";
+}
+
+function hidePrintButton() {
+    printBtn.style.display = "none";
+}
+
+printBtn.onclick = () => {
+    let summary = "=== Sleep Intake Summary ===\n\n";
+
+    translatedResponses.forEach((resp, i) => {
+        summary += `Q${i + 1}: ${questions[i]}\n`;
+        summary += `Answer (English): ${resp.english}\n`;
+        summary += `Answer (${languageSelect.options[languageSelect.selectedIndex].text}): ${resp.selected}\n`;
+        summary += `Original: ${originalResponses[i]}\n\n`;
+    });
+
+    alert(summary);
 };
 
-// -------------------------------
-// READ‑ALOUD (RESTORED ORIGINAL)
-// -------------------------------
-document.getElementById("readAloudBtn").onclick = () => {
-    const last = document.querySelector(".message.bot:last-child");
-    if (!last) return;
+/* ---------------------------------------------------
+   VOICE SYSTEM
+--------------------------------------------------- */
+let recognition = null;
+let voiceMode = false;
+let silenceTimer = null;
 
-    const utter = new SpeechSynthesisUtterance(last.textContent);
+function getSoftFemaleVoice(lang) {
+    const voices = speechSynthesis.getVoices();
+    return voices.find(v => v.lang === lang) || voices[0];
+}
+
+function speak(text) {
+    if (!readAloudToggle.checked) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = languageSelect.value;
+    utter.voice = getSoftFemaleVoice(languageSelect.value);
+    utter.rate = 0.95;
     speechSynthesis.speak(utter);
-};
+}
 
-// -------------------------------
-// VOICE MODE (RESTORED ORIGINAL)
-// -------------------------------
-let recognition;
-let listening = false;
+function initRecognition() {
+    if (!("webkitSpeechRecognition" in window)) {
+        addMessage("Voice recognition not supported in this browser.", "bot");
+        return;
+    }
 
-if ("webkitSpeechRecognition" in window) {
     recognition = new webkitSpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
+    recognition.lang = languageSelect.value;
 
-    recognition.onresult = (event) => {
-        const text = event.results[0][0].transcript;
-        addUserMessage(text);
-        currentQuestion++;
-        askNextQuestion();
+    recognition.onstart = () => micButton.classList.add("active");
+    recognition.onspeechend = () => startSilenceCountdown();
+
+    recognition.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+        addMessage(transcript, "user");
+
+        const result = await translateSmart(transcript, languageSelect.value);
+
+        originalResponses.push(transcript);
+        translatedResponses.push({
+            english: result.english,
+            selected: result.selected
+        });
+
+        if (interviewActive && !paused) {
+            currentIndex++;
+            askQuestion();
+        }
     };
 
     recognition.onend = () => {
-        listening = false;
-        document.getElementById("micButton").classList.remove("listening");
+        if (voiceMode) {
+            try { recognition.start(); } catch (e) {}
+        } else {
+            micButton.classList.remove("active");
+        }
     };
 }
 
-document.getElementById("micButton").onclick = () => {
-    if (!recognition) return;
+function startSilenceCountdown() {
+    clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(() => {
+        voiceMode = false;
+        voiceModeToggle.checked = false;
+        if (recognition) recognition.stop();
+        micButton.classList.remove("active");
+        addMessage("Voice Mode turned off due to inactivity.", "bot");
+    }, 20000);
+}
 
-    if (!listening) {
-        listening = true;
-        document.getElementById("micButton").classList.add("listening");
-        recognition.start();
+/* ---------------------------------------------------
+   MIC TOGGLE
+--------------------------------------------------- */
+micButton.onclick = () => {
+    if (!voiceMode) {
+        voiceMode = true;
+        voiceModeToggle.checked = true;
+        if (!recognition) initRecognition();
+        try { recognition.start(); } catch (e) {}
+        micButton.classList.add("active");
     } else {
-        listening = false;
-        document.getElementById("micButton").classList.remove("listening");
-        recognition.stop();
+        voiceMode = false;
+        voiceModeToggle.checked = false;
+        clearTimeout(silenceTimer);
+        if (recognition) recognition.stop();
+        micButton.classList.remove("active");
     }
 };
 
-// -------------------------------
-// GUIDED TOUR
-// -------------------------------
-const tourSteps = [
-    { element: "#btnStart", text: "Begin the next question in the intake." },
-    { element: "#btnPause", text: "Pause the intake at any time." },
-    { element: "#btnFinish", text: "Finish the session immediately." },
-    { element: "#btnRepeat", text: "Repeat the current question." },
-    { element: "#btnSkip", text: "Skip to the next question." },
-    { element: "#btnReset", text: "Reset the entire intake session." },
-    { element: "#readAloudBtn", text: "Read aloud the last assistant message." },
-    { element: "#voiceModeCheckbox", text: "Enable voice mode for hands‑free input." },
-    { element: "#micButton", text: "Tap to speak your answer." }
-];
+languageSelect.onchange = () => {
+    if (recognition) recognition.lang = languageSelect.value;
 
-let tourIndex = 0;
-
-document.getElementById("btnTour").onclick = () => startTour();
-
-function startTour() {
-    tourIndex = 0;
-    document.getElementById("tourOverlay").style.display = "block";
-    document.getElementById("tourControls").style.display = "flex";
-    showTourStep();
-}
-
-function showTourStep() {
-    const step = tourSteps[tourIndex];
-    const el = document.querySelector(step.element);
-    const tooltip = document.getElementById("tourTooltip");
-    const arrow = document.getElementById("tourArrow");
-
-    const rect = el.getBoundingClientRect();
-
-    tooltip.style.left = rect.left + "px";
-    tooltip.style.top = rect.bottom + 10 + "px";
-    tooltip.textContent = step.text;
-
-    arrow.style.left = rect.left + 20 + "px";
-    arrow.style.top = rect.bottom - 5 + "px";
-}
-
-document.getElementById("tourNext").onclick = () => {
-    tourIndex++;
-    if (tourIndex >= tourSteps.length) endTour();
-    else showTourStep();
+    speechSynthesis.cancel();
+    setTimeout(() => {
+        const testVoice = getSoftFemaleVoice(languageSelect.value);
+        const utter = new SpeechSynthesisUtterance("Language updated.");
+        utter.lang = languageSelect.value;
+        utter.voice = testVoice;
+        utter.rate = 0.95;
+        if (readAloudToggle.checked) speechSynthesis.speak(utter);
+    }, 200);
 };
 
-document.getElementById("tourSkip").onclick = () => endTour();
+voiceModeToggle.onchange = () => {
+    voiceMode = voiceModeToggle.checked;
+    if (!voiceMode) {
+        clearTimeout(silenceTimer);
+        if (recognition) recognition.stop();
+        micButton.classList.remove("active");
+    } else {
+        if (!recognition) initRecognition();
+        try { recognition.start(); } catch (e) {}
+        micButton.classList.add("active");
+    }
+};
 
-function endTour() {
-    document.getElementById("tourOverlay").style.display = "none";
-    document.getElementById("tourControls").style.display = "none";
-}
+/* ---------------------------------------------------
+   INIT
+--------------------------------------------------- */
+updateProgressBar();
