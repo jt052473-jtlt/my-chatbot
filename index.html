@@ -1,57 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 423 Initiative | Sleep Intake Assistant</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<header class="app-header">
+    <h2>Sleep Intake Assistant</h2>
+    <div class="progress-container">
+        <div id="progressBar"></div>
+    </div>
+</header>
 
-    <div id="demoOverlay">
-        <div class="demo-content">
-            <h1>Clinical Intake Assistant</h1>
-            <p>
-                The 423 Initiative engine supports multi‑department clinical intake across 
-                Cardiology, Neurology, and Sleep Medicine.
-            </p>
-            <button id="startDemoBtn">Start Demo</button>
+<main class="app-main">
+
+    <!-- LEFT PANEL REMOVED — controls will move to right side -->
+
+    <section class="right-panel">
+
+        <!-- TOP SETTINGS ROW -->
+        <div class="settings-row">
+            <select id="languageSelect"></select>
+            <input type="text" id="languageSearch" placeholder="Search language...">
+
+            <label class="toggle">
+                <input type="checkbox" id="readAloudToggle">
+                <span>Read Aloud</span>
+            </label>
+
+            <label class="toggle">
+                <input type="checkbox" id="voiceModeToggle">
+                <span>Voice Mode</span>
+            </label>
+
+            <button id="micBtn" class="mic-button">🎤</button>
         </div>
-    </div>
 
-    <div class="app-container">
-        <header class="app-header">
-            <h2>Sleep Intake Assistant</h2>
-        </header>
+        <!-- CHAT WINDOW -->
+        <div id="chatWindow" class="chat-window"></div>
 
-        <main class="app-main">
-            <section class="left-panel">
-                <div class="control-buttons">
-                    <button id="startBtn" class="btn-primary">Start</button>
-                    <button id="pauseBtn">Pause</button>
-                    <button id="finishBtn">Finish</button>
-                    <button id="repeatBtn">Repeat</button>
-                    <button id="skipBtn">Skip</button>
-                    <button id="resetBtn" class="btn-danger">Reset</button>
-                </div>
+        <!-- INPUT + CONTROLS -->
+        <div class="input-controls-row">
+            <div class="control-buttons">
+                <button id="startBtn" class="btn-primary">Start</button>
+                <button id="pauseBtn">Pause</button>
+                <button id="finishBtn">Finish</button>
+                <button id="repeatBtn">Repeat</button>
+                <button id="skipBtn">Skip</button>
+                <button id="resetBtn" class="btn-danger">Reset</button>
+            </div>
 
-                <div class="accessibility-controls">
-                    <button id="readAloudBtn">Read Aloud</button>
-                    <button id="voiceModeBtn">Voice Mode</button>
-                    <button id="micBtn" class="mic-button">🎤</button>
-                </div>
-            </section>
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Type your response here..." autofocus>
+                <button id="sendBtn">Send</button>
+            </div>
+        </div>
 
-            <section class="right-panel">
-                <div id="chatWindow" class="chat-window"></div>
-                <div class="input-area">
-                    <input type="text" id="userInput" placeholder="Type your response here..." autofocus>
-                    <button id="sendBtn">Send</button>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
+    </section>
+</main>
