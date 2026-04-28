@@ -1,318 +1,206 @@
-// ---------------------------------------------------------
-// BASIC CHAT FUNCTIONS
-// ---------------------------------------------------------
-
-function botSpeak(text) {
-    const chat = document.getElementById("chatWindow");
-    const typing = document.getElementById("typingIndicator");
-
-    typing.style.display = "block";
+// -------------------------------
+// START SCREEN → FADE OUT
+// -------------------------------
+document.getElementById("startDemoSession").addEventListener("click", () => {
+    const screen = document.getElementById("startScreen");
+    screen.style.animation = "fadeOut 0.8s ease-out forwards";
 
     setTimeout(() => {
-        typing.style.display = "none";
+        screen.style.display = "none";
+        document.querySelector(".app-container").style.display = "flex";
+        initializeChat();
+    }, 800);
+});
 
-        const msg = document.createElement("div");
-        msg.className = "message bot";
-        msg.innerHTML = text;
-        chat.appendChild(msg);
-        chat.scrollTop = chat.scrollHeight;
-
-        // Read aloud every bot message
-        speakText(msg.innerText);
-    }, 900);
+// -------------------------------
+// INITIAL CHAT SETUP
+// -------------------------------
+function initializeChat() {
+    addBotMessage("Click the button below to begin.");
+    insertStartDemoButton();
 }
 
-function userSpeak(text) {
+function insertStartDemoButton() {
+    const chat = document.getElementById("chatWindow");
+
+    const btn = document.createElement("button");
+    btn.textContent = "Start Demo";
+    btn.style.padding = "10px 16px";
+    btn.style.fontSize = "16px";
+    btn.style.marginTop = "10px";
+    btn.style.cursor = "pointer";
+    btn.style.background = "#0057ff";
+    btn.style.color = "white";
+    btn.style.border = "none";
+    btn.style.borderRadius = "6px";
+
+    btn.onclick = () => {
+        addBotMessage("Great. Let’s begin.");
+        startIntake();
+        btn.remove();
+    };
+
+    chat.appendChild(btn);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+// -------------------------------
+// BASIC CHAT FUNCTIONS
+// -------------------------------
+function addBotMessage(text) {
     const chat = document.getElementById("chatWindow");
     const msg = document.createElement("div");
-    msg.className = "message user";
-    msg.innerText = text;
+    msg.className = "message bot";
+    msg.textContent = text;
     chat.appendChild(msg);
     chat.scrollTop = chat.scrollHeight;
 }
 
-
-
-// ---------------------------------------------------------
-// SPLASH SCREEN → START DEMO
-// ---------------------------------------------------------
-
-document.getElementById("startDemoBtn").addEventListener("click", () => {
-    document.getElementById("splashScreen").style.display = "none";
-    startIntroMessage();
-});
-
-
-
-// ---------------------------------------------------------
-// INTRO MESSAGE (with literacy)
-// ---------------------------------------------------------
-
-function startIntroMessage() {
-    botSpeak(
-        "<strong>Welcome to the Clinical Intake Assistant.</strong><br><br>" +
-        "This demo uses a <strong>sleep intake</strong> example, but the same system can support " +
-        "cardiology, pulmonary, neurology, pain management, behavioral health, and more.<br><br>" +
-        "In our service area, more than <strong>1 in 5 adults have low literacy</strong>, so this assistant " +
-        "includes <strong>Read‑Aloud</strong> and <strong>Voice Input</strong> to help patients who prefer listening " +
-        "and speaking instead of reading and typing.<br><br>" +
-        "<strong>To begin:</strong><br>" +
-        "• Click <strong>Start</strong> to begin the demo.<br>" +
-        "• Or click <strong>“What do these buttons do?”</strong> for a quick explanation first."
-    );
+function addUserMessage(text) {
+    const chat = document.getElementById("chatWindow");
+    const msg = document.createElement("div");
+    msg.className = "message user";
+    msg.textContent = text;
+    chat.appendChild(msg);
+    chat.scrollTop = chat.scrollHeight;
 }
 
+// -------------------------------
+// INTAKE LOGIC (RESTORED ORIGINAL)
+// -------------------------------
+let currentQuestion = 0;
 
+const questions = [
+    "What brings you in today?",
+    "How long have you been experiencing this?",
+    "Does anything make it better or worse?",
+    "Have you had this issue before?",
+    "Are you currently taking any medications?"
+];
 
-// ---------------------------------------------------------
-// ABOUT POPUP (with literacy)
-// ---------------------------------------------------------
+function startIntake() {
+    currentQuestion = 0;
+    askNextQuestion();
+}
 
-document.getElementById("btnAbout").addEventListener("click", () => {
-    alert(
-        "ABOUT THIS PROTOTYPE\n\n" +
-        "This Clinical Intake Assistant demonstrates how conversational AI can streamline " +
-        "patient intake before the patient reaches the clinic.\n\n" +
-        "Although this demo uses a sleep intake workflow, the underlying engine supports " +
-        "multi‑department intake including cardiology, pulmonary, neurology, pain management, " +
-        "behavioral health, primary care, and more.\n\n" +
-        "Local data shows that more than 1 in 5 adults in the NGHS service area struggle " +
-        "with low literacy, meaning many patients have difficulty understanding medical " +
-        "forms, prescription instructions, and discharge papers.\n\n" +
-        "Because of this, the assistant includes Read‑Aloud mode and full voice support, " +
-        "allowing patients to listen to questions and speak their answers instead of " +
-        "reading and typing.\n\n" +
-        "The goal is to reduce staff workload, improve data quality, and modernize the " +
-        "patient experience using structured conversational flows."
-    );
-});
+function askNextQuestion() {
+    if (currentQuestion < questions.length) {
+        addBotMessage(questions[currentQuestion]);
+    } else {
+        addBotMessage("Thank you. Your intake is complete.");
+    }
+}
 
+document.getElementById("btnStart").onclick = () => askNextQuestion();
+document.getElementById("btnPause").onclick = () => addBotMessage("Paused.");
+document.getElementById("btnFinish").onclick = () => addBotMessage("Session finished.");
+document.getElementById("btnRepeat").onclick = () => addBotMessage(questions[currentQuestion]);
+document.getElementById("btnSkip").onclick = () => { currentQuestion++; askNextQuestion(); };
+document.getElementById("btnReset").onclick = () => {
+    document.getElementById("chatWindow").innerHTML = "";
+    initializeChat();
+};
 
+// -------------------------------
+// READ‑ALOUD (RESTORED ORIGINAL)
+// -------------------------------
+document.getElementById("readAloudBtn").onclick = () => {
+    const last = document.querySelector(".message.bot:last-child");
+    if (!last) return;
 
-// ---------------------------------------------------------
-// ADVANCED VOICE SYSTEM (RESTORED)
-// ---------------------------------------------------------
+    const utter = new SpeechSynthesisUtterance(last.textContent);
+    speechSynthesis.speak(utter);
+};
 
+// -------------------------------
+// VOICE MODE (RESTORED ORIGINAL)
+// -------------------------------
 let recognition;
-let isListening = false;
-let voiceMode = false;
+let listening = false;
 
-// Initialize Speech Recognition
 if ("webkitSpeechRecognition" in window) {
     recognition = new webkitSpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
-    recognition.lang = "en-US";
 
-    recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript.trim();
-        userSpeak(transcript);
-        handleVoiceLogic(transcript);
+    recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        addUserMessage(text);
+        currentQuestion++;
+        askNextQuestion();
     };
 
-    recognition.onend = function() {
-        isListening = false;
-        micButton.classList.remove("listening");
-
-        if (voiceMode) {
-            setTimeout(() => recognition.start(), 400);
-        }
+    recognition.onend = () => {
+        listening = false;
+        document.getElementById("micButton").classList.remove("listening");
     };
 }
 
+document.getElementById("micButton").onclick = () => {
+    if (!recognition) return;
 
-
-// ---------------------------------------------------------
-// TEXT-TO-SPEECH (Female voice only)
-// ---------------------------------------------------------
-
-function speakText(text) {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.rate = 1;
-    utter.pitch = 1;
-    utter.volume = 1;
-    utter.lang = "en-US";
-
-    // Force female voice if available
-    const voices = speechSynthesis.getVoices();
-    const female = voices.find(v =>
-        v.name.toLowerCase().includes("female") ||
-        v.name.toLowerCase().includes("woman") ||
-        v.name.toLowerCase().includes("samantha") ||
-        v.name.toLowerCase().includes("google us english")
-    );
-    if (female) utter.voice = female;
-
-    speechSynthesis.speak(utter);
-}
-
-
-
-// ---------------------------------------------------------
-// VOICE MODE CHECKBOX + MIC BUTTON
-// ---------------------------------------------------------
-
-const voiceCheckbox = document.getElementById("voiceModeCheckbox");
-const micButton = document.getElementById("micButton");
-
-// Voice Mode OFF on startup
-voiceCheckbox.checked = false;
-
-voiceCheckbox.addEventListener("change", () => {
-    voiceMode = voiceCheckbox.checked;
-
-    if (voiceMode) {
-        botSpeak("Voice Mode enabled. I will listen after each question.");
-        startListening();
+    if (!listening) {
+        listening = true;
+        document.getElementById("micButton").classList.add("listening");
+        recognition.start();
     } else {
-        botSpeak("Voice Mode disabled.");
-        stopListening();
+        listening = false;
+        document.getElementById("micButton").classList.remove("listening");
+        recognition.stop();
     }
-});
+};
 
-micButton.addEventListener("click", () => {
-    if (isListening) {
-        stopListening();
-    } else {
-        startListening();
-    }
-});
-
-function startListening() {
-    if (!recognition) {
-        botSpeak("Voice input is not supported in this browser.");
-        return;
-    }
-
-    isListening = true;
-    micButton.classList.add("listening");
-    recognition.start();
-}
-
-function stopListening() {
-    isListening = false;
-    micButton.classList.remove("listening");
-    if (recognition) recognition.stop();
-}
-
-
-
-// ---------------------------------------------------------
-// NATURAL YES/NO DETECTION + MEDICATION LOGIC
-// ---------------------------------------------------------
-
-function handleVoiceLogic(text) {
-    const lower = text.toLowerCase();
-
-    if (lower.includes("yes")) {
-        botSpeak("Okay. Please list the medications you're currently taking.");
-        return;
-    }
-
-    if (lower.includes("no")) {
-        botSpeak("Understood. Moving to the next question.");
-        return;
-    }
-
-    botSpeak("Thank you. I recorded your response.");
-}
-
-
-
-// ---------------------------------------------------------
+// -------------------------------
 // GUIDED TOUR
-// ---------------------------------------------------------
-
+// -------------------------------
 const tourSteps = [
-    { selector: "#btnStart", text: "This begins the intake session." },
-    { selector: "#btnPause", text: "This pauses the session." },
-    { selector: "#btnFinish", text: "This ends the session." },
-    { selector: "#btnRepeat", text: "This repeats the last question." },
-    { selector: "#btnSkip", text: "This skips the current question." },
-    { selector: "#btnReset", text: "This resets the entire session." },
-    { selector: "#btnAbout", text: "This shows information about the prototype." }
+    { element: "#btnStart", text: "Begin the next question in the intake." },
+    { element: "#btnPause", text: "Pause the intake at any time." },
+    { element: "#btnFinish", text: "Finish the session immediately." },
+    { element: "#btnRepeat", text: "Repeat the current question." },
+    { element: "#btnSkip", text: "Skip to the next question." },
+    { element: "#btnReset", text: "Reset the entire intake session." },
+    { element: "#readAloudBtn", text: "Read aloud the last assistant message." },
+    { element: "#voiceModeCheckbox", text: "Enable voice mode for hands‑free input." },
+    { element: "#micButton", text: "Tap to speak your answer." }
 ];
 
 let tourIndex = 0;
 
-document.getElementById("btnTour").addEventListener("click", startTour);
-document.getElementById("tourNext").addEventListener("click", nextTourStep);
-document.getElementById("tourSkip").addEventListener("click", endTour);
+document.getElementById("btnTour").onclick = () => startTour();
 
 function startTour() {
     tourIndex = 0;
     document.getElementById("tourOverlay").style.display = "block";
-    document.getElementById("tourTooltip").style.display = "block";
-    document.getElementById("tourArrow").style.display = "block";
     document.getElementById("tourControls").style.display = "flex";
     showTourStep();
 }
 
-function nextTourStep() {
-    tourIndex++;
-    if (tourIndex >= tourSteps.length) {
-        endTour();
-        return;
-    }
-    showTourStep();
-}
-
-function endTour() {
-    document.getElementById("tourOverlay").style.display = "none";
-    document.getElementById("tourTooltip").style.display = "none";
-    document.getElementById("tourArrow").style.display = "none";
-    document.getElementById("tourControls").style.display = "none";
-}
-
 function showTourStep() {
     const step = tourSteps[tourIndex];
-    const element = document.querySelector(step.selector);
-    const rect = element.getBoundingClientRect();
-
+    const el = document.querySelector(step.element);
     const tooltip = document.getElementById("tourTooltip");
     const arrow = document.getElementById("tourArrow");
 
-    tooltip.innerHTML = step.text;
+    const rect = el.getBoundingClientRect();
 
-    tooltip.style.top = rect.top + window.scrollY - 70 + "px";
-    tooltip.style.left = rect.left + window.scrollX + "px";
+    tooltip.style.left = rect.left + "px";
+    tooltip.style.top = rect.bottom + 10 + "px";
+    tooltip.textContent = step.text;
 
-    arrow.style.top = rect.bottom + window.scrollY + 8 + "px";
-    arrow.style.left = rect.left + (rect.width / 2) - 12 + window.scrollX + "px";
+    arrow.style.left = rect.left + 20 + "px";
+    arrow.style.top = rect.bottom - 5 + "px";
 }
 
+document.getElementById("tourNext").onclick = () => {
+    tourIndex++;
+    if (tourIndex >= tourSteps.length) endTour();
+    else showTourStep();
+};
 
+document.getElementById("tourSkip").onclick = () => endTour();
 
-// ---------------------------------------------------------
-// BASIC BUTTON ACTIONS
-// ---------------------------------------------------------
-
-document.getElementById("btnStart").addEventListener("click", () => {
-    userSpeak("Start");
-    botSpeak("Beginning the intake session.");
-});
-
-document.getElementById("btnPause").addEventListener("click", () => {
-    userSpeak("Pause");
-    botSpeak("Pausing the session.");
-});
-
-document.getElementById("btnFinish").addEventListener("click", () => {
-    userSpeak("Finish");
-    botSpeak("Ending the session.");
-});
-
-document.getElementById("btnRepeat").addEventListener("click", () => {
-    userSpeak("Repeat");
-    botSpeak("Repeating the last question.");
-});
-
-document.getElementById("btnSkip").addEventListener("click", () => {
-    userSpeak("Skip");
-    botSpeak("Skipping this question.");
-});
-
-document.getElementById("btnReset").addEventListener("click", () => {
-    userSpeak("Reset");
-    botSpeak("Resetting the session.");
-});
+function endTour() {
+    document.getElementById("tourOverlay").style.display = "none";
+    document.getElementById("tourControls").style.display = "none";
+}
