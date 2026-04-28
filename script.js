@@ -1,98 +1,62 @@
-// Simple demo conversation flow (placeholder)
+const questions = [
+    "What brings you in for a sleep study today?",
+    "How many hours of sleep do you typically get per night?",
+    "Do you often feel tired during the day despite sleeping?",
+    "Has anyone ever told you that you snore or stop breathing at night?",
+    "Do you take any medications to help you fall asleep?"
+];
+
+let currentStep = 0;
 const chatWindow = document.getElementById("chatWindow");
 const userInput = document.getElementById("userInput");
-const sendBtn = document.getElementById("sendBtn");
 
 function addMessage(text, sender = "bot") {
     const msg = document.createElement("div");
     msg.classList.add("message", sender);
     msg.textContent = text;
     chatWindow.appendChild(msg);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+    chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: 'smooth' });
 }
 
-// Initial bot message when Start is clicked
-const startBtn = document.getElementById("startBtn");
-const pauseBtn = document.getElementById("pauseBtn");
-const finishBtn = document.getElementById("finishBtn");
-const repeatBtn = document.getElementById("repeatBtn");
-const skipBtn = document.getElementById("skipBtn");
-const resetBtn = document.getElementById("resetBtn");
+function nextQuestion() {
+    if (currentStep < questions.length) {
+        setTimeout(() => {
+            addMessage(questions[currentStep]);
+            currentStep++;
+        }, 800);
+    } else {
+        setTimeout(() => {
+            addMessage("Intake complete. Your clinician will review your responses shortly.");
+        }, 800);
+    }
+}
 
-startBtn.addEventListener("click", () => {
-    addMessage("Welcome. Let’s begin your sleep intake. What brings you in today?");
-});
-
-pauseBtn.addEventListener("click", () => {
-    addMessage("Okay, pausing for a moment. Let me know when you’re ready to continue.");
-});
-
-finishBtn.addEventListener("click", () => {
-    addMessage("Thank you. Your intake is complete. The summary will be available to your clinician.");
-});
-
-repeatBtn.addEventListener("click", () => {
-    addMessage("I’ll repeat the last question for you.");
-});
-
-skipBtn.addEventListener("click", () => {
-    addMessage("No problem, we’ll skip that question and move on.");
-});
-
-resetBtn.addEventListener("click", () => {
-    chatWindow.innerHTML = "";
-    addMessage("Session reset. Click Start when you’re ready to begin again.");
-});
-
-// Send button / Enter key
-sendBtn.addEventListener("click", handleUserSend);
-userInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-        handleUserSend();
+// Event Listeners
+document.getElementById("startBtn").addEventListener("click", () => {
+    if (currentStep === 0) {
+        addMessage("Welcome. Let’s begin your clinical intake.");
+        nextQuestion();
     }
 });
 
-function handleUserSend() {
-    const text = userInput.value.trim();
-    if (!text) return;
-    addMessage(text, "user");
-    userInput.value = "";
+document.getElementById("sendBtn").addEventListener("click", handleSend);
+userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") handleSend(); });
 
-    // Simple echo-style bot response placeholder
-    setTimeout(() => {
-        addMessage("Thanks for sharing. (Demo response)");
-    }, 600);
+function handleSend() {
+    const val = userInput.value.trim();
+    if (!val) return;
+    addMessage(val, "user");
+    userInput.value = "";
+    nextQuestion();
 }
 
-// Accessibility buttons (placeholder behavior)
-const readAloudBtn = document.getElementById("readAloudBtn");
-const voiceModeBtn = document.getElementById("voiceModeBtn");
-const micBtn = document.getElementById("micBtn");
-
-readAloudBtn.addEventListener("click", () => {
-    addMessage("Read Aloud is not fully implemented in this demo, but would speak questions and responses.", "bot");
+document.getElementById("resetBtn").addEventListener("click", () => {
+    chatWindow.innerHTML = "";
+    currentStep = 0;
+    addMessage("Session reset. Press Start to begin again.");
 });
 
-voiceModeBtn.addEventListener("click", () => {
-    addMessage("Voice Mode would allow you to answer using your voice instead of typing.", "bot");
-});
-
-micBtn.addEventListener("click", () => {
-    addMessage("🎤 Voice capture is not active in this demo build.", "bot");
-});
-
-// Apple-style Start Demo fade-out
-document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("startDemoBtn");
-    if (!btn) return;
-
-    btn.addEventListener("click", () => {
-        const overlay = document.getElementById("demoOverlay");
-        overlay.classList.add("fade-out");
-
-        // Remove overlay from DOM after fade
-        setTimeout(() => {
-            overlay.style.display = "none";
-        }, 1000);
-    });
+// Demo Overlay Logic
+document.getElementById("startDemoBtn").addEventListener("click", () => {
+    document.getElementById("demoOverlay").classList.add("fade-out");
 });
