@@ -102,8 +102,16 @@ function showTourStep() {
     tourTitle.textContent = step.title;
     tourText.textContent = step.text;
 
-    // Position tooltip below the target, aligned to its left
-    const top = rect.bottom + 10 + window.scrollY;
+    const tooltipHeight = 150; // approximate
+    const bottomLimit = window.innerHeight - 170; // keep above bottom controls
+
+    let top = rect.bottom + 12 + window.scrollY;
+
+    // If tooltip would go off-screen, place ABOVE the element
+    if (top > bottomLimit) {
+        top = rect.top - tooltipHeight + window.scrollY - 12;
+    }
+
     const left = rect.left + window.scrollX;
 
     tourTooltip.style.top = `${top}px`;
@@ -238,7 +246,7 @@ const translations = {
         Hindi: "क्या किसी ने देखा है कि आप सोते समय सांस लेना बंद कर देते हैं?",
         Portuguese: "Alguém já observou você parar de respirar durante o sono?",
         Bengali: "কেউ কি লক্ষ্য করেছেন যে আপনি ঘুমের মধ্যে শ্বাস বন্ধ করেন?",
-        Russian: "Кто-нибудь замечал, что вы перестаёте дышать во сне?",
+        Russian: "Кто-нибудь замечал, कि вы перестаёте дышать во сне?",
         German: "Hat jemand beobachtet, dass Sie im Schlaf aufhören zu atmen?"
     },
     "Do you feel rested when you wake up?": {
@@ -308,13 +316,13 @@ const translations = {
         German: "Vielen Dank. Die Aufnahme ist abgeschlossen."
     },
     "Intake reset.": {
-        Spanish: "La evaluación se ha reiniciado.",
+        Spanish: "La evaluación se ha reiniciada.",
         French: "L’entretien a été réinitialisé.",
         Chinese: "评估已重置。",
         Arabic: "تمت إعادة تعيين التقييم.",
         Hindi: "इंटेक रीसेट कर दिया गया है.",
         Portuguese: "A avaliação foi reiniciada.",
-        Bengali: "ইনটेक পুনরায় শুরু করা হয়েছে।",
+        Bengali: "ইনটেক পুনরায় শুরু করা হয়েছে।",
         Russian: "Опрос был сброшен.",
         German: "Die Aufnahme wurde zurückgesetzt."
     },
@@ -346,7 +354,6 @@ loadLanguages(topLanguages);
 // Language change
 languageSelect.addEventListener("change", () => {
     activeLanguage = languageSelect.value;
-    console.log("Language changed to:", activeLanguage);
 });
 
 // Language search
@@ -371,7 +378,6 @@ languageSearch.addEventListener("input", () => {
 // Mic + voice mode
 micBtn.addEventListener("click", () => {
     isListening = !isListening;
-    console.log("Mic listening:", isListening);
     if (voiceModeEnabled || isListening) {
         micBtn.classList.add("active");
     } else {
@@ -388,7 +394,6 @@ voiceModeToggle.addEventListener("change", () => {
         micBtn.classList.remove("active");
         isListening = false;
     }
-    console.log("Voice mode:", voiceModeEnabled, "Listening:", isListening);
 });
 
 // Read aloud toggle
