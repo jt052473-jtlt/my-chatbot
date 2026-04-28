@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
         splash.style.display = "none";
 
         if (wantsTour) {
-            startGuidedTour(); // Added in Block 6
+            startGuidedTour();
         } else {
             startIntroMessage();
         }
@@ -44,8 +44,14 @@ document.addEventListener("DOMContentLoaded", () => {
             "This Clinical Intake Assistant demonstrates how conversational AI can streamline " +
             "patient intake before the patient reaches the clinic.\n\n" +
             "Although this demo uses a sleep intake workflow, the underlying engine supports " +
-            "multi‑department intake including cardiology, pulmonary, neurology, pain management, " +
-            "behavioral health, and more.\n\n" +
+            "multi‑department intake including:\n" +
+            "• Cardiology\n" +
+            "• Pulmonary\n" +
+            "• Neurology\n" +
+            "• Pain Management\n" +
+            "• Behavioral Health\n" +
+            "• Primary Care\n" +
+            "• And more\n\n" +
             "The goal is to reduce staff workload, improve data quality, and modernize the " +
             "patient experience using structured conversational flows."
         );
@@ -58,19 +64,18 @@ document.addEventListener("DOMContentLoaded", () => {
 /* ========================================================= */
 
 function startIntroMessage() {
-    addBotMessage(
+    botSpeak(
         "<strong>Welcome to the Clinical Intake Assistant.</strong><br><br>" +
         "This prototype demonstrates how conversational AI can guide patients through structured " +
         "intake workflows before they arrive at the clinic. While this demo uses a " +
         "<strong>sleep intake</strong> example, the underlying system is designed to support " +
-        "<strong>multiple departments</strong> including cardiology, pulmonary, neurology, " +
+        "<strong>multiple clinical departments</strong> including cardiology, pulmonary, neurology, " +
         "pain management, behavioral health, and more.<br><br>" +
         "The goal is to reduce staff workload, improve data accuracy, and create a smoother, " +
         "more modern patient experience. You can respond by typing or using voice. " +
         "When you're ready, we'll begin."
     );
 
-    // Wait 3 seconds, then start the first question
     setTimeout(() => {
         if (typeof askNextQuestion === "function") {
             askNextQuestion();
@@ -91,64 +96,41 @@ function addBotMessage(text) {
     chat.appendChild(msg);
     chat.scrollTop = chat.scrollHeight;
 }
-<!-- =============================== -->
-<!--   BUTTON EXPLANATION PANEL     -->
-<!-- =============================== -->
-<div id="buttonHelpPanel" class="help-panel">
-    <div class="help-header">
-        <span>❓ What do these buttons do?</span>
-        <button id="toggleHelpBtn" class="help-toggle">▼</button>
-    </div>
 
-    <div class="help-body">
-        <p><strong>▶ Start</strong> — Begins the intake session.</p>
-        <p><strong>⏸ Pause</strong> — Temporarily stops the conversation.</p>
-        <p><strong>🛑 Finish</strong> — Ends the session immediately.</p>
-        <p><strong>🔁 Repeat</strong> — Repeats the last question.</p>
-        <p><strong>⏭ Skip</strong> — Skips the current question.</p>
-        <p><strong>🔄 Reset</strong> — Restarts the entire intake from the beginning.</p>
-    </div>
-</div>
-/* =============================== */
-/*     BUTTON EXPLANATION PANEL    */
-/* =============================== */
 
-.help-panel {
-    background: #ffffff;
-    border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    padding: 12px;
-    margin-top: 10px;
-    font-size: 13px;
+/* ========================================================= */
+/*     TYPING INDICATOR ENGINE + botSpeak() DELAY            */
+/* ========================================================= */
+
+function showTyping() {
+    const indicator = document.getElementById("typingIndicator");
+    indicator.style.display = "flex";
+    scrollChatToBottom();
 }
 
-.help-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    font-weight: 600;
+function hideTyping() {
+    const indicator = document.getElementById("typingIndicator");
+    indicator.style.display = "none";
 }
 
-.help-toggle {
-    background: none;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
+function scrollChatToBottom() {
+    const chat = document.getElementById("chat");
+    chat.scrollTop = chat.scrollHeight;
 }
 
-.help-body {
-    margin-top: 10px;
-    display: none; /* Hidden until toggled */
-    line-height: 1.45;
+function botSpeak(text, delay = 1200) {
+    showTyping();
+
+    setTimeout(() => {
+        hideTyping();
+        addBotMessage(text);
+    }, delay);
 }
 
-.help-body p {
-    margin: 6px 0;
-}
-/* =============================== */
-/*   BUTTON EXPLANATION PANEL JS   */
-/* =============================== */
+
+/* ========================================================= */
+/*        BUTTON EXPLANATION PANEL (HELP PANEL)              */
+/* ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
     const helpPanel = document.getElementById("buttonHelpPanel");
@@ -157,40 +139,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     toggleBtn.addEventListener("click", () => {
         const isOpen = helpBody.style.display === "block";
-
         helpBody.style.display = isOpen ? "none" : "block";
         toggleBtn.textContent = isOpen ? "▼" : "▲";
     });
 
-    // Clicking the header also toggles the panel
     helpPanel.querySelector(".help-header").addEventListener("click", () => {
         toggleBtn.click();
     });
 });
-<!-- ===================================== -->
-<!--        GUIDED TOUR OVERLAY           -->
-<!-- ===================================== -->
-<div id="tourOverlay" class="tour-overlay" style="display:none;">
-    <div id="tourSpotlight" class="tour-spotlight"></div>
 
-    <div id="tourTooltip" class="tour-tooltip">
-        <div id="tourText"></div>
 
-        <div class="tour-controls">
-            <button id="tourNextBtn" class="tour-btn">Next</button>
-            <button id="tourSkipBtn" class="tour-btn secondary">Skip</button>
-        </div>
-    </div>
-</div>
-/* ===================================== */
-/*        GUIDED TOUR ENGINE (JS)        */
-/* ===================================== */
+/* ========================================================= */
+/*                GUIDED TOUR ENGINE (JS)                    */
+/* ========================================================= */
 
 let tourSteps = [];
 let currentStep = 0;
 
 function startGuidedTour() {
-    // Define the steps of the tour
     tourSteps = [
         {
             element: document.getElementById("startBtn"),
@@ -233,19 +199,15 @@ function showTourStep() {
 
     const rect = step.element.getBoundingClientRect();
 
-    // Position spotlight
     spotlight.style.top = rect.top + window.scrollY - 50 + "px";
     spotlight.style.left = rect.left + window.scrollX - 50 + "px";
 
-    // Update tooltip text
     textBox.innerHTML = step.text;
 
-    // Position tooltip under the spotlight
     tooltip.style.top = rect.bottom + window.scrollY + 20 + "px";
     tooltip.style.left = rect.left + window.scrollX + "px";
 }
 
-// NEXT button
 document.getElementById("tourNextBtn").addEventListener("click", () => {
     currentStep++;
     if (currentStep >= tourSteps.length) {
@@ -255,66 +217,38 @@ document.getElementById("tourNextBtn").addEventListener("click", () => {
     }
 });
 
-// SKIP button
 document.getElementById("tourSkipBtn").addEventListener("click", () => {
     endTour();
 });
 
 function endTour() {
     document.getElementById("tourOverlay").style.display = "none";
-    startIntroMessage(); // After tour, begin intro
-}
-function startIntroMessage() {
-    addBotMessage(
-        "<strong>Welcome to the Clinical Intake Assistant.</strong><br><br>" +
-        "This prototype demonstrates how conversational AI can guide patients through structured " +
-        "intake workflows before they arrive at the clinic. While this demo uses a " +
-        "<strong>sleep intake</strong> example, the underlying system is designed to support " +
-        "<strong>multiple clinical departments</strong> including cardiology, pulmonary, neurology, " +
-        "pain management, behavioral health, and more.<br><br>" +
-        "The goal is to reduce staff workload, improve data accuracy, and create a smoother, " +
-        "more modern patient experience. You can respond by typing or using voice. " +
-        "When you're ready, we'll begin."
-    );
-
-    setTimeout(() => {
-        if (typeof askNextQuestion === "function") {
-            askNextQuestion();
-        }
-    }, 3000);
-}
-/* =============================== */
-/*         TYPING INDICATOR        */
-/* =============================== */
-
-.typing-indicator {
-    display: flex;
-    gap: 4px;
-    padding: 10px 14px;
-    margin: 6px;
-    background: #e5e5ea;
-    border-radius: 12px;
-    width: fit-content;
+    startIntroMessage();
 }
 
-.typing-indicator span {
-    width: 8px;
-    height: 8px;
-    background: #888;
-    border-radius: 50%;
-    animation: blink 1.4s infinite both;
-}
 
-.typing-indicator span:nth-child(2) {
-    animation-delay: 0.2s;
-}
+/* ========================================================= */
+/*        BASIC SEND BUTTON + USER MESSAGE HANDLING          */
+/* ========================================================= */
 
-.typing-indicator span:nth-child(3) {
-    animation-delay: 0.4s;
-}
+document.getElementById("sendBtn").addEventListener("click", () => {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if (!text) return;
 
-@keyframes blink {
-    0% { opacity: .2; }
-    20% { opacity: 1; }
-    100% { opacity: .2; }
+    addUserMessage(text);
+    input.value = "";
+
+    if (typeof handleUserResponse === "function") {
+        handleUserResponse(text);
+    }
+});
+
+function addUserMessage(text) {
+    const chat = document.getElementById("chat");
+    const msg = document.createElement("div");
+    msg.className = "message user";
+    msg.textContent = text;
+    chat.appendChild(msg);
+    chat.scrollTop = chat.scrollHeight;
 }
