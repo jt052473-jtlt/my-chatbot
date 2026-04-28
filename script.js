@@ -1,9 +1,18 @@
-// Demo overlay fade-out
+// Demo overlay fade-out + start guided tour
 const demoOverlay = document.getElementById("demoOverlay");
 const startDemoBtn = document.getElementById("startDemoBtn");
+
+const tourOverlay = document.getElementById("tourOverlay");
+const tourTooltip = document.getElementById("tourTooltip");
+const tourTitle = document.getElementById("tourTitle");
+const tourText = document.getElementById("tourText");
+const tourNextBtn = document.getElementById("tourNextBtn");
+const tourExitBtn = document.getElementById("tourExitBtn");
+
 startDemoBtn.addEventListener("click", () => {
     demoOverlay.classList.add("hidden");
     setTimeout(() => (demoOverlay.style.display = "none"), 500);
+    startTour();
 });
 
 // Elements
@@ -31,6 +40,88 @@ let isListening = false;
 let currentQuestionIndex = 0;
 let activeLanguage = "English";
 let transcript = [];
+
+// Guided tour state
+let currentTourStep = 0;
+
+const tourSteps = [
+    {
+        selector: "#languageSelect",
+        title: "Language Selector",
+        text: "Choose your preferred language. All questions and system messages will appear in this language."
+    },
+    {
+        selector: "#languageSearch",
+        title: "Language Search",
+        text: "Quickly find a language by typing its name."
+    },
+    {
+        selector: "#readAloudToggle",
+        title: "Read Aloud",
+        text: "When enabled, the assistant will speak each question in your selected language."
+    },
+    {
+        selector: "#voiceModeToggle",
+        title: "Voice Mode & Mic",
+        text: "Turn this on to answer using your voice. The mic turns blue when listening."
+    },
+    {
+        selector: "#chatWindow",
+        title: "Chat Window",
+        text: "All questions, answers, and system messages appear here."
+    },
+    {
+        selector: ".control-buttons",
+        title: "Controls",
+        text: "Start, Pause, Repeat, Skip, Finish, and Reset manage the intake flow and PDF export."
+    },
+    {
+        selector: ".input-area",
+        title: "Answer Box",
+        text: "Type your responses here and press Send."
+    }
+];
+
+function startTour() {
+    currentTourStep = 0;
+    tourOverlay.classList.remove("hidden");
+    showTourStep();
+}
+
+function endTour() {
+    tourOverlay.classList.add("hidden");
+}
+
+function showTourStep() {
+    const step = tourSteps[currentTourStep];
+    const target = document.querySelector(step.selector);
+    if (!target) return;
+
+    const rect = target.getBoundingClientRect();
+
+    tourTitle.textContent = step.title;
+    tourText.textContent = step.text;
+
+    // Position tooltip below the target, aligned to its left
+    const top = rect.bottom + 10 + window.scrollY;
+    const left = rect.left + window.scrollX;
+
+    tourTooltip.style.top = `${top}px`;
+    tourTooltip.style.left = `${left}px`;
+}
+
+tourNextBtn.addEventListener("click", () => {
+    currentTourStep++;
+    if (currentTourStep >= tourSteps.length) {
+        endTour();
+    } else {
+        showTourStep();
+    }
+});
+
+tourExitBtn.addEventListener("click", () => {
+    endTour();
+});
 
 // Top 10 languages
 const topLanguages = [
@@ -223,7 +314,7 @@ const translations = {
         Arabic: "تمت إعادة تعيين التقييم.",
         Hindi: "इंटेक रीसेट कर दिया गया है.",
         Portuguese: "A avaliação foi reiniciada.",
-        Bengali: "ইনটেক পুনরায় শুরু করা হয়েছে।",
+        Bengali: "ইনটेक পুনরায় শুরু করা হয়েছে।",
         Russian: "Опрос был сброшен.",
         German: "Die Aufnahme wurde zurückgesetzt."
     },
@@ -281,7 +372,6 @@ languageSearch.addEventListener("input", () => {
 micBtn.addEventListener("click", () => {
     isListening = !isListening;
     console.log("Mic listening:", isListening);
-    // Visual state primarily tied to Voice Mode, but we can reflect listening too
     if (voiceModeEnabled || isListening) {
         micBtn.classList.add("active");
     } else {
@@ -319,7 +409,6 @@ function translateText(text) {
     if (entry && entry[activeLanguage]) {
         return entry[activeLanguage];
     }
-    // For user free-text or missing dictionary entries, just return original
     return text;
 }
 
