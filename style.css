@@ -1,260 +1,28 @@
-/* Global reset */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body { background: #f5f5f7; color: #1d1d1f; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
 
-body {
-    background: #f3f4f6;
-    color: #111827;
-}
+.app-container { width: 95%; max-width: 1100px; height: 85vh; background: #fff; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+.app-header { padding: 20px 30px; border-bottom: 1px solid #d2d2d7; background: #fff; }
 
-/* App layout */
-.app-container {
-    max-width: 1100px;
-    margin: 30px auto;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
+.app-main { display: flex; flex: 1; overflow: hidden; }
+.left-panel { width: 300px; border-right: 1px solid #d2d2d7; padding: 25px; display: flex; flex-direction: column; gap: 20px; background: #fafafa; }
 
-.app-header {
-    padding: 16px 24px;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f9fafb;
-}
+.control-buttons, .accessibility-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+button { padding: 12px; border-radius: 12px; border: 1px solid #d2d2d7; background: #fff; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+button:hover { background: #f5f5f7; border-color: #86868b; }
+.btn-primary { background: #0071e3; color: white; border: none; grid-column: span 2; }
+.btn-primary:hover { background: #0077ed; }
 
-.app-header h2 {
-    font-size: 1.4rem;
-    font-weight: 600;
-}
+.right-panel { flex: 1; display: flex; flex-direction: column; padding: 25px; background: #fff; }
+.chat-window { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-bottom: 20px; }
 
-/* Main content */
-.app-main {
-    display: flex;
-    min-height: 500px;
-}
+.message { max-width: 75%; padding: 12px 16px; border-radius: 18px; line-height: 1.5; font-size: 0.95rem; }
+.bot { align-self: flex-start; background: #f2f2f7; color: #1d1d1f; border-bottom-left-radius: 4px; }
+.user { align-self: flex-end; background: #0071e3; color: white; border-bottom-right-radius: 4px; }
 
-/* Left panel */
-.left-panel {
-    width: 35%;
-    border-right: 1px solid #e5e7eb;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+.input-area { display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid #d2d2d7; }
+#userInput { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #d2d2d7; outline: none; }
+#sendBtn { background: #0071e3; color: white; border: none; padding: 0 25px; }
 
-.intro-text p {
-    font-size: 1rem;
-    color: #111827;
-}
-
-/* Control buttons */
-.control-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.control-buttons button {
-    flex: 1 1 45%;
-    padding: 8px 10px;
-    font-size: 0.9rem;
-    border-radius: 999px;
-    border: 1px solid #d1d5db;
-    background: #f9fafb;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.control-buttons button:hover {
-    background: #e5e7eb;
-    transform: translateY(-1px);
-}
-
-/* Helper text */
-.helper-text p {
-    font-size: 0.9rem;
-    color: #6b7280;
-}
-
-/* Accessibility controls */
-.accessibility-controls {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.accessibility-controls button {
-    flex: 1 1 30%;
-    padding: 8px 10px;
-    font-size: 0.85rem;
-    border-radius: 999px;
-    border: 1px solid #d1d5db;
-    background: #f9fafb;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.accessibility-controls button:hover {
-    background: #e5e7eb;
-    transform: translateY(-1px);
-}
-
-.mic-button {
-    font-size: 1.1rem;
-}
-
-/* Right panel */
-.right-panel {
-    width: 65%;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-/* Chat window */
-.chat-window {
-    flex: 1;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    padding: 12px;
-    background: #f9fafb;
-    overflow-y: auto;
-}
-
-/* Chat messages */
-.message {
-    margin-bottom: 10px;
-    padding: 8px 10px;
-    border-radius: 10px;
-    max-width: 80%;
-    font-size: 0.9rem;
-    line-height: 1.4;
-}
-
-.message.bot {
-    background: #e5f0ff;
-    align-self: flex-start;
-}
-
-.message.user {
-    background: #d1fae5;
-    align-self: flex-end;
-}
-
-/* Input area */
-.input-area {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-#userInput {
-    flex: 1;
-    padding: 10px 12px;
-    border-radius: 999px;
-    border: 1px solid #d1d5db;
-    font-size: 0.95rem;
-}
-
-#sendBtn {
-    padding: 10px 18px;
-    border-radius: 999px;
-    border: none;
-    background: #2563eb;
-    color: white;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-}
-
-#sendBtn:hover {
-    background: #1d4ed8;
-    transform: translateY(-1px);
-}
-
-/* Apple-style Start Demo overlay */
-#demoOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 40px;
-    z-index: 9999;
-    opacity: 1;
-    transition: opacity 1s ease;
-}
-
-/* Centered content */
-.demo-content h1 {
-    font-size: 2.4rem;
-    font-weight: 600;
-    margin-bottom: 15px;
-    color: #000;
-}
-
-.demo-content p {
-    font-size: 1.1rem;
-    color: #555;
-    max-width: 600px;
-    line-height: 1.5;
-}
-
-/* Start Demo Button */
-#startDemoBtn {
-    position: absolute;
-    bottom: 60px;
-    padding: 14px 32px;
-    font-size: 1.2rem;
-    border: none;
-    border-radius: 30px;
-    background: #007aff;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: background 0.3s ease, transform 0.2s ease;
-}
-
-#startDemoBtn:hover {
-    background: #005fcc;
-    transform: scale(1.03);
-}
-
-/* Fade-out class */
-.fade-out {
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-    .app-main {
-        flex-direction: column;
-    }
-
-    .left-panel,
-    .right-panel {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .right-panel {
-        border-bottom: none;
-    }
-}
+#demoOverlay { position: fixed; inset: 0; background: #fff; z-index: 100; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease; }
+.fade-out { opacity: 0; pointer-events: none; }
