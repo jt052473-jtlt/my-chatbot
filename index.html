@@ -1,247 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Clinical Intake Assistant</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sleep Intake Assistant</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            color: #222;
-        }
+<style>
+    :root {
+        --blue-main: #0050c8;
+    }
 
-        .app-container {
-            display: none; /* Hidden until start screen fades out */
-            height: 100vh;
-            display: flex;
-        }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f2f2f7;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+    }
 
-        /* CHAT AREA */
-        .chat-container {
-            flex: 2;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid #ddd;
-            background: #ffffff;
-        }
+    .layout {
+        display: flex;
+        width: 95%;
+        max-width: 1000px;
+        gap: 16px;
+        padding: 16px 0;
+    }
 
-        #chatWindow {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
+    .left-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
-        .message {
-            margin-bottom: 12px;
-            padding: 10px 14px;
-            border-radius: 8px;
-            max-width: 70%;
-            line-height: 1.4;
-        }
+    .header-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
 
-        .bot {
-            background: #e8f0fe;
-            align-self: flex-start;
-        }
+    .progress-container {
+        width: 100%;
+        height: 4px;
+        background: #e5e5ea;
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
 
-        .user {
-            background: #d1ffd6;
-            align-self: flex-end;
-        }
+    .progress-bar {
+        height: 100%;
+        width: 0%;
+        background: #ffffff;
+        transition: width 0.25s ease, background-color 0.25s ease;
+    }
 
-        #typingIndicator {
-            display: none;
-            padding: 10px;
-            font-style: italic;
-            color: #666;
-        }
+    #chat {
+        flex: 1;
+        min-height: 260px;
+        max-height: 420px;
+        overflow-y: auto;
+        padding: 12px;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        margin-bottom: 10px;
+    }
 
-        /* RIGHT PANEL */
-        .control-panel {
-            flex: 1;
-            background: #fafafa;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+    .message {
+        padding: 8px 12px;
+        border-radius: 14px;
+        margin-bottom: 8px;
+        max-width: 80%;
+        line-height: 1.4;
+        font-size: 14px;
+    }
 
-        .control-panel button {
-            padding: 12px;
-            font-size: 16px;
-            border: none;
-            background: #0057ff;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+    .bot { background: #e5e5ea; }
+    .user { background: var(--blue-main); color: white; margin-left: auto; }
 
-        .control-panel button:hover {
-            background: #003fcc;
-        }
+    /* SETTINGS ROW */
+    .settings-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
 
-        /* VOICE CONTROLS */
-        #voiceControls {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-        }
+    .setting-group {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+    }
 
-        #micButton {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: none;
-            background: #ccc;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-        }
+    /* LANGUAGE DROPDOWN — NARROW + SCROLLABLE */
+    #languageSelect {
+        width: 135px;                 /* Narrow enough to fit everything */
+        max-height: 200px;            /* Shows ~10 languages */
+        overflow-y: auto;             /* Scroll for the rest */
+        border-radius: 10px;
+        padding: 4px 6px;
+        font-size: 13px;
+    }
 
-        #micButton.listening {
-            background: #007bff;
-        }
+    /* SEARCH BAR — SHORTER */
+    #languageSearch {
+        width: 95px;                  /* Shorter to fit on same line */
+        padding: 5px 8px 5px 26px;
+        border-radius: 14px;
+        border: 1px solid #ccc;
+        font-size: 12px;
+        background: #fff url('data:image/svg+xml;utf8,<svg fill="gray" height="12" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>') no-repeat 8px center;
+        background-size: 12px;
+    }
 
-        /* APPLE‑STYLE START SCREEN */
-        #startScreen {
-            position: fixed;
-            inset: 0;
-            background: white;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            animation: fadeIn 0.5s ease-out;
-        }
+    .input-row {
+        display: flex;
+        gap: 8px;
+    }
 
-        #startScreen h1 {
-            font-size: 32px;
-            margin-bottom: 40px;
-        }
+    #textInput {
+        flex: 1;
+        padding: 10px;
+        border-radius: 14px;
+        border: 1px solid #d1d1d6;
+        font-size: 14px;
+    }
 
-        #startDemoSession {
-            padding: 14px 22px;
-            font-size: 18px;
-            background: #0057ff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+    #sendBtn {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: var(--blue-main);
+        color: white;
+        font-size: 18px;
+        border: none;
+        cursor: pointer;
+    }
 
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
+    .right-panel {
+        width: 180px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+    .control-btn {
+        padding: 8px;
+        border-radius: 10px;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
 
-        /* GUIDED TOUR */
-        #tourOverlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-            display: none;
-            z-index: 99998;
-        }
+    #micButton {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #c7c7cc;
+        color: white;
+        font-size: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 10px auto 0 auto;
+        cursor: pointer;
+    }
 
-        #tourTooltip {
-            position: absolute;
-            background: white;
-            padding: 12px 16px;
-            border-radius: 6px;
-            max-width: 260px;
-            font-size: 15px;
-            line-height: 1.4;
-            z-index: 999999;
-        }
+    #micButton.active {
+        background: var(--blue-main);
+        box-shadow: 0 0 12px rgba(0,80,200,0.6);
+    }
 
-        .tour-arrow {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 12px solid transparent;
-            border-right: 12px solid transparent;
-            border-top: 18px solid #ffffff;
-            z-index: 999999;
-        }
+    #printBtn { display: none; }
 
-        #tourControls {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
-            gap: 12px;
-            z-index: 999999;
-        }
-
-        #tourControls button {
-            padding: 10px 16px;
-            font-size: 15px;
-            border: none;
-            background: #0057ff;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-    </style>
+</style>
 </head>
 
 <body>
 
-    <!-- APPLE‑SIMPLE START SCREEN -->
-    <div id="startScreen">
-        <h1>Clinical Intake Assistant</h1>
-        <button id="startDemoSession">Start Demo Session</button>
-    </div>
+<div class="layout">
 
-    <!-- MAIN APP -->
-    <div class="app-container">
+    <div class="left-panel">
 
-        <!-- CHAT -->
-        <div class="chat-container">
-            <div id="chatWindow"></div>
-            <div id="typingIndicator">Assistant is typing…</div>
+        <h2 class="header-title">Sleep Intake Assistant</h2>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
         </div>
 
-        <!-- CONTROL PANEL -->
-        <div class="control-panel">
-            <button id="btnStart">Start</button>
-            <button id="btnPause">Pause</button>
-            <button id="btnFinish">Finish</button>
-            <button id="btnRepeat">Repeat</button>
-            <button id="btnSkip">Skip</button>
-            <button id="btnReset">Reset</button>
-            <button id="btnTour">What do these buttons do?</button>
+        <div id="chat"></div>
 
-            <div id="voiceControls">
-                <button id="readAloudBtn">🔊 Read Aloud</button>
-                <label><input type="checkbox" id="voiceModeCheckbox"> Voice Mode</label>
-                <button id="micButton">🎤</button>
+        <!-- SETTINGS ROW -->
+        <div class="settings-row">
+
+            <div class="setting-group">
+                <span>🌐 Language:</span>
+                <select id="languageSelect"></select>
             </div>
+
+            <input id="languageSearch" type="text" placeholder="Search…">
+
+            <div class="setting-group">
+                <span>🎙️ Voice</span>
+                <input type="checkbox" id="voiceModeToggle">
+            </div>
+
+            <div class="setting-group">
+                <span>🔊 Read</span>
+                <input type="checkbox" id="readAloudToggle">
+            </div>
+
         </div>
+
+        <div class="input-row">
+            <input id="textInput" type="text" placeholder="Type your response...">
+            <button id="sendBtn">➤</button>
+        </div>
+
     </div>
 
-    <!-- GUIDED TOUR ELEMENTS -->
-    <div id="tourOverlay"></div>
-    <div id="tourTooltip"></div>
-    <div id="tourArrow" class="tour-arrow"></div>
-
-    <div id="tourControls">
-        <button id="tourNext">Next</button>
-        <button id="tourSkip">Skip</button>
+    <div class="right-panel">
+        <button class="control-btn" id="startBtn">▶️ Start</button>
+        <button class="control-btn" id="pauseBtn">⏸️ Pause</button>
+        <button class="control-btn" id="finishBtn">🛑 Finish</button>
+        <button class="control-btn" id="repeatBtn">🔁 Repeat</button>
+        <button class="control-btn" id="skipBtn">⏭️ Skip</button>
+        <button class="control-btn" id="resetBtn">🔄 Reset</button>
+        <div id="micButton">🎤</div>
+        <button class="control-btn" id="printBtn">🖨️ Print Summary</button>
     </div>
 
-    <script src="script.js"></script>
+</div>
 
+<script src="script.js"></script>
 </body>
 </html>
