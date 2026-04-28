@@ -1,388 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clinical Intake Assistant</title>
+    <meta charset="UTF-8">
+    <title>Clinical Intake Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
 
-/* ========================= */
-/*      GLOBAL STYLES        */
-/* ========================= */
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f2f2f7;
-}
+        /* LEFT SIDE — CHAT */
+        .chat-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #ddd;
+            background: #ffffff;
+            position: relative;
+        }
 
-/* Layout */
-.layout {
-    display: flex;
-    height: 100vh;
-}
+        #chatWindow {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
 
-/* Left Panel (Chat) */
-.left-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-right: 1px solid #ddd;
-}
+        .message {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            max-width: 70%;
+            line-height: 1.4;
+        }
 
-#chat {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px;
-}
+        .bot {
+            background: #e8f0fe;
+            align-self: flex-start;
+        }
 
-.message {
-    padding: 10px 14px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-    max-width: 80%;
-}
+        .user {
+            background: #d1ffd6;
+            align-self: flex-end;
+        }
 
-.message.bot {
-    background: #e5e5ea;
-    align-self: flex-start;
-}
+        /* Typing indicator */
+        #typingIndicator {
+            display: none;
+            padding: 10px;
+            font-style: italic;
+            color: #666;
+        }
 
-.message.user {
-    background: #007aff;
-    color: white;
-    align-self: flex-end;
-}
+        /* RIGHT SIDE — BUTTON PANEL */
+        .control-panel {
+            flex: 1;
+            background: #fafafa;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-/* Input Area */
-.input-area {
-    display: flex;
-    padding: 10px;
-    border-top: 1px solid #ddd;
-    background: #fafafa;
-}
+        .control-panel button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            background: #0057ff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
 
-.input-area input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-}
+        .control-panel button:hover {
+            background: #003fcc;
+        }
 
-.input-area button {
-    margin-left: 10px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: none;
-    background: #007aff;
-    color: white;
-    cursor: pointer;
-}
+        /* SPLASH SCREEN */
+        #splashScreen {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+        }
 
-/* Right Panel (Buttons) */
-.right-panel {
-    width: 260px;
-    padding: 15px;
-    background: #f7f7fa;
-}
+        #splashScreen p {
+            max-width: 600px;
+            font-size: 18px;
+            line-height: 1.5;
+        }
 
-.right-panel button {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-    border: none;
-    background: #007aff;
-    color: white;
-    cursor: pointer;
-}
+        #startDemoBtn {
+            margin-top: 20px;
+            padding: 14px 22px;
+            font-size: 18px;
+            background: #0057ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
 
-/* ========================= */
-/*      SPLASH SCREEN        */
-/* ========================= */
+        /* GUIDED TOUR OVERLAY */
+        #tourOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            z-index: 99998;
+        }
 
-#splashScreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(242, 242, 247, 0.96);
-    backdrop-filter: blur(6px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
+        #tourTooltip {
+            position: absolute;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 6px;
+            max-width: 260px;
+            font-size: 15px;
+            line-height: 1.4;
+            z-index: 999999;
+        }
 
-.splash-content {
-    background: #ffffff;
-    padding: 28px;
-    width: 90%;
-    max-width: 420px;
-    border-radius: 18px;
-    box-shadow: 0 6px 22px rgba(0,0,0,0.12);
-    text-align: center;
-    animation: fadeIn 0.4s ease;
-}
+        /* Arrow BELOW button, pointing UP */
+        .tour-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 18px solid #ffffff;
+            z-index: 999999;
+        }
 
-.splash-content h1 {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
+        #tourControls {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 999999;
+        }
 
-.splash-content p {
-    font-size: 14px;
-    line-height: 1.45;
-    margin-bottom: 20px;
-}
-
-.splash-btn {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    background: #007aff;
-    color: white;
-}
-
-.splash-btn.secondary {
-    background: #e5e5ea;
-    color: #333;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* =============================== */
-/*     BUTTON EXPLANATION PANEL    */
-/* =============================== */
-
-.help-panel {
-    background: #ffffff;
-    border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    padding: 12px;
-    margin-top: 10px;
-    font-size: 13px;
-}
-
-.help-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.help-toggle {
-    background: none;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.help-body {
-    margin-top: 10px;
-    display: none;
-    line-height: 1.45;
-}
-
-.help-body p {
-    margin: 6px 0;
-}
-
-/* =============================== */
-/*         TYPING INDICATOR        */
-/* =============================== */
-
-.typing-indicator {
-    display: none;
-    gap: 4px;
-    padding: 10px 14px;
-    margin: 6px;
-    background: #e5e5ea;
-    border-radius: 12px;
-    width: fit-content;
-}
-
-.typing-indicator span {
-    width: 8px;
-    height: 8px;
-    background: #888;
-    border-radius: 50%;
-    animation: blink 1.4s infinite both;
-}
-
-.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes blink {
-    0% { opacity: .2; }
-    20% { opacity: 1; }
-    100% { opacity: .2; }
-}
-
-/* ===================================== */
-/*        GUIDED TOUR OVERLAY            */
-/* ===================================== */
-
-.tour-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.65);
-    backdrop-filter: blur(3px);
-    z-index: 99999;
-    display: none;
-}
-
-.tour-spotlight {
-    position: absolute;
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    box-shadow: 0 0 0 9999px rgba(0,0,0,0.65);
-    transition: all 0.35s ease;
-    pointer-events: none;
-}
-
-.tour-tooltip {
-    position: absolute;
-    background: #ffffff;
-    padding: 14px;
-    border-radius: 12px;
-    width: 260px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.18);
-    font-size: 14px;
-    line-height: 1.45;
-}
-
-.tour-controls {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 12px;
-}
-
-.tour-btn {
-    padding: 8px 14px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    background: #007aff;
-    color: white;
-    font-weight: 600;
-}
-
-.tour-btn.secondary {
-    background: #e5e5ea;
-    color: #333;
-}
-
-</style>
+        #tourControls button {
+            padding: 10px 16px;
+            font-size: 15px;
+            border: none;
+            background: #0057ff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- ========================= -->
-<!--   SPLASH SCREEN OVERLAY   -->
-<!-- ========================= -->
-<div id="splashScreen">
-    <div class="splash-content">
-        <h1>Clinical Intake Assistant Prototype</h1>
+    <!-- SPLASH SCREEN -->
+    <div id="splashScreen">
+        <h2>Clinical Intake Assistant</h2>
 
         <p>
             This demo showcases a <strong>sleep intake workflow</strong>, but the underlying 
             engine is designed to support <strong>multi‑department clinical intake</strong> 
             across cardiology, pulmonary, neurology, pain management, behavioral health, 
-            and more.  
+            and more.
             <br><br>
-            The goal of this prototype is to demonstrate how conversational AI can streamline 
-            patient intake, reduce staff workload, and improve data quality before the patient 
-            ever reaches the clinic.
+            In our service area, more than <strong>1 in 5 adults struggle with low literacy</strong>, 
+            which makes traditional medical forms difficult to understand.
+            <br><br>
+            To support these patients, this assistant includes <strong>Read‑Aloud</strong> and 
+            <strong>Voice Input</strong> options.
+            <br><br>
+            You may click <strong>“What do these buttons do?”</strong> to learn the controls, 
+            or click <strong>Start Demo Session</strong> to begin.
         </p>
 
-        <button id="startDemoBtn" class="splash-btn">▶ Start Demo Session</button>
-        <button id="tourBtn" class="splash-btn secondary">❓ Take a Guided Tour</button>
-        <button id="aboutBtn" class="splash-btn secondary">ℹ About This Prototype</button>
-    </div>
-</div>
-
-<!-- ========================= -->
-<!--        MAIN LAYOUT        -->
-<!-- ========================= -->
-<div class="layout">
-
-    <!-- LEFT PANEL -->
-    <div class="left-panel">
-        <div id="chat"></div>
-
-        <!-- TYPING INDICATOR -->
-        <div id="typingIndicator" class="typing-indicator">
-            <span></span><span></span><span></span>
-        </div>
-
-        <div class="input-area">
-            <input id="userInput" type="text" placeholder="Type your response...">
-            <button id="sendBtn">Send</button>
-        </div>
+        <button id="startDemoBtn">Start Demo Session</button>
     </div>
 
-    <!-- RIGHT PANEL -->
-    <div class="right-panel">
-        <button id="startBtn">▶ Start</button>
-        <button id="pauseBtn">⏸ Pause</button>
-        <button id="finishBtn">🛑 Finish</button>
-        <button id="repeatBtn">🔁 Repeat</button>
-        <button id="skipBtn">⏭ Skip</button>
-        <button id="resetBtn">🔄 Reset</button>
+    <!-- MAIN APP -->
+    <div class="app-container">
 
-        <!-- HELP PANEL -->
-        <div id="buttonHelpPanel" class="help-panel">
-            <div class="help-header">
-                <span>❓ What do these buttons do?</span>
-                <button id="toggleHelpBtn" class="help-toggle">▼</button>
-            </div>
+        <!-- CHAT -->
+        <div class="chat-container">
+            <div id="chatWindow"></div>
+            <div id="typingIndicator">Assistant is typing…</div>
+        </div>
 
-            <div class="help-body">
-                <p><strong>▶ Start</strong> — Begins the intake session.</p>
-                <p><strong>⏸ Pause</strong> — Temporarily stops the conversation.</p>
-                <p><strong>🛑 Finish</strong> — Ends the session immediately.</p>
-                <p><strong>🔁 Repeat</strong> — Repeats the last question.</p>
-                <p><strong>⏭ Skip</strong> — Skips the current question.</p>
-                <p><strong>🔄 Reset</strong> — Restarts the entire intake.</p>
-            </div>
+        <!-- CONTROL PANEL -->
+        <div class="control-panel">
+            <button id="btnStart">Start</button>
+            <button id="btnPause">Pause</button>
+            <button id="btnFinish">Finish</button>
+            <button id="btnRepeat">Repeat</button>
+            <button id="btnSkip">Skip</button>
+            <button id="btnReset">Reset</button>
+            <button id="btnAbout">About</button>
+            <button id="btnTour">What do these buttons do?</button>
         </div>
     </div>
-</div>
 
-<!-- ===================================== -->
-<!--        GUIDED TOUR OVERLAY            -->
-<!-- ===================================== -->
-<div id="tourOverlay" class="tour-overlay">
-    <div id="tourSpotlight" class="tour-spotlight"></div>
+    <!-- GUIDED TOUR ELEMENTS -->
+    <div id="tourOverlay"></div>
+    <div id="tourTooltip"></div>
+    <div id="tourArrow" class="tour-arrow"></div>
 
-    <div id="tourTooltip" class="tour-tooltip">
-        <div id="tourText"></div>
-
-        <div class="tour-controls">
-            <button id="tourNextBtn" class="tour-btn">Next</button>
-            <button id="tourSkipBtn" class="tour-btn secondary">Skip</button>
-        </div>
+    <div id="tourControls">
+        <button id="tourNext">Next</button>
+        <button id="tourSkip">Skip</button>
     </div>
-</div>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
+
 </body>
 </html>
