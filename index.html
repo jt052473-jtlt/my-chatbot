@@ -1,27 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Sleep Intake Assistant</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The 423 Initiative | Sleep Intake</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- Apple-Style Start Demo Screen -->
     <div id="demoOverlay">
         <div class="demo-content">
             <h1>Clinical Intake Assistant</h1>
-            <p>
-                This demo showcases a sleep intake workflow, but the underlying engine supports 
-                multi‑department clinical intake across cardiology, pulmonary, neurology, 
-                pain management, behavioral health, and more.
-            </p>
+            <p>The 423 Initiative engine supports multi‑department clinical intake including Cardiology, Neurology, and Sleep Medicine.</p>
+            <button id="startDemoBtn">Start Demo</button>
         </div>
-
-        <button id="startDemoBtn">Start Demo</button>
     </div>
 
-    <!-- Main App Container -->
     <div class="app-container">
         <header class="app-header">
             <h2>Sleep Intake Assistant</h2>
@@ -29,23 +22,14 @@
 
         <main class="app-main">
             <section class="left-panel">
-                <div class="intro-text">
-                    <p>Click the button below to begin.</p>
-                </div>
-
                 <div class="control-buttons">
-                    <button id="startBtn">Start</button>
+                    <button id="startBtn" class="btn-primary">Start</button>
                     <button id="pauseBtn">Pause</button>
                     <button id="finishBtn">Finish</button>
                     <button id="repeatBtn">Repeat</button>
                     <button id="skipBtn">Skip</button>
                     <button id="resetBtn">Reset</button>
                 </div>
-
-                <div class="helper-text">
-                    <p>What do these buttons do?</p>
-                </div>
-
                 <div class="accessibility-controls">
                     <button id="readAloudBtn">Read Aloud</button>
                     <button id="voiceModeBtn">Voice Mode</button>
@@ -54,22 +38,14 @@
             </section>
 
             <section class="right-panel">
-                <div id="chatWindow" class="chat-window">
-                    <!-- Messages will appear here -->
-                </div>
-
+                <div id="chatWindow" class="chat-window"></div>
                 <div class="input-area">
-                    <input
-                        type="text"
-                        id="userInput"
-                        placeholder="Type your response here..."
-                    />
+                    <input type="text" id="userInput" placeholder="Type your response here...">
                     <button id="sendBtn">Send</button>
                 </div>
             </section>
         </main>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
