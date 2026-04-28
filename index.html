@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 423 Initiative | Sleep Intake</title>
+    <title>Sleep Intake Assistant | The 423 Initiative</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div id="demoOverlay">
         <div class="demo-content">
             <h1>Clinical Intake Assistant</h1>
-            <p>The 423 Initiative engine supports multi‑department clinical intake including Cardiology, Neurology, and Sleep Medicine.</p>
+            <p>
+                This demo showcases a sleep intake workflow. The underlying engine supports 
+                multi‑department clinical intake for Cardiology, Neurology, and more.
+            </p>
             <button id="startDemoBtn">Start Demo</button>
         </div>
     </div>
@@ -30,6 +34,7 @@
                     <button id="skipBtn">Skip</button>
                     <button id="resetBtn">Reset</button>
                 </div>
+
                 <div class="accessibility-controls">
                     <button id="readAloudBtn">Read Aloud</button>
                     <button id="voiceModeBtn">Voice Mode</button>
@@ -38,14 +43,17 @@
             </section>
 
             <section class="right-panel">
-                <div id="chatWindow" class="chat-window"></div>
+                <div id="chatWindow" class="chat-window">
+                    </div>
+
                 <div class="input-area">
-                    <input type="text" id="userInput" placeholder="Type your response here...">
+                    <input type="text" id="userInput" placeholder="Type your response here..." autofocus>
                     <button id="sendBtn">Send</button>
                 </div>
             </section>
         </main>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
