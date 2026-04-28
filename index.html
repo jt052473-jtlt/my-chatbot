@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 423 Initiative | Sleep Intake Assistant</title>
+    <title>Sleep Intake Assistant</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,8 +13,9 @@
         <div class="demo-content">
             <h1>Clinical Intake Assistant</h1>
             <p>
-                The 423 Initiative engine supports multi‑department clinical intake across 
-                Cardiology, Neurology, and Sleep Medicine.
+                This demo showcases a sleep intake workflow, but the underlying engine is designed
+                to support multi‑department clinical intake across cardiology, pulmonary, neurology,
+                pain management, behavioral health, and more.
             </p>
             <button id="startDemoBtn">Start Demo</button>
         </div>
@@ -24,8 +25,6 @@
 
         <header class="app-header">
             <h2>Sleep Intake Assistant</h2>
-
-            <!-- Progress Bar -->
             <div class="progress-container">
                 <div id="progressBar"></div>
             </div>
@@ -73,6 +72,8 @@
 
     </div>
 
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
