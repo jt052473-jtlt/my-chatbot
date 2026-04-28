@@ -1,15 +1,9 @@
 // Demo overlay fade-out
 const demoOverlay = document.getElementById("demoOverlay");
-const startDemoBtn = document.getElementById("startDemoBtn");
-
-if (startDemoBtn) {
-    startDemoBtn.addEventListener("click", () => {
-        demoOverlay.classList.add("hidden");
-        setTimeout(() => {
-            demoOverlay.style.display = "none";
-        }, 500);
-    });
-}
+document.getElementById("startDemoBtn").addEventListener("click", () => {
+    demoOverlay.classList.add("hidden");
+    setTimeout(() => demoOverlay.style.display = "none", 500);
+});
 
 // Elements
 const chatWindow = document.getElementById("chatWindow");
@@ -33,42 +27,30 @@ const languageSearch = document.getElementById("languageSearch");
 let readAloudEnabled = false;
 let voiceModeEnabled = false;
 let currentQuestionIndex = 0;
-const totalQuestions = 10; // adjust to your real count
 
-// Top 10 languages (greatest to least)
+// Top 10 languages
 const topLanguages = [
-    "English",
-    "Spanish",
-    "French",
-    "Chinese",
-    "Arabic",
-    "Hindi",
-    "Portuguese",
-    "Bengali",
-    "Russian",
-    "German"
+    "English", "Spanish", "French", "Chinese", "Arabic",
+    "Hindi", "Portuguese", "Bengali", "Russian", "German"
 ];
 
-// Populate language dropdown
-topLanguages.forEach(lang => {
-    const option = document.createElement("option");
-    option.value = lang;
-    option.textContent = lang;
-    languageSelect.appendChild(option);
-});
-
-// Simple language search filter
-languageSearch.addEventListener("input", () => {
-    const query = languageSearch.value.toLowerCase();
+// Populate dropdown
+function loadLanguages(list) {
     languageSelect.innerHTML = "";
-    topLanguages
-        .filter(lang => lang.toLowerCase().includes(query))
-        .forEach(lang => {
-            const option = document.createElement("option");
-            option.value = lang;
-            option.textContent = lang;
-            languageSelect.appendChild(option);
-        });
+    list.forEach(lang => {
+        const opt = document.createElement("option");
+        opt.value = lang;
+        opt.textContent = lang;
+        languageSelect.appendChild(opt);
+    });
+}
+loadLanguages(topLanguages);
+
+// Search filter
+languageSearch.addEventListener("input", () => {
+    const q = languageSearch.value.toLowerCase();
+    const filtered = topLanguages.filter(l => l.toLowerCase().includes(q));
+    loadLanguages(filtered);
 });
 
 // Mic toggle
@@ -76,7 +58,7 @@ micBtn.addEventListener("click", () => {
     micBtn.classList.toggle("active");
 });
 
-// Read Aloud + Voice Mode toggles
+// Toggles
 readAloudToggle.addEventListener("change", () => {
     readAloudEnabled = readAloudToggle.checked;
 });
@@ -85,13 +67,13 @@ voiceModeToggle.addEventListener("change", () => {
     voiceModeEnabled = voiceModeToggle.checked;
 });
 
-// Progress bar update
-function updateProgress(current, total) {
-    const percent = Math.min(100, (current / total) * 100);
+// Progress bar
+function updateProgress() {
+    const percent = (currentQuestionIndex / questions.length) * 100;
     document.getElementById("progressBar").style.width = percent + "%";
 }
 
-// Basic chat helpers
+// Chat helpers
 function addMessage(text, sender = "bot") {
     const msg = document.createElement("div");
     msg.classList.add("message", sender);
@@ -100,7 +82,7 @@ function addMessage(text, sender = "bot") {
     chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-// Example question flow
+// Questions
 const questions = [
     "Welcome to the Sleep Intake Assistant. What is your full name?",
     "What is your date of birth?",
@@ -114,75 +96,58 @@ const questions = [
     "Anything else you’d like to share about your sleep?"
 ];
 
-function askCurrentQuestion() {
+// Ask question
+function askQuestion() {
     if (currentQuestionIndex < questions.length) {
         addMessage(questions[currentQuestionIndex], "bot");
-        updateProgress(currentQuestionIndex, questions.length);
+        updateProgress();
     } else {
-        addMessage("Thank you. The intake is complete.", "bot");
-        updateProgress(questions.length, questions.length);
+        addMessage("Thank you. Intake complete.", "bot");
+        updateProgress();
     }
 }
 
-// Start button
+// Start
 startBtn.addEventListener("click", () => {
     if (currentQuestionIndex === 0 && chatWindow.children.length === 0) {
-        askCurrentQuestion();
+        askQuestion();
     }
 });
 
-// Send button
+// Send
 sendBtn.addEventListener("click", () => {
     const text = userInput.value.trim();
     if (!text) return;
+
     addMessage(text, "user");
     userInput.value = "";
 
-    // Move to next question
     currentQuestionIndex++;
-    if (currentQuestionIndex < questions.length) {
-        askCurrentQuestion();
-    } else {
-        addMessage("Thank you. The intake is complete.", "bot");
-        updateProgress(questions.length, questions.length);
-    }
+    askQuestion();
 });
 
 // Enter key
-userInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-        sendBtn.click();
-    }
+userInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") sendBtn.click();
 });
 
-// Other controls (stubs you can expand)
-pauseBtn.addEventListener("click", () => {
-    addMessage("Intake paused.", "bot");
-});
-
+// Controls
+pauseBtn.addEventListener("click", () => addMessage("Intake paused.", "bot"));
 finishBtn.addEventListener("click", () => {
     currentQuestionIndex = questions.length;
-    updateProgress(questions.length, questions.length);
-    addMessage("Intake finished early.", "bot");
+    askQuestion();
 });
-
 repeatBtn.addEventListener("click", () => {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        addMessage("Repeating previous question.", "bot");
-        askCurrentQuestion();
-    }
+    if (currentQuestionIndex > 0) currentQuestionIndex--;
+    askQuestion();
 });
-
 skipBtn.addEventListener("click", () => {
     currentQuestionIndex++;
-    addMessage("Question skipped.", "bot");
-    askCurrentQuestion();
+    askQuestion();
 });
-
 resetBtn.addEventListener("click", () => {
     chatWindow.innerHTML = "";
     currentQuestionIndex = 0;
-    updateProgress(0, questions.length);
+    updateProgress();
     addMessage("Intake reset.", "bot");
 });
