@@ -41,6 +41,14 @@ let currentQuestionIndex = 0;
 let activeLanguage = "English";
 let transcript = [];
 
+// Voice timing (Clinical Smooth Mode)
+let voiceDelayMin = 3000; // 3 seconds
+let voiceDelayMax = 4000; // 4 seconds
+
+function randomVoiceDelay() {
+    return Math.floor(Math.random() * (voiceDelayMax - voiceDelayMin)) + voiceDelayMin;
+}
+
 // Guided tour state
 let currentTourStep = 0;
 
@@ -246,7 +254,7 @@ const translations = {
         Hindi: "क्या किसी ने देखा है कि आप सोते समय सांस लेना बंद कर देते हैं?",
         Portuguese: "Alguém já observou você parar de respirar durante o sono?",
         Bengali: "কেউ কি লক্ষ্য করেছেন যে আপনি ঘুমের মধ্যে শ্বাস বন্ধ করেন?",
-        Russian: "Кто-нибудь замечал, कि вы перестаёте дышать во сне?",
+        Russian: "Кто-нибудь замечал, что вы перестаёте дышать во сне?",
         German: "Hat jemand beobachtet, dass Sie im Schlaf aufhören zu atmen?"
     },
     "Do you feel rested when you wake up?": {
@@ -430,6 +438,26 @@ if ("speechSynthesis" in window) {
     loadVoices();
 }
 
+// Soft female voice selection
+function getSoftFemaleVoice() {
+    if (!availableVoices || availableVoices.length === 0) return null;
+
+    const preferred = ["soft", "calm", "natural", "female", "woman", "girl"];
+
+    let softVoice = availableVoices.find(v =>
+        preferred.some(p => v.name.toLowerCase().includes(p))
+    );
+
+    if (!softVoice) {
+        softVoice = availableVoices.find(v =>
+            v.name.toLowerCase().includes("female") ||
+            v.name.toLowerCase().includes("woman")
+        );
+    }
+
+    return softVoice || null;
+}
+
 // Speak text in selected language
 function speakText(text) {
     if (!readAloudEnabled) return;
@@ -441,13 +469,19 @@ function speakText(text) {
     const langCode = languageLocaleMap[activeLanguage] || "en";
     utter.lang = langCode;
 
-    const match = availableVoices.find(v =>
-        v.lang.toLowerCase().startsWith(langCode)
-    );
-    if (match) {
-        utter.voice = match;
+    const softVoice = getSoftFemaleVoice();
+    if (softVoice) {
+        utter.voice = softVoice;
+    } else {
+        const match = availableVoices.find(v =>
+            v.lang.toLowerCase().startsWith(langCode)
+        );
+        if (match) {
+            utter.voice = match;
+        }
     }
 
+    utter.rate = 0.9; // slightly slower, more natural
     synth.speak(utter);
 }
 
@@ -491,6 +525,14 @@ const questions = [
 function askQuestion() {
     if (currentQuestionIndex < questions.length) {
         addMessage("bot", questions[currentQuestionIndex]);
+
+        if (voiceModeEnabled) {
+            setTimeout(() => {
+                isListening = true;
+                micBtn.classList.add("active");
+            }, randomVoiceDelay());
+        }
+
         updateProgress();
     } else {
         addMessage("bot", "Thank you. Intake complete.");
@@ -513,12 +555,27 @@ sendBtn.addEventListener("click", () => {
     addMessage("user", text);
     userInput.value = "";
 
-    currentQuestionIndex++;
-    if (currentQuestionIndex < questions.length) {
-        askQuestion();
+    if (voiceModeEnabled) {
+        isListening = false;
+        micBtn.classList.remove("active");
+
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                askQuestion();
+            } else {
+                addMessage("bot", "Thank you. Intake complete.");
+                updateProgress();
+            }
+        }, randomVoiceDelay());
     } else {
-        addMessage("bot", "Thank you. Intake complete.");
-        updateProgress();
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            askQuestion();
+        } else {
+            addMessage("bot", "Thank you. Intake complete.");
+            updateProgress();
+        }
     }
 });
 
