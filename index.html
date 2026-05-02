@@ -1,399 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sleep Intake Assistant</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-    }
-
-    /* Tooltip fix ONLY for progress bar */
-    .demo-step-progress .demo-tooltip {
-      margin-top: 20px !important;
-    }
-
-    /* Basic layout styles (your original layout preserved) */
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      padding: 16px;
-      background: white;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .progress-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: white;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .main {
-      display: flex;
-      padding: 16px;
-      gap: 16px;
-    }
-
-    .panel {
-      background: white;
-      border-radius: 8px;
-      padding: 16px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .chat-body {
-      flex: 1;
-      overflow-y: auto;
-      padding-right: 8px;
-    }
-
-    .msg {
-      margin-bottom: 12px;
-      padding: 10px;
-      border-radius: 6px;
-    }
-
-    .msg.system {
-      background: #eef2ff;
-    }
-
-    .msg.assistant {
-      background: #e8f5e9;
-    }
-
-    .input-bar {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .input-wrapper {
-      flex: 1;
-    }
-
-    .send-button {
-      padding: 10px 16px;
-      background: #0078ff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    /* Demo overlay */
-    #demoOverlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      display: none;
-      z-index: 9999;
-    }
-
-    .demo-tooltip {
-      position: fixed;
-      background: white;
-      padding: 16px;
-      border-radius: 8px;
-      width: 260px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 10000;
-    }
-
-    .demo-tooltip-title {
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .demo-tooltip-footer {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 12px;
-    }
-
-    .demo-step-btn {
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: #f5f5f5;
-      cursor: pointer;
-    }
-
-    .demo-step-btn.primary {
-      background: #0078ff;
-      color: white;
-      border-color: #0078ff;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Intake Assistant</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <!-- Demo overlay -->
-  <div id="demoOverlay">
-    <div class="demo-tooltip" id="demoTooltip">
-      <div class="demo-tooltip-title" id="demoTooltipTitle"></div>
-      <div class="demo-tooltip-body" id="demoTooltipBody"></div>
-      <div class="demo-tooltip-footer">
-        <button class="demo-step-btn" id="demoExitBtn">Exit</button>
-        <button class="demo-step-btn primary" id="demoNextBtn">Next</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- Top bar -->
-  <div class="top-bar">
-    <div class="title-block">
-      <div class="title-main">
-        Sleep Intake Assistant
-        <span class="title-pill">Clinical Intake</span>
-      </div>
-      <div class="title-sub">
-        Guides patients through a structured sleep history before they ever see the provider.
-      </div>
+    <!-- Apple-style demo overlay -->
+    <div id="demoOverlay">
+        <div class="demo-content">
+            <h1>Clinical Intake Assistant</h1>
+            <p>
+                This demo showcases a sleep intake workflow, but the underlying engine is designed
+                to support multi‑department clinical intake across Cardiology, Pulmonary, Neurology,
+                Pain Management, Behavioral Health, and more.
+            </p>
+            <button id="startDemoBtn">Start Demo</button>
+        </div>
     </div>
 
-    <div class="top-right">
-      <div class="language-select">
-        <span>Language</span>
-        <select id="languageSelect">
-          <option value="en">English</option>
-          <option value="es">Spanish (coming soon)</option>
-        </select>
-      </div>
-
-      <button class="demo-button" id="demoButton">
-        <span class="icon">👁️</span>
-        <span>Show what each button does</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- Progress row -->
-  <div class="progress-row" id="progressRow">
-    <div class="progress-label">
-      <span class="progress-label-dot"></span>
-      <span>Intake progress</span>
+    <!-- Guided overview overlay (appears AFTER Start Demo) -->
+    <div id="tourOverlay" class="tour-overlay hidden">
+        <div id="tourTooltip" class="tour-tooltip">
+            <h3 id="tourTitle"></h3>
+            <p id="tourText"></p>
+            <div class="tour-buttons">
+                <button id="tourNextBtn">Next</button>
+                <button id="tourExitBtn">Exit Overview</button>
+            </div>
+        </div>
     </div>
 
-    <div class="progress-container" id="progressContainer">
-      <div class="progress-fill" id="progressFill"></div>
+    <div class="app-container">
+
+        <header class="app-header">
+            <h2>Sleep Intake Assistant</h2>
+            <div class="progress-container">
+                <div id="progressBar"></div>
+            </div>
+        </header>
+
+        <!-- SETTINGS ROW -->
+        <div class="settings-row">
+            <select id="languageSelect"></select>
+            <input type="text" id="languageSearch" placeholder="Search language...">
+
+            <label class="toggle">
+                <input type="checkbox" id="readAloudToggle">
+                <span>Read Aloud</span>
+            </label>
+
+            <label class="toggle">
+                <input type="checkbox" id="voiceModeToggle">
+                <span>Voice Mode</span>
+            </label>
+
+            <button id="micBtn" class="mic-button">🎤</button>
+        </div>
+
+        <!-- CHAT WINDOW -->
+        <div id="chatWindow" class="chat-window"></div>
+
+        <!-- INPUT + CONTROLS -->
+        <div class="input-controls-row">
+
+            <div class="control-buttons">
+                <button id="startBtn" class="btn-primary">Start</button>
+                <button id="pauseBtn">Pause</button>
+                <button id="finishBtn">Finish</button>
+                <button id="repeatBtn">Repeat</button>
+                <button id="skipBtn">Skip</button>
+                <button id="resetBtn" class="btn-danger">Reset</button>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Type your response here..." autofocus>
+                <button id="sendBtn" class="btn-primary">Send</button>
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="progress-text" id="progressText">18%</div>
-  </div>
-
-  <!-- Main layout -->
-  <div class="main">
-    <!-- Chat panel -->
-    <section class="panel" id="chatPanel">
-      <header class="chat-header">
-        <div>
-          <div class="chat-header-title">
-            Chat Window
-            <span class="chat-header-pill">Live Intake</span>
-          </div>
-          <div class="chat-header-sub">
-            All questions, answers, and system messages appear here.
-          </div>
-        </div>
-      </header>
-
-      <div class="chat-body" id="chatBody">
-        <div class="msg system">
-          This is a demo. Your responses are not stored or sent to a real clinic.
-        </div>
-
-        <div class="msg assistant">
-          Welcome to the Sleep Intake Assistant. I’ll ask a few focused questions to understand your sleep concerns.
-        </div>
-
-        <div class="msg assistant">
-          To start, what is the main reason you’re seeking help with your sleep today?
-        </div>
-      </div>
-
-      <footer class="input-bar">
-        <div class="input-wrapper" id="inputWrapper">
-          <input id="userInput" type="text" placeholder="Type your response here..." />
-        </div>
-        <button class="send-button" id="sendButton">➤</button>
-      </footer>
-    </section>
-
-    <!-- Controls panel -->
-    <aside class="panel" id="controlsPanel">
-      <header class="controls-header">
-        <div class="controls-title-row">
-          <div class="controls-title">
-            <span class="mic-pill">🎤</span>
-            Read Aloud / Voice Mode
-          </div>
-        </div>
-        <div class="controls-sub">
-          Use these controls if the patient prefers listening and speaking instead of reading and typing.
-        </div>
-      </header>
-
-      <div class="controls-body">
-        <div class="controls-grid">
-          <button class="control-btn main" id="btnStart">
-            <div class="control-label">Start</div>
-            <div class="control-desc">Begin reading the current question out loud.</div>
-          </button>
-
-          <button class="control-btn" id="btnPause">
-            <div class="control-label">Pause</div>
-            <div class="control-desc">Temporarily stop reading without losing your place.</div>
-          </button>
-
-          <button class="control-btn" id="btnFinish">
-            <div class="control-label">Finish</div>
-            <div class="control-desc">End voice mode and return to normal text-only intake.</div>
-          </button>
-
-          <button class="control-btn" id="btnRepeat">
-            <div class="control-label">Repeat</div>
-            <div class="control-desc">Hear the current question again from the beginning.</div>
-          </button>
-
-          <button class="control-btn" id="btnSkip">
-            <div class="control-label">Skip</div>
-            <div class="control-desc">Move past this question and continue the intake.</div>
-          </button>
-
-          <button class="control-btn danger" id="btnReset">
-            <div class="control-label">Reset</div>
-            <div class="control-desc">Clear voice mode state and restart from the current question.</div>
-          </button>
-        </div>
-
-        <div class="controls-footer">
-          <div class="status-pill" id="voiceStatus">
-            <span class="status-dot"></span>
-            Voice mode: idle
-          </div>
-
-          <div>
-            Tip: You can use voice mode for patients who are tired, visually impaired, or prefer to listen.
-          </div>
-        </div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Demo JavaScript -->
-  <script>
-    const demoOverlay = document.getElementById("demoOverlay");
-    const demoTooltip = document.getElementById("demoTooltip");
-    const demoTooltipTitle = document.getElementById("demoTooltipTitle");
-    const demoTooltipBody = document.getElementById("demoTooltipBody");
-    const demoNextBtn = document.getElementById("demoNextBtn");
-    const demoExitBtn = document.getElementById("demoExitBtn");
-    const demoButton = document.getElementById("demoButton");
-
-    const appShell = document.body;
-
-    const demoSteps = [
-      {
-        id: "progressRow",
-        title: "Intake progress bar",
-        body: "Shows how far the patient is through the intake.",
-        anchor: document.getElementById("progressRow"),
-        position: "bottom"
-      },
-      {
-        id: "chatPanel",
-        title: "Chat window",
-        body: "All questions and responses appear here.",
-        anchor: document.getElementById("chatPanel"),
-        position: "right"
-      },
-      {
-        id: "controlsPanel",
-        title: "Voice controls",
-        body: "Start, pause, repeat, skip, or reset voice mode.",
-        anchor: document.getElementById("controlsPanel"),
-        position: "left"
-      },
-      {
-        id: "inputWrapper",
-        title: "Response input",
-        body: "Type responses here.",
-        anchor: document.getElementById("inputWrapper"),
-        position: "top"
-      }
-    ];
-
-    let currentDemoStep = -1;
-
-    function positionTooltip(step) {
-      const rect = step.anchor.getBoundingClientRect();
-      const tooltipRect = demoTooltip.getBoundingClientRect();
-
-      let top, left;
-
-      if (step.position === "bottom") {
-        top = rect.bottom + 10;
-        left = rect.left + rect.width / 2 - tooltipRect.width / 2;
-      } else if (step.position === "top") {
-        top = rect.top - tooltipRect.height - 10;
-        left = rect.left + rect.width / 2 - tooltipRect.width / 2;
-      } else if (step.position === "left") {
-        top = rect.top + rect.height / 2 - tooltipRect.height / 2;
-        left = rect.left - tooltipRect.width - 10;
-      } else {
-        top = rect.top + rect.height / 2 - tooltipRect.height / 2;
-        left = rect.right + 10;
-      }
-
-      demoTooltip.style.top = top + "px";
-      demoTooltip.style.left = left + "px";
-    }
-
-    function showDemoStep(index) {
-      if (index >= demoSteps.length) {
-        endDemo();
-        return;
-      }
-
-      currentDemoStep = index;
-      const step = demoSteps[index];
-
-      // Apply tooltip fix ONLY for progress bar
-      if (step.id === "progressRow") {
-        appShell.classList.add("demo-step-progress");
-      } else {
-        appShell.classList.remove("demo-step-progress");
-      }
-
-      demoTooltipTitle.textContent = step.title;
-      demoTooltipBody.textContent = step.body;
-
-      positionTooltip(step);
-    }
-
-    function startDemo() {
-      demoOverlay.style.display = "block";
-      showDemoStep(0);
-    }
-
-    function endDemo() {
-      demoOverlay.style.display = "none";
-      appShell.classList.remove("demo-step-progress");
-      currentDemoStep = -1;
-    }
-
-    demoNextBtn.onclick = () => showDemoStep(currentDemoStep + 1);
-    demoExitBtn.onclick = endDemo;
-    demoButton.onclick = startDemo;
-  </script>
-
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
