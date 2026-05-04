@@ -85,7 +85,7 @@ html, body {
     color: white;
 }
 
-/* Chat window — ⭐ moved UP by 30px */
+/* Chat window — ⭐ moved UP by 50px */
 .chat-window {
     flex: 1;
     height: calc(100vh - 350px);
@@ -95,7 +95,7 @@ html, body {
     padding: 12px;
     overflow-y: auto;
     margin-bottom: 8px;
-    margin-top: -30px !important; /* ⭐ NEW: lift chat window */
+    margin-top: -50px !important; /* ⭐ NEW: lift chat window */
 }
 
 /* Input + controls */
