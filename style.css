@@ -1,1 +1,306 @@
+/* Full-screen, no scroll */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f4f6fb;
+}
 
+/* Main container */
+.app-container {
+    max-width: 1100px;
+    height: 100vh;
+    margin: 0 auto;
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.app-header {
+    margin-bottom: 6px;
+}
+
+.app-header h2 {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Progress bar */
+.progress-container {
+    width: 100%;
+    height: 8px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    margin-top: 6px;
+}
+
+#progressBar {
+    height: 100%;
+    width: 0%;
+    background: #0033cc;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Settings row */
+.settings-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.settings-row select,
+.settings-row input {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Mic button */
+.mic-button {
+    margin-left: auto;
+    font-size: 22px;
+    padding: 6px 10px;
+    border-radius: 50%;
+    border: none;
+    background: #ccc;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.mic-button.active {
+    background: #0033cc;
+    color: white;
+}
+
+/* Chat window — universal lift so it doesn't cover progress bar */
+.chat-window {
+    flex: 1;
+    height: calc(100vh - 350px);
+    background: #fafbff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 12px;
+    overflow-y: auto;
+    margin-bottom: 8px;
+    margin-top: -60px !important;
+}
+
+/* Input + controls */
+.input-controls-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Control buttons */
+.control-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.control-buttons button {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    cursor: pointer;
+    font-size: 13px;
+    color: black;
+}
+
+/* Primary + danger buttons */
+.btn-primary {
+    background: #0033cc;
+    color: black !important;
+}
+
+.btn-danger {
+    background: #cc0033;
+    color: black !important;
+}
+
+/* Input area */
+.input-area {
+    display: flex;
+    gap: 8px;
+}
+
+.input-area input {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.input-area button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Chat bubbles (if you use .message classes later) */
+.message {
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    max-width: 80%;
+    font-size: 14px;
+}
+
+.message.bot {
+    background: #e6ecff;
+}
+
+.message.user {
+    background: #d1f5d3;
+}
+
+.message.system {
+    background: #f0f0f0;
+    font-style: italic;
+}
+
+/* Demo overlay */
+#demoOverlay {
+    position: fixed;
+    inset: 0;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: opacity 0.5s ease;
+}
+
+#demoOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.demo-content {
+    text-align: center;
+    max-width: 480px;
+    padding: 20px;
+}
+
+.demo-content h1 {
+    margin-bottom: 10px;
+}
+
+.demo-content p {
+    margin-bottom: 18px;
+    color: #555;
+}
+
+#startDemoBtn {
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: none;
+    background: #0033cc;
+    color: white;
+    cursor: pointer;
+}
+
+/* Utility hidden */
+.hidden {
+    display: none;
+}
+
+/* Guided tour overlay */
+.tour-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 9999;
+}
+
+/* Tooltip box */
+.tour-tooltip {
+    position: absolute;
+    max-width: 320px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    font-size: 14px;
+    z-index: 10000;
+}
+
+/* Tooltip arrow */
+.tour-tooltip::before {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 2px;
+    background: #0033cc;
+    top: -10px;
+    left: 20px;
+}
+
+.tour-tooltip::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 8px solid #0033cc;
+    top: -18px;
+    left: 34px;
+}
+
+.tour-tooltip h3 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.tour-tooltip p {
+    margin: 0 0 10px 0;
+    color: #444;
+}
+
+/* Tour buttons */
+.tour-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+#tourNextBtn {
+    background: #cccccc;
+    color: black;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+#tourExitBtn {
+    background: #cc0033;
+    color: black;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Tooltip lowered ONLY when we explicitly add this class (used for bottom controls step) */
+.tooltip-lower {
+    margin-top: 30px !important;
+}
