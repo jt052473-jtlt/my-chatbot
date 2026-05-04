@@ -85,7 +85,7 @@ html, body {
     color: white;
 }
 
-/* Chat window */
+/* Chat window — ⭐ moved UP by 30px */
 .chat-window {
     flex: 1;
     height: calc(100vh - 350px);
@@ -95,6 +95,7 @@ html, body {
     padding: 12px;
     overflow-y: auto;
     margin-bottom: 8px;
+    margin-top: -30px !important; /* ⭐ NEW: lift chat window */
 }
 
 /* Input + controls */
@@ -240,7 +241,7 @@ html, body {
     z-index: 10000;
 }
 
-/* Clean line arrow from tooltip to target (upward) */
+/* Tooltip arrow */
 .tour-tooltip::before {
     content: "";
     position: absolute;
@@ -282,7 +283,7 @@ html, body {
 }
 
 #tourNextBtn {
-    background: #cccccc; /* gray */
+    background: #cccccc;
     color: black;
     padding: 6px 12px;
     border-radius: 6px;
@@ -297,4 +298,9 @@ html, body {
     border-radius: 6px;
     border: none;
     cursor: pointer;
+}
+
+/* ⭐ Tooltip lowered ONLY during progress bar step */
+.tooltip-lower {
+    margin-top: 30px !important;
 }
