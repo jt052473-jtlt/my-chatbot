@@ -1,1 +1,132 @@
+/* ===== GENERAL LAYOUT ===== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+}
 
+.app-container {
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+/* ===== HEADER ===== */
+.app-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.progress-container {
+    width: 100%;
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#progressBar {
+    width: 0%;
+    height: 100%;
+    background: #4caf50;
+}
+
+/* ===== SETTINGS ROW ===== */
+.settings-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+/* ===== CHAT WINDOW ===== */
+.chat-window {
+    width: 100%;
+    height: 350px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow-y: auto;
+    padding: 10px;
+
+    /* ⭐ Move chat window UP by 60px */
+    margin-top: -60px;
+}
+
+/* ===== MESSAGES ===== */
+.bot-message {
+    background: #e8e8e8;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.user-message {
+    background: #d1e7ff;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    text-align: right;
+}
+
+/* ===== CONTROLS + INPUT ===== */
+.input-controls-row {
+    margin-top: 15px;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* ===== BUTTONS ===== */
+button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-danger {
+    background: #d9534f;
+    color: white;
+}
+
+/* ===== TOUR OVERLAY ===== */
+.tour-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+}
+
+.hidden {
+    display: none;
+}
+
+.tour-tooltip {
+    position: absolute;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    width: 260px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
