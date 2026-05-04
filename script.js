@@ -31,7 +31,7 @@ const tourSteps = [
         title: "Progress Bar",
         text: "This bar fills as the patient answers questions.",
         element: progressBar,
-        lowerTooltip: true   // ⭐ NEW: tells script to lower tooltip
+        lowerTooltip: true   // ⭐ Tooltip lowered ONLY here
     },
     {
         title: "Chat Window",
@@ -55,6 +55,7 @@ const tourSteps = [
 // ===============================
 function positionTooltip(target) {
     if (!target) {
+        // Center tooltip for the first step
         tourTooltip.style.top = "50%";
         tourTooltip.style.left = "50%";
         tourTooltip.style.transform = "translate(-50%, -50%)";
@@ -64,10 +65,10 @@ function positionTooltip(target) {
     const rect = target.getBoundingClientRect();
     const tooltipHeight = tourTooltip.offsetHeight;
 
-    // Default position ABOVE the element
+    // Default: place tooltip ABOVE the target
     let top = rect.top - tooltipHeight - 10;
 
-    // ⭐ If tooltip would be cut off, push it down
+    // If too high, place BELOW instead
     if (top < 10) {
         top = rect.bottom + 10;
     }
@@ -78,7 +79,7 @@ function positionTooltip(target) {
 }
 
 // ===============================
-// ⭐ NEW: LOWER TOOLTIP CLASS
+// ⭐ APPLY LOWERED TOOLTIP CLASS
 // ===============================
 function applyTooltipLower(apply) {
     if (apply) {
@@ -97,7 +98,7 @@ function showTourStep() {
     tourTitle.textContent = step.title;
     tourText.textContent = step.text;
 
-    // ⭐ Apply lowered tooltip ONLY for progress bar step
+    // Apply lowered tooltip ONLY for progress bar step
     applyTooltipLower(step.lowerTooltip === true);
 
     positionTooltip(step.element);
@@ -133,7 +134,7 @@ tourExitBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// CHATBOT BASICS (unchanged)
+// CHATBOT BASICS
 // ===============================
 function addMessage(sender, text) {
     const msg = document.createElement("div");
@@ -150,7 +151,6 @@ sendBtn.addEventListener("click", () => {
     userInput.value = "";
 });
 
-// Enter key
 userInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
         sendBtn.click();
