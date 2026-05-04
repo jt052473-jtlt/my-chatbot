@@ -1,1 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Intake Assistant</title>
 
+    <!-- Load CSS (no cache-buster to avoid GitHub Pages 404) -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Demo overlay -->
+    <div id="demoOverlay">
+        <div class="demo-content">
+            <h1>Clinical Intake Assistant</h1>
+            <p>
+                This demo showcases a sleep intake workflow, but the underlying engine is designed
+                to support multi‑department clinical intake across Cardiology, Pulmonary, Neurology,
+                Pain Management, Behavioral Health, and more.
+            </p>
+            <button id="startDemoBtn">Start Demo</button>
+        </div>
+    </div>
+
+    <!-- Guided tour overlay -->
+    <div id="tourOverlay" class="tour-overlay hidden">
+        <div id="tourTooltip" class="tour-tooltip">
+            <h3 id="tourTitle"></h3>
+            <p id="tourText"></p>
+            <div class="tour-buttons">
+                <button id="tourNextBtn">Next</button>
+                <button id="tourExitBtn">Exit Overview</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+
+        <!-- Header -->
+        <header class="app-header">
+            <h2>Sleep Intake Assistant</h2>
+            <div class="progress-container">
+                <div id="progressBar"></div>
+            </div>
+        </header>
+
+        <!-- Settings row -->
+        <div class="settings-row">
+            <select id="languageSelect"></select>
+            <input type="text" id="languageSearch" placeholder="Search language...">
+
+            <label class="toggle">
+                <input type="checkbox" id="readAloudToggle">
+                <span>Read Aloud</span>
+            </label>
+
+            <label class="toggle">
+                <input type="checkbox" id="voiceModeToggle">
+                <span>Voice Mode</span>
+            </label>
+
+            <button id="micBtn" class="mic-button">🎤</button>
+        </div>
+
+        <!-- Chat window -->
+        <div id="chatWindow" class="chat-window"></div>
+
+        <!-- Controls + input -->
+        <div class="input-controls-row">
+
+            <div class="control-buttons">
+                <button id="startBtn" class="btn-primary">Start</button>
+                <button id="pauseBtn">Pause</button>
+                <button id="finishBtn">Finish</button>
+                <button id="repeatBtn">Repeat</button>
+                <button id="skipBtn">Skip</button>
+                <button id="resetBtn" class="btn-danger">Reset</button>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Type your response here..." autofocus>
+                <button id="sendBtn" class="btn-primary">Send</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Load JS (no cache-buster) -->
+    <script src="script.js"></script>
+</body>
+</html>
