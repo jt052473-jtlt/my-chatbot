@@ -1,13 +1,8 @@
-// -------------------------------
-// INTERVIEW FLOW CONTROLLER
-// -------------------------------
-
 let currentStep = 0;
 let interviewActive = false;
 let lastBotMessage = "";
 let responses = [];
 
-// BOT MESSAGE
 function botSay(text) {
   lastBotMessage = text;
   const chatWindow = document.getElementById("chatWindow");
@@ -17,7 +12,6 @@ function botSay(text) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-// USER MESSAGE
 function userSay(text) {
   const chatWindow = document.getElementById("chatWindow");
   const msg = document.createElement("div");
@@ -26,7 +20,6 @@ function userSay(text) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-// START
 function startInterview() {
   interviewActive = true;
   currentStep = 0;
@@ -34,27 +27,22 @@ function startInterview() {
   botSay(interviewQuestions[currentStep]);
 }
 
-// PAUSE
 function pauseInterview() {
   interviewActive = false;
   botSay("Okay, pausing for now.");
 }
 
-// FINISH
 function finishInterview() {
   interviewActive = false;
   botSay("Thank you. The interview is now complete.");
-
   const summary = buildSummary(responses);
   botSay(summary);
 }
 
-// REPEAT
 function repeatLast() {
   if (lastBotMessage) botSay(lastBotMessage);
 }
 
-// SKIP
 function skipStep() {
   if (!interviewActive) return;
   currentStep++;
@@ -66,7 +54,6 @@ function skipStep() {
   }
 }
 
-// RESET
 function resetInterview() {
   interviewActive = false;
   currentStep = 0;
@@ -75,30 +62,9 @@ function resetInterview() {
   botSay("Interview reset. Press Start to begin again.");
 }
 
-// BUTTON EVENTS
 document.getElementById("startBtn").addEventListener("click", startInterview);
 document.getElementById("pauseBtn").addEventListener("click", pauseInterview);
 document.getElementById("finishBtn").addEventListener("click", finishInterview);
 document.getElementById("repeatBtn").addEventListener("click", repeatLast);
 document.getElementById("skipBtn").addEventListener("click", skipStep);
-document.getElementById("resetBtn").addEventListener("click", resetInterview);
-
-// SEND BUTTON
-document.getElementById("sendBtn").addEventListener("click", () => {
-  const input = document.getElementById("userInput");
-  const text = input.value.trim();
-  if (!text) return;
-
-  userSay(text);
-  responses[currentStep] = text;
-  input.value = "";
-
-  if (interviewActive) {
-    currentStep++;
-    if (currentStep >= interviewQuestions.length) {
-      finishInterview();
-    } else {
-      botSay(interviewQuestions[currentStep]);
-    }
-  }
-});
+document.getElementById("resetBtn").addEventListener
