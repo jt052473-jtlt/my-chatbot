@@ -1,64 +1,78 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const demoOverlay = document.getElementById("demoOverlay");
-  const startDemoBtn = document.getElementById("startDemoBtn");
-  const tourOverlay = document.getElementById("tourOverlay");
-  const tourTooltip = document.getElementById("tourTooltip");
-  const tourTitle = document.getElementById("tourTitle");
-  const tourText = document.getElementById("tourText");
-  const tourNextBtn = document.getElementById("tourNextBtn");
-  const tourExitBtn = document.getElementById("tourExitBtn");
-  const chatWindow = document.getElementById("chatWindow");
+const steps = [
+  { title: "Welcome", element: null, text: "This tour will guide you through the interface." },
+  { title: "Chat Window", element: "#chatWindow", text: "This is where messages appear." },
+  { title: "Progress Bar", element: "#progressBar", text: "Shows how far the patient is in the intake." },
+  { title: "Input Box", element: "#userInput", text: "Type responses here." },
+  { title: "Start Button", element: "#startBtn", text: "Begins the intake process." },
+  { title: "Pause Button", element: "#pauseBtn", text: "Temporarily pauses the intake." },
+  { title: "Finish Button", element: "#finishBtn", text: "Ends the intake early." },
+  { title: "Repeat Button", element: "#repeatBtn", text: "Repeats the last message." },
+  { title: "Skip Button", element: "#skipBtn", text: "Skips the current question." },
+  { title: "Reset Button", element: "#resetBtn", text: "Restarts the entire intake." },
+  { title: "Language Select", element: "#languageSelect", text: "Choose the patient’s preferred language." },
+  { title: "Language Search", element: "#languageSearch", text: "Search for a language by typing." },
+  { title: "Voice Mode", element: "#voiceModeToggle", text: "Enable voice input." },
+  { title: "Read Aloud", element: "#readAloudToggle", text: "Sam will read messages aloud." },
+  { title: "Microphone", element: "#micBtn", text: "Tap to speak instead of typing." },
+  { title: "Tour Complete", element: null, text: "You're ready to begin!" }
+];
 
-  const tourSteps = [
-    { title: "Welcome", text: "This is Sam, your Clinical Intake Assistant." },
-    { title: "Chat Window", text: "All conversation appears here." },
-    { title: "Input Box", text: "Type your responses here and press Send." },
-    { title: "Start", text: "Start begins the intake process." },
-    { title: "Pause", text: "Pause temporarily stops the intake." },
-    { title: "Finish", text: "Finish ends the intake early." },
-    { title: "Repeat", text: "Repeat makes Sam repeat the last message." },
-    { title: "Skip", text: "Skip moves past the current question." },
-    { title: "Reset", text: "Reset clears the intake and starts over." },
-    { title: "Language Select", text: "Choose the patient’s preferred language." },
-    { title: "Language Search", text: "Search for a language by typing its name." },
-    { title: "Voice Mode", text: "Enable voice input for spoken responses." },
-    { title: "Read Aloud", text: "Sam will read messages out loud when enabled." },
-    { title: "Microphone", text: "Tap the microphone to begin voice input." },
-    { title: "Tour Complete", text: "You're ready to begin the demo." }
-  ];
+let currentStep = 0;
 
-  let tourStep = 0;
+const overlay = document.getElementById("tourOverlay");
+const tooltip = document.getElementById("tourTooltip");
+const titleEl = document.getElementById("tourTitle");
+const textEl = document.getElementById("tourText");
 
-  function showTourStep() {
-    const step = tourSteps[tourStep];
-    tourTitle.textContent = step.title;
-    tourText.textContent = step.text;
-    tourTooltip.classList.remove("hidden");
+function clearHighlights() {
+  document.querySelectorAll(".highlighted").forEach(el => {
+    el.classList.remove("highlighted");
+  });
+}
+
+function showStep() {
+  clearHighlights();
+
+  const step = steps[currentStep];
+  titleEl.textContent = step.title;
+  textEl.textContent = step.text;
+
+  if (step.element) {
+    const el = document.querySelector(step.element);
+    if (el) el.classList.add("highlighted");
+    overlay.classList.remove("hidden");
+  } else {
+    overlay.classList.add("hidden");
   }
 
-  startDemoBtn.addEventListener("click", () => {
-    demoOverlay.style.display = "none";
+  tooltip.classList.remove("hidden");
+}
 
-    const bubbles = chatWindow.querySelectorAll("div:not(#tourTooltip)");
-    bubbles.forEach(b => b.remove());
+document.getElementById("tourNextBtn").onclick = () => {
+  currentStep++;
+  if (currentStep >= steps.length) {
+    endTour();
+  } else {
+    showStep();
+  }
+};
 
-    tourOverlay.classList.remove("hidden");
-    tourStep = 0;
-    showTourStep();
-  });
+function endTour() {
+  tooltip.classList.add("hidden");
+  overlay.classList.add("hidden");
+  clearHighlights();
+}
 
-  tourNextBtn.addEventListener("click", () => {
-    tourStep++;
-    if (tourStep < tourSteps.length) {
-      showTourStep();
-    } else {
-      tourTooltip.classList.add("hidden");
-      tourOverlay.classList.add("hidden");
-    }
-  });
+document.getElementById("tourExitBtn").onclick = endTour;
 
-  tourExitBtn.addEventListener("click", () => {
-    tourTooltip.classList.add("hidden");
-    tourOverlay.classList.add("hidden");
-  });
-});
+/* --- START DEMO --- */
+document.getElementById("startDemoBtn").onclick = () => {
+  document.getElementById("demoOverlay").style.display = "none";
+  currentStep = 0;
+  showStep();
+};
+
+/* --- EXIT DEMO --- */
+document.getElementById("exitDemoBtn").onclick = () => {
+  document.getElementById("demoOverlay").style.display = "none";
+};
