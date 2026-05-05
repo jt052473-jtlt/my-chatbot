@@ -1,103 +1,104 @@
-// interviewFlow2.js
-// Handles question flow, answer saving, and DOB normalization
+// -------------------------------
+// INTERVIEW FLOW CONTROLLER
+// -------------------------------
 
-import { getQuestionsForLanguage } from "./interviewQuestions2.js";
+let currentStep = 0;
+let interviewActive = false;
+let lastBotMessage = "";
+let responses = [];
 
-/* ---------------------------------------------------------
-   NORMALIZE DOB (MM/DD/YYYY)
---------------------------------------------------------- */
-function normalizeDOB(input) {
-  try {
-    const date = new Date(input);
-    if (isNaN(date.getTime())) return input;
+// BOT MESSAGE
+function botSay(text) {
+  lastBotMessage = text;
+  const chatWindow = document.getElementById("chatWindow");
+  const msg = document.createElement("div");
+  msg.textContent = "Sam: " + text;
+  chatWindow.appendChild(msg);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
 
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const dd = String(date.getDate()).padStart(2, "0");
-    const yyyy = date.getFullYear();
+// USER MESSAGE
+function userSay(text) {
+  const chatWindow = document.getElementById("chatWindow");
+  const msg = document.createElement("div");
+  msg.textContent = "You: " + text;
+  chatWindow.appendChild(msg);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
 
-    return `${mm}/${dd}/${yyyy}`;
-  } catch {
-    return input;
+// START
+function startInterview() {
+  interviewActive = true;
+  currentStep = 0;
+  responses = [];
+  botSay(interviewQuestions[currentStep]);
+}
+
+// PAUSE
+function pauseInterview() {
+  interviewActive = false;
+  botSay("Okay, pausing for now.");
+}
+
+// FINISH
+function finishInterview() {
+  interviewActive = false;
+  botSay("Thank you. The interview is now complete.");
+
+  const summary = buildSummary(responses);
+  botSay(summary);
+}
+
+// REPEAT
+function repeatLast() {
+  if (lastBotMessage) botSay(lastBotMessage);
+}
+
+// SKIP
+function skipStep() {
+  if (!interviewActive) return;
+  currentStep++;
+
+  if (currentStep >= interviewQuestions.length) {
+    finishInterview();
+  } else {
+    botSay(interviewQuestions[currentStep]);
   }
 }
 
-/* ---------------------------------------------------------
-   SAVE ANSWER INTO PACKET
---------------------------------------------------------- */
-export function saveAnswer(key, value, packetData) {
-  if (!key) return;
-
-  if (key === "patient_date_of_birth") {
-    value = normalizeDOB(value);
-  }
-
-  packetData[key] = value;
+// RESET
+function resetInterview() {
+  interviewActive = false;
+  currentStep = 0;
+  responses = [];
+  document.getElementById("chatWindow").innerHTML = "";
+  botSay("Interview reset. Press Start to begin again.");
 }
 
-/* ---------------------------------------------------------
-   INTERVIEW FLOW CLASS
---------------------------------------------------------- */
-export class InterviewFlow {
-  constructor(language = "en", existingPacket = null, existingIndex = 0) {
-    this.language = language;
+// BUTTON EVENTS
+document.getElementById("startBtn").addEventListener("click", startInterview);
+document.getElementById("pauseBtn").addEventListener("click", pauseInterview);
+document.getElementById("finishBtn").addEventListener("click", finishInterview);
+document.getElementById("repeatBtn").addEventListener("click", repeatLast);
+document.getElementById("skipBtn").addEventListener("click", skipStep);
+document.getElementById("resetBtn").addEventListener("click", resetInterview);
 
-    // Load questions in selected language
-    this.questions = getQuestionsForLanguage(language);
+// SEND BUTTON
+document.getElementById("sendBtn").addEventListener("click", () => {
+  const input = document.getElementById("userInput");
+  const text = input.value.trim();
+  if (!text) return;
 
-    // Restore or start fresh
-    this.currentIndex = existingIndex || 0;
-    this.packetData = existingPacket || {};
+  userSay(text);
+  responses[currentStep] = text;
+  input.value = "";
 
-    // Store metadata
-    this.packetData.language = language;
-  }
-
-  /* ---------------------------------------------------------
-     GET CURRENT QUESTION
-  --------------------------------------------------------- */
-  getCurrentQuestion() {
-    return this.questions[this.currentIndex] || null;
-  }
-
-  /* ---------------------------------------------------------
-     SAVE ANSWER + MOVE TO NEXT
-  --------------------------------------------------------- */
-  recordAnswer(value) {
-    const question = this.getCurrentQuestion();
-
-    if (question && question.key) {
-      saveAnswer(question.key, value, this.packetData);
+  if (interviewActive) {
+    currentStep++;
+    if (currentStep >= interviewQuestions.length) {
+      finishInterview();
+    } else {
+      botSay(interviewQuestions[currentStep]);
     }
-
-    this.currentIndex++;
   }
-
-  /* ---------------------------------------------------------
-     CHECK IF FINISHED
-  --------------------------------------------------------- */
-  isFinished() {
-    return this.currentIndex >= this.questions.length;
-  }
-
-  /* ---------------------------------------------------------
-     GET PACKET FOR BACKEND
-  --------------------------------------------------------- */
-  getPacket() {
-    return this.packetData;
-  }
-
-  /* ---------------------------------------------------------
-     PROGRESS HELPERS
-  --------------------------------------------------------- */
-  getTotalQuestions() {
-    return this.questions.length;
-  }
-
-  getCurrentIndex() {
-    return this.currentIndex;
-  }
-
-  next() {
-    this.currentIndex++;
-  }
-}
+});
