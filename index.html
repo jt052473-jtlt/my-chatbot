@@ -24,10 +24,11 @@
   <div class="app-container">
     <header class="app-header">
       <h2>Clinical Intake Assistant</h2>
-      <div class="progress-container">
-        <div id="progressBar"></div>
-      </div>
     </header>
+
+    <div class="progress-container">
+      <div id="progressBar"></div>
+    </div>
 
     <div id="chatWindow" class="chat-window">
       <div id="tourTooltip" class="tour-tooltip hidden">
@@ -39,8 +40,23 @@
         </div>
       </div>
     </div>
-    
+
+    <div class="input-controls-row">
+      <div class="control-buttons">
+        <button id="startBtn" class="btn-primary">Start</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="finishBtn">Finish</button>
+        <button id="repeatBtn">Repeat</button>
+        <button id="skipBtn">Skip</button>
+        <button id="resetBtn" class="btn-danger">Reset</button>
+      </div>
+
+      <div class="input-area">
+        <input type="text" id="userInput" placeholder="Type your response here..." autofocus />
+        <button id="sendBtn" class="btn-primary">Send</button>
+      </div>
     </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
