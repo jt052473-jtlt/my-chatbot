@@ -27,11 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   startDemoBtn.addEventListener("click", () => {
     demoOverlay.style.display = "none";
-    
-    // Clear chat bubbles only
+    // Clear chat bubbles only, leaving tour box intact
     const bubbles = chatWindow.querySelectorAll('div:not(.tour-tooltip):not(.tour-overlay)');
     bubbles.forEach(b => b.remove());
-
     tourOverlay.classList.remove("hidden");
     tourStep = 0;
     showTourStep();
