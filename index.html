@@ -25,6 +25,17 @@
 <!-- TOUR DIM OVERLAY -->
 <div id="tourOverlay" class="tour-overlay hidden"></div>
 
+<!-- TOUR TOOLTIP -->
+<div id="tourTooltip" class="tour-tooltip hidden">
+  <h3 id="tourTitle"></h3>
+  <p id="tourText"></p>
+
+  <div class="tour-buttons">
+    <button id="tourNextBtn" class="btn-primary">Next</button>
+    <button id="tourExitBtn" class="btn-secondary">Exit</button>
+  </div>
+</div>
+
 <div class="app-container">
 
   <header class="app-header">
@@ -52,20 +63,7 @@
     <button id="micBtn" class="mic-button">🎤</button>
   </div>
 
-  <div id="chatWindow" class="chat-window">
-
-    <!-- TOUR TOOLTIP -->
-    <div id="tourTooltip" class="tour-tooltip hidden">
-      <h3 id="tourTitle"></h3>
-      <p id="tourText"></p>
-
-      <div class="tour-buttons">
-        <button id="tourNextBtn" class="btn-primary">Next</button>
-        <button id="tourExitBtn" class="btn-secondary">Exit</button>
-      </div>
-    </div>
-
-  </div>
+  <div id="chatWindow" class="chat-window"></div>
 
   <div class="input-controls-row">
 
@@ -87,12 +85,12 @@
 
 </div>
 
-<!-- YOUR OTHER JS FILES -->
+<!-- YOUR ORIGINAL CHATBOT LOGIC FILES -->
 <script src="interviewFlow2.js"></script>
 <script src="interviewQuestions2.js"></script>
 <script src="summaryBuilder2.js"></script>
 
-<!-- GUIDED TOUR JS -->
+<!-- GUIDED TOUR LOGIC -->
 <script src="script.js?v=5001"></script>
 
 </body>
