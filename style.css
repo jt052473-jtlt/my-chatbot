@@ -19,7 +19,7 @@ body {
   padding: 15px 0;
 }
 
-/* Progress Bar Fixes */
+/* Progress Bar */
 .progress-container {
   width: 90%;
   height: 14px;
@@ -46,19 +46,19 @@ body {
   position: relative;
 }
 
-/* THE FLOATING BOX FIX */
+/* Floating tour tooltip */
 .tour-tooltip {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: white !important; /* Forces background to be white */
+  background: white !important;
   padding: 25px;
   width: 80%;
   max-width: 320px;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-  z-index: 10000; /* Puts it in front of the gray tint */
+  z-index: 10000;
   text-align: center;
   border: 2px solid #007bff;
 }
@@ -88,7 +88,9 @@ body {
   text-align: center;
 }
 
-.hidden { display: none !important; }
+.hidden {
+  display: none !important;
+}
 
 .highlight {
   outline: 4px solid #007bff !important;
@@ -104,8 +106,31 @@ body {
   border: 1px solid #e0e0e0;
 }
 
-.settings-row, .input-controls-row { padding: 10px; }
-.control-buttons, .input-area { display: flex; gap: 10px; flex-wrap: wrap; }
-button { padding: 10px 15px; border-radius: 6px; cursor: pointer; border: none; }
-.btn-primary { background: #007bff; color: white; }
-.btn-danger { background: #dc3545; color: white; }
+.settings-row,
+.input-controls-row {
+  padding: 10px;
+}
+
+.control-buttons,
+.input-area {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
