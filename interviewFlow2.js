@@ -1,20 +1,31 @@
-// --------------------------------------
-// INTERVIEW FLOW CONTROLLER
-// --------------------------------------
+// ---------------------------------------------------------
+// INTERVIEW FLOW CONTROLLER — MULTILINGUAL VERSION
+// ---------------------------------------------------------
 
 let currentStep = 0;
 let interviewActive = false;
 let lastBotMessage = "";
 let responses = [];
 
-// BOT MESSAGE
+// Get current language block
+function getLang() {
+  return translations[document.getElementById("languageSelect").value];
+}
+
+// BOT MESSAGE (with voice)
 function botSay(text) {
   lastBotMessage = text;
+
   const chatWindow = document.getElementById("chatWindow");
   const msg = document.createElement("div");
   msg.textContent = "Sam: " + text;
   chatWindow.appendChild(msg);
   chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  // Speak in selected language
+  if (window.speak) {
+    window.speak(text);
+  }
 }
 
 // USER MESSAGE
@@ -31,21 +42,25 @@ function startInterview() {
   interviewActive = true;
   currentStep = 0;
   responses = [];
-  botSay(interviewQuestions[currentStep]);
+
+  const lang = getLang();
+  botSay(lang.questions[currentStep]);
 }
 
 // PAUSE
 function pauseInterview() {
   interviewActive = false;
-  botSay("Okay, pausing for now.");
+  botSay(getLang().ui.pause);
 }
 
 // FINISH
 function finishInterview() {
   interviewActive = false;
-  botSay("Thank you. The interview is now complete.");
 
-  const summary = buildSummary(responses);
+  const lang = getLang();
+  botSay(lang.ui.finish);
+
+  const summary = buildSummaryTranslated(responses, lang);
   botSay(summary);
 }
 
@@ -60,10 +75,12 @@ function skipStep() {
 
   currentStep++;
 
-  if (currentStep >= interviewQuestions.length) {
+  const lang = getLang();
+
+  if (currentStep >= lang.questions.length) {
     finishInterview();
   } else {
-    botSay(interviewQuestions[currentStep]);
+    botSay(lang.questions[currentStep]);
   }
 }
 
@@ -72,9 +89,30 @@ function resetInterview() {
   interviewActive = false;
   currentStep = 0;
   responses = [];
+
   document.getElementById("chatWindow").innerHTML = "";
-  botSay("Interview reset. Press Start to begin again.");
+
+  botSay(getLang().ui.reset);
 }
+
+// HANDLE USER RESPONSE
+window.handleUserResponse = function (text) {
+  userSay(text);
+
+  const lang = getLang();
+
+  responses[currentStep] = text;
+
+  if (interviewActive) {
+    currentStep++;
+
+    if (currentStep >= lang.questions.length) {
+      finishInterview();
+    } else {
+      botSay(lang.questions[currentStep]);
+    }
+  }
+};
 
 // BUTTON EVENTS
 document.getElementById("startBtn").addEventListener("click", startInterview);
@@ -83,24 +121,3 @@ document.getElementById("finishBtn").addEventListener("click", finishInterview);
 document.getElementById("repeatBtn").addEventListener("click", repeatLast);
 document.getElementById("skipBtn").addEventListener("click", skipStep);
 document.getElementById("resetBtn").addEventListener("click", resetInterview);
-
-// SEND BUTTON HANDLER
-document.getElementById("sendBtn").addEventListener("click", () => {
-  const input = document.getElementById("userInput");
-  const text = input.value.trim();
-  if (!text) return;
-
-  userSay(text);
-  responses[currentStep] = text;
-  input.value = "";
-
-  if (interviewActive) {
-    currentStep++;
-
-    if (currentStep >= interviewQuestions.length) {
-      finishInterview();
-    } else {
-      botSay(interviewQuestions[currentStep]);
-    }
-  }
-});
