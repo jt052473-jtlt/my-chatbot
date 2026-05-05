@@ -1,38 +1,55 @@
-// Inside your DOMContentLoaded block...
+document.addEventListener("DOMContentLoaded", () => {
+  const demoOverlay = document.getElementById("demoOverlay");
+  const startDemoBtn = document.getElementById("startDemoBtn");
+  const tourOverlay = document.getElementById("tourOverlay");
+  const tourTooltip = document.getElementById("tourTooltip");
+  const tourTitle = document.getElementById("tourTitle");
+  const tourText = document.getElementById("tourText");
+  const tourNextBtn = document.getElementById("tourNextBtn");
+  const tourExitBtn = document.getElementById("tourExitBtn");
+  const chatWindow = document.getElementById("chatWindow");
 
-  // 1. FIXED START DEMO: Starts the tour when clicked
+  const tourSteps = [
+    { title: "Welcome", text: "This is Sam, your Clinical Intake Assistant." },
+    { title: "Chat Window", text: "Conversation appears here." },
+    { title: "Input Box", text: "Type responses here." },
+    { title: "Tour Complete", text: "You’re ready to begin." }
+  ];
+
+  let tourStep = 0;
+
+  function showTourStep() {
+    const step = tourSteps[tourStep];
+    tourTitle.textContent = step.title;
+    tourText.textContent = step.text;
+    tourTooltip.classList.remove("hidden");
+  }
+
   startDemoBtn.addEventListener("click", () => {
     demoOverlay.style.display = "none";
     
-    // Clear only chat messages, not Sam's tour box
-    const messages = chatWindow.querySelectorAll('div:not(.tour-tooltip):not(.tour-overlay)');
-    messages.forEach(m => m.remove());
+    // Clear chat bubbles only
+    const bubbles = chatWindow.querySelectorAll('div:not(.tour-tooltip):not(.tour-overlay)');
+    bubbles.forEach(b => b.remove());
 
     tourOverlay.classList.remove("hidden");
-    tourTooltip.classList.remove("hidden");
-    
     tourStep = 0;
     showTourStep();
   });
 
-  // 2. FIXED NEXT BUTTON: Moves through the tour
   tourNextBtn.addEventListener("click", (e) => {
-    e.stopPropagation(); // Prevents the click from bleeding into the background
+    e.stopPropagation();
     tourStep++;
-    
     if (tourStep < tourSteps.length) {
       showTourStep();
     } else {
-      // Tour is over
-      clearHighlights();
       tourTooltip.classList.add("hidden");
       tourOverlay.classList.add("hidden");
     }
   });
 
-  // 3. EXIT BUTTON: Stops the tour immediately
   tourExitBtn.addEventListener("click", () => {
-    clearHighlights();
     tourTooltip.classList.add("hidden");
     tourOverlay.classList.add("hidden");
   });
+});
