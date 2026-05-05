@@ -46,6 +46,15 @@ body {
   position: relative;
 }
 
+/* FIX: Prevent chat bubble styling from covering tooltip */
+.chat-window > div:not(.tour-tooltip):not(.tour-overlay):not(.tour-buttons) {
+  background: #f9f9f9;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
 /* Floating tour tooltip */
 .tour-tooltip {
   position: absolute;
@@ -61,6 +70,13 @@ body {
   z-index: 10000;
   text-align: center;
   border: 2px solid #007bff;
+}
+
+.tour-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
 .tour-overlay {
@@ -90,32 +106,6 @@ body {
 
 .hidden {
   display: none !important;
-}
-
-.highlight {
-  outline: 4px solid #007bff !important;
-  box-shadow: 0 0 15px #007bff;
-}
-
-/* Standard Message Styling */
-.chat-window div:not(.tour-tooltip):not(.tour-overlay):not(.tour-buttons) {
-  background: #f9f9f9;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-}
-
-.settings-row,
-.input-controls-row {
-  padding: 10px;
-}
-
-.control-buttons,
-.input-area {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
 button {
