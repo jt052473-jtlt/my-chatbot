@@ -174,19 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // -------------------------------------------------------
-  // START DEMO LOGIC
-  // -------------------------------------------------------
-  startDemoBtn.addEventListener("click", () => {
-    demoOverlay.style.display = "none";
-    startInterview(); // from interviewFlow2.js
-  });
-
-  exitDemoBtn.addEventListener("click", () => {
-    demoOverlay.style.display = "none";
-  });
-
-  // -------------------------------------------------------
-  // GUIDED TOUR LOGIC
+  // GUIDED TOUR STEPS
   // -------------------------------------------------------
   let tourStep = 0;
 
@@ -237,10 +225,23 @@ document.addEventListener("DOMContentLoaded", () => {
     tourTooltip.classList.add("hidden");
   });
 
-  // Auto-start tour on first load
-  setTimeout(() => {
+  // -------------------------------------------------------
+  // START DEMO LOGIC (Option C)
+  // -------------------------------------------------------
+  startDemoBtn.addEventListener("click", () => {
+    demoOverlay.style.display = "none";
+
+    // Start the guided tour AFTER the demo begins
+    tourStep = 0;
     showTourStep();
-  }, 800);
+
+    // Start the interview
+    startInterview();
+  });
+
+  exitDemoBtn.addEventListener("click", () => {
+    demoOverlay.style.display = "none";
+  });
 
   // -------------------------------------------------------
   // EXPOSE FUNCTIONS
