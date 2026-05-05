@@ -1,151 +1,92 @@
-document.addEventListener("DOMContentLoaded", () => {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Clinical Intake Assistant</title>
+<link rel="stylesheet" href="style.css?v=5001" />
+</head>
 
-  const demoOverlay = document.getElementById("demoOverlay");
-  const startDemoBtn = document.getElementById("startDemoBtn");
-  const exitDemoBtn = document.getElementById("exitDemoBtn");
+<body>
 
-  const tourOverlay = document.getElementById("tourOverlay");
-  const tourTooltip = document.getElementById("tourTooltip");
-  const tourTitle = document.getElementById("tourTitle");
-  const tourText = document.getElementById("tourText");
-  const tourNextBtn = document.getElementById("tourNextBtn");
-  const tourExitBtn = document.getElementById("tourExitBtn");
+<!-- INTRO OVERLAY (NO DIMMING) -->
+<div id="demoOverlay">
+  <div class="demo-content">
+    <h1>Clinical Intake Assistant</h1>
+    <p>This demo showcases a clinical intake workflow. Click Start Demo to begin.</p>
 
-  const chatWindow = document.getElementById("chatWindow");
-  const userInput = document.getElementById("userInput");
-  const sendBtn = document.getElementById("sendBtn");
+    <div class="demo-buttons">
+      <button id="startDemoBtn" class="btn-primary">Start Demo</button>
+      <button id="exitDemoBtn" class="btn-secondary">Exit</button>
+    </div>
+  </div>
+</div>
 
-  const controls = {
-    Start: document.getElementById("startBtn"),
-    Pause: document.getElementById("pauseBtn"),
-    Finish: document.getElementById("finishBtn"),
-    Repeat: document.getElementById("repeatBtn"),
-    Skip: document.getElementById("skipBtn"),
-    Reset: document.getElementById("resetBtn"),
-    "Language Select": document.getElementById("languageSelect"),
-    "Language Search": document.getElementById("languageSearch"),
-    "Read Aloud": document.getElementById("readAloudToggle"),
-    "Voice Mode": document.getElementById("voiceModeToggle"),
-    Microphone: document.getElementById("micBtn"),
-  };
+<!-- TOUR DIM OVERLAY -->
+<div id="tourOverlay" class="tour-overlay hidden"></div>
 
-  function clearHighlights() {
-    Object.values(controls).forEach((el) => el.classList.remove("highlight"));
-  }
+<div class="app-container">
 
-  function addMessage(sender, text) {
-    const msg = document.createElement("div");
-    msg.textContent = `${sender}: ${text}`;
-    chatWindow.appendChild(msg);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-  }
+  <header class="app-header">
+    <h2>Clinical Intake Assistant</h2>
 
-  sendBtn.addEventListener("click", () => {
-    const text = userInput.value.trim();
-    if (!text) return;
-    addMessage("You", text);
-    userInput.value = "";
-  });
+    <div class="progress-container">
+      <div id="progressBar"></div>
+    </div>
+  </header>
 
-  userInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendBtn.click();
-  });
+  <div class="settings-row">
+    <select id="languageSelect"></select>
+    <input type="text" id="languageSearch" placeholder="Search language..." />
 
-  /* LANGUAGE LISTS */
-  const top10 = [
-    "English","Spanish","Chinese","Tagalog","Vietnamese",
-    "Arabic","French","Korean","Russian","German"
-  ];
+    <label class="toggle">
+      <input type="checkbox" id="readAloudToggle" />
+      <span>Read Aloud</span>
+    </label>
 
-  const allLanguages = [
-    "English","Spanish","Chinese","Tagalog","Vietnamese","Arabic","French","Korean",
-    "Russian","German","Italian","Portuguese","Hindi","Japanese","Polish","Dutch",
-    "Greek","Urdu","Persian","Hebrew","Thai","Swedish"
-  ];
+    <label class="toggle">
+      <input type="checkbox" id="voiceModeToggle" />
+      <span>Voice Mode</span>
+    </label>
 
-  const orderedLanguages = [
-    "English",
-    ...top10.filter((l) => l !== "English"),
-    ...allLanguages.filter((l) => !top10.includes(l)).sort(),
-  ];
+    <button id="micBtn" class="mic-button">🎤</button>
+  </div>
 
-  const languageSelect = document.getElementById("languageSelect");
+  <div id="chatWindow" class="chat-window">
 
-  orderedLanguages.forEach((lang) => {
-    const opt = document.createElement("option");
-    opt.value = lang;
-    opt.textContent = lang;
-    languageSelect.appendChild(opt);
-  });
+    <!-- TOUR TOOLTIP -->
+    <div id="tourTooltip" class="tour-tooltip hidden">
+      <h3 id="tourTitle"></h3>
+      <p id="tourText"></p>
 
-  languageSelect.value = "English";
+      <div class="tour-buttons">
+        <button id="tourNextBtn" class="btn-primary">Next</button>
+        <button id="tourExitBtn" class="btn-secondary">Exit</button>
+      </div>
+    </div>
 
-  /* TOUR STEPS */
-  const tourSteps = [
-    { title: "Welcome", text: "This is Sam, your Clinical Intake Assistant." },
-    { title: "Chat Window", text: "All conversation appears here in the chat window." },
-    { title: "Input Box", text: "Type your responses here and press Send." },
-    { title: "Start", text: "Start begins the intake process." },
-    { title: "Pause", text: "Pause temporarily stops the intake." },
-    { title: "Finish", text: "Finish ends the intake early." },
-    { title: "Repeat", text: "Repeat makes Sam repeat the last message." },
-    { title: "Skip", text: "Skip moves past the current question." },
-    { title: "Reset", text: "Reset clears the intake and starts over." },
-    { title: "Language Select", text: "Choose the patient's preferred language." },
-    { title: "Language Search", text: "Search for a language by typing its name." },
-    { title: "Voice Mode", text: "Voice Mode allows spoken responses." },
-    { title: "Read Aloud", text: "Sam will read messages out loud when enabled." },
-    { title: "Microphone", text: "Tap the microphone to begin voice input." },
-    { title: "Tour Complete", text: "That's the overview. You're ready to begin." },
-  ];
+  </div>
 
-  let tourStep = 0;
+  <div class="input-controls-row">
 
-  function showTourStep() {
-    clearHighlights();
-    const step = tourSteps[tourStep];
+    <div class="control-buttons">
+      <button id="startBtn" class="btn-primary">Start</button>
+      <button id="pauseBtn">Pause</button>
+      <button id="finishBtn">Finish</button>
+      <button id="repeatBtn">Repeat</button>
+      <button id="skipBtn">Skip</button>
+      <button id="resetBtn" class="btn-danger">Reset</button>
+    </div>
 
-    tourTitle.textContent = step.title;
-    tourText.textContent = step.text;
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your response here..." autofocus />
+      <button id="sendBtn" class="btn-primary">Send</button>
+    </div>
 
-    if (controls[step.title]) {
-      controls[step.title].classList.add("highlight");
-    }
+  </div>
 
-    tourTooltip.classList.remove("hidden");
-  }
+</div>
 
-  /* START DEMO */
-  startDemoBtn.addEventListener("click", () => {
-    chatWindow.innerHTML = "";
-    demoOverlay.style.display = "none";
-    tourOverlay.classList.remove("hidden");
-    tourStep = 0;
-    showTourStep();
-  });
-
-  /* EXIT DEMO */
-  exitDemoBtn.addEventListener("click", () => {
-    demoOverlay.style.display = "none";
-  });
-
-  /* NEXT STEP */
-  tourNextBtn.addEventListener("click", () => {
-    tourStep++;
-    if (tourStep >= tourSteps.length) {
-      clearHighlights();
-      tourTooltip.classList.add("hidden");
-      tourOverlay.classList.add("hidden");
-      return;
-    }
-    showTourStep();
-  });
-
-  /* EXIT TOUR */
-  tourExitBtn.addEventListener("click", () => {
-    clearHighlights();
-    tourTooltip.classList.add("hidden");
-    tourOverlay.classList.add("hidden");
-  });
-
-});
+<script src="script.js?v=5001"></script>
+</body>
+</html>
