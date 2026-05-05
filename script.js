@@ -9,11 +9,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const tourExitBtn = document.getElementById("tourExitBtn");
   const chatWindow = document.getElementById("chatWindow");
 
+  // ⭐ FULL guided tour steps (you said: explain each button)
   const tourSteps = [
     { title: "Welcome", text: "This is Sam, your Clinical Intake Assistant." },
-    { title: "Chat Window", text: "Conversation appears here." },
-    { title: "Input Box", text: "Type responses here." },
-    { title: "Tour Complete", text: "You’re ready to begin." }
+    { title: "Chat Window", text: "All conversation appears here." },
+    { title: "Input Box", text: "Type your responses here and press Send." },
+    { title: "Start", text: "Start begins the intake process." },
+    { title: "Pause", text: "Pause temporarily stops the intake." },
+    { title: "Finish", text: "Finish ends the intake early." },
+    { title: "Repeat", text: "Repeat makes Sam repeat the last message." },
+    { title: "Skip", text: "Skip moves past the current question." },
+    { title: "Reset", text: "Reset clears the intake and starts over." },
+    { title: "Language Select", text: "Choose the patient’s preferred language." },
+    { title: "Language Search", text: "Search for a language by typing its name." },
+    { title: "Voice Mode", text: "Enable voice input for spoken responses." },
+    { title: "Read Aloud", text: "Sam will read messages out loud when enabled." },
+    { title: "Microphone", text: "Tap the microphone to begin voice input." },
+    { title: "Tour Complete", text: "You're ready to begin the demo." }
   ];
 
   let tourStep = 0;
@@ -25,16 +37,20 @@ document.addEventListener("DOMContentLoaded", () => {
     tourTooltip.classList.remove("hidden");
   }
 
+  // ⭐ Start Demo button (opens overlay)
   startDemoBtn.addEventListener("click", () => {
     demoOverlay.style.display = "none";
-    // Clear chat bubbles only, leaving tour box intact
-    const bubbles = chatWindow.querySelectorAll('div:not(.tour-tooltip):not(.tour-overlay)');
+
+    // Clear chat bubbles only (keep tour tooltip)
+    const bubbles = chatWindow.querySelectorAll("div:not(#tourTooltip)");
     bubbles.forEach(b => b.remove());
+
     tourOverlay.classList.remove("hidden");
     tourStep = 0;
     showTourStep();
   });
 
+  // ⭐ Next button
   tourNextBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     tourStep++;
@@ -46,6 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // ⭐ Exit button (inside tour)
   tourExitBtn.addEventListener("click", () => {
     tourTooltip.classList.add("hidden");
     tourOverlay.classList.add("hidden");
