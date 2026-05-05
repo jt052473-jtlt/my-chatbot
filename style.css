@@ -4,17 +4,14 @@ body {
   padding: 0;
   background: #f4f4f4;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
 }
 
 .app-container {
-  flex: 1;
+  width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  max-width: 900px;
-  margin: 0 auto;
-  width: 100%;
 }
 
 .app-header {
@@ -22,13 +19,13 @@ body {
   padding: 15px 0;
 }
 
-/* Progress Bar Styling */
+/* Progress Bar Fixes */
 .progress-container {
-  width: 95%;
+  width: 90%;
   height: 14px;
   background: #ddd;
   border-radius: 7px;
-  margin: 5px auto 15px auto;
+  margin: 0 auto 15px auto;
   border: 1px solid #ccc;
   overflow: hidden;
 }
@@ -37,33 +34,31 @@ body {
   width: 0%;
   height: 100%;
   background: #007bff;
-  transition: width 0.3s ease;
 }
 
 .chat-window {
   flex: 1;
   background: white;
   border: 1px solid #ccc;
-  border-radius: 8px;
   margin: 0 10px;
   padding: 15px;
   overflow-y: auto;
-  position: relative; /* REQUIRED for centering tooltip */
+  position: relative;
 }
 
-/* THE FLOATING TOUR BOX */
+/* THE FLOATING BOX FIX */
 .tour-tooltip {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: white !important;
+  background: white !important; /* Forces background to be white */
   padding: 25px;
   width: 80%;
   max-width: 320px;
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-  z-index: 10000; /* Highest priority for clicking Next */
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  z-index: 10000; /* Puts it in front of the gray tint */
   text-align: center;
   border: 2px solid #007bff;
 }
@@ -71,8 +66,9 @@ body {
 .tour-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.25);
   z-index: 9000;
+  border-radius: 8px;
 }
 
 #demoOverlay {
@@ -98,3 +94,18 @@ body {
   outline: 4px solid #007bff !important;
   box-shadow: 0 0 15px #007bff;
 }
+
+/* Standard Message Styling */
+.chat-window div:not(.tour-tooltip):not(.tour-overlay):not(.tour-buttons) {
+  background: #f9f9f9;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.settings-row, .input-controls-row { padding: 10px; }
+.control-buttons, .input-area { display: flex; gap: 10px; flex-wrap: wrap; }
+button { padding: 10px 15px; border-radius: 6px; cursor: pointer; border: none; }
+.btn-primary { background: #007bff; color: white; }
+.btn-danger { background: #dc3545; color: white; }
