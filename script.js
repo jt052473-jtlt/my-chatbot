@@ -1,12 +1,12 @@
 // ---------------------------------------------------------
-// SCRIPT.JS — MULTILINGUAL + VOICE ENGINE + UI TRANSLATION
+// SCRIPT.JS — MULTILINGUAL + VOICE + START DEMO + TOUR
 // ---------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // -----------------------------
+  // -------------------------------------------------------
   // ELEMENT REFERENCES
-  // -----------------------------
+  // -------------------------------------------------------
   const chatWindow = document.getElementById("chatWindow");
   const userInput = document.getElementById("userInput");
   const sendBtn = document.getElementById("sendBtn");
@@ -16,9 +16,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const voiceModeToggle = document.getElementById("voiceModeToggle");
   const micBtn = document.getElementById("micBtn");
 
-  // -----------------------------
+  const demoOverlay = document.getElementById("demoOverlay");
+  const startDemoBtn = document.getElementById("startDemoBtn");
+  const exitDemoBtn = document.getElementById("exitDemoBtn");
+
+  const tourOverlay = document.getElementById("tourOverlay");
+  const tourTooltip = document.getElementById("tourTooltip");
+  const tourNextBtn = document.getElementById("tourNextBtn");
+  const tourExitBtn = document.getElementById("tourExitBtn");
+  const tourTitle = document.getElementById("tourTitle");
+  const tourText = document.getElementById("tourText");
+
+  // -------------------------------------------------------
   // TOP 10 LANGUAGES ONLY
-  // -----------------------------
+  // -------------------------------------------------------
   const top10 = [
     "English",
     "Spanish",
@@ -42,9 +53,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   languageSelect.value = "English";
 
-  // -----------------------------
+  // -------------------------------------------------------
+  // APPLY LANGUAGE TO UI
+  // -------------------------------------------------------
+  function applyLanguage(lang) {
+    const t = translations[lang];
+
+    document.querySelector(".app-header h2").textContent = t.ui.appTitle;
+
+    document.getElementById("startBtn").textContent = t.ui.start;
+    document.getElementById("pauseBtn").textContent = t.ui.pause;
+    document.getElementById("finishBtn").textContent = t.ui.finish;
+    document.getElementById("repeatBtn").textContent = t.ui.repeat;
+    document.getElementById("skipBtn").textContent = t.ui.skip;
+    document.getElementById("resetBtn").textContent = t.ui.reset;
+    sendBtn.textContent = t.ui.send;
+    userInput.placeholder = t.ui.typeHere;
+  }
+
+  applyLanguage("English");
+
+  languageSelect.addEventListener("change", () => {
+    applyLanguage(languageSelect.value);
+  });
+
+  // -------------------------------------------------------
   // LANGUAGE SEARCH FILTER
-  // -----------------------------
+  // -------------------------------------------------------
   languageSearch.addEventListener("input", () => {
     const searchValue = languageSearch.value.toLowerCase();
 
@@ -67,29 +102,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // -----------------------------
-  // APPLY LANGUAGE TO UI
-  // -----------------------------
-  function applyLanguage(lang) {
-    const t = translations[lang];
-
-    document.querySelector(".app-header h2").textContent = t.ui.appTitle;
-
-    document.getElementById("startBtn").textContent = t.ui.start;
-    document.getElementById("pauseBtn").textContent = t.ui.pause;
-    document.getElementById("finishBtn").textContent = t.ui.finish;
-    document.getElementById("repeatBtn").textContent = t.ui.repeat;
-    document.getElementById("skipBtn").textContent = t.ui.skip;
-    document.getElementById("resetBtn").textContent = t.ui.reset;
-    sendBtn.textContent = t.ui.send;
-    userInput.placeholder = t.ui.typeHere;
-  }
-
-  applyLanguage("English");
-
-  // -----------------------------
+  // -------------------------------------------------------
   // VOICE OUTPUT (TEXT-TO-SPEECH)
-  // -----------------------------
+  // -------------------------------------------------------
   function speak(text) {
     if (!readAloudToggle.checked) return;
 
@@ -102,9 +117,9 @@ document.addEventListener("DOMContentLoaded", () => {
     speechSynthesis.speak(utter);
   }
 
-  // -----------------------------
+  // -------------------------------------------------------
   // VOICE INPUT (SPEECH-TO-TEXT)
-  // -----------------------------
+  // -------------------------------------------------------
   let recognition;
 
   if ("webkitSpeechRecognition" in window) {
@@ -129,9 +144,9 @@ document.addEventListener("DOMContentLoaded", () => {
     recognition.start();
   });
 
-  // -----------------------------
+  // -------------------------------------------------------
   // CHAT MESSAGE HELPERS
-  // -----------------------------
+  // -------------------------------------------------------
   function addMessage(sender, text) {
     const msg = document.createElement("div");
     msg.textContent = `${sender}: ${text}`;
@@ -139,9 +154,9 @@ document.addEventListener("DOMContentLoaded", () => {
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
 
-  // -----------------------------
+  // -------------------------------------------------------
   // SEND BUTTON HANDLER
-  // -----------------------------
+  // -------------------------------------------------------
   sendBtn.addEventListener("click", () => {
     const text = userInput.value.trim();
     if (!text) return;
@@ -158,15 +173,79 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") sendBtn.click();
   });
 
-  // -----------------------------
-  // EXPOSE FUNCTIONS GLOBALLY
-  // -----------------------------
-  window.applyLanguage = applyLanguage;
-  window.speak = speak;
-
-  // Update UI when language changes
-  languageSelect.addEventListener("change", () => {
-    applyLanguage(languageSelect.value);
+  // -------------------------------------------------------
+  // START DEMO LOGIC
+  // -------------------------------------------------------
+  startDemoBtn.addEventListener("click", () => {
+    demoOverlay.style.display = "none";
+    startInterview(); // from interviewFlow2.js
   });
+
+  exitDemoBtn.addEventListener("click", () => {
+    demoOverlay.style.display = "none";
+  });
+
+  // -------------------------------------------------------
+  // GUIDED TOUR LOGIC
+  // -------------------------------------------------------
+  let tourStep = 0;
+
+  const tourSteps = [
+    {
+      title: "Welcome!",
+      text: "This is the Clinical Intake Assistant. I'll guide you through the interface."
+    },
+    {
+      title: "Language Settings",
+      text: "Use the dropdown to switch languages. Everything updates instantly."
+    },
+    {
+      title: "Voice Features",
+      text: "Enable Read Aloud or Voice Mode for hands-free interaction."
+    },
+    {
+      title: "Chat Controls",
+      text: "Use Start, Pause, Skip, Repeat, and Finish to control the interview."
+    },
+    {
+      title: "You're Ready!",
+      text: "Start the demo anytime using the Start Demo button."
+    }
+  ];
+
+  function showTourStep() {
+    const step = tourSteps[tourStep];
+    tourTitle.textContent = step.title;
+    tourText.textContent = step.text;
+
+    tourOverlay.classList.remove("hidden");
+    tourTooltip.classList.remove("hidden");
+  }
+
+  tourNextBtn.addEventListener("click", () => {
+    tourStep++;
+    if (tourStep >= tourSteps.length) {
+      tourOverlay.classList.add("hidden");
+      tourTooltip.classList.add("hidden");
+      return;
+    }
+    showTourStep();
+  });
+
+  tourExitBtn.addEventListener("click", () => {
+    tourOverlay.classList.add("hidden");
+    tourTooltip.classList.add("hidden");
+  });
+
+  // Auto-start tour on first load
+  setTimeout(() => {
+    showTourStep();
+  }, 800);
+
+  // -------------------------------------------------------
+  // EXPOSE FUNCTIONS
+  // -------------------------------------------------------
+  window.speak = speak;
+  window.applyLanguage = applyLanguage;
 
 });
