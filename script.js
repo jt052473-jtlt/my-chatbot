@@ -1,78 +1,151 @@
-const steps = [
-  { title: "Welcome", element: null, text: "This tour will guide you through the interface." },
-  { title: "Chat Window", element: "#chatWindow", text: "This is where messages appear." },
-  { title: "Progress Bar", element: "#progressBar", text: "Shows how far the patient is in the intake." },
-  { title: "Input Box", element: "#userInput", text: "Type responses here." },
-  { title: "Start Button", element: "#startBtn", text: "Begins the intake process." },
-  { title: "Pause Button", element: "#pauseBtn", text: "Temporarily pauses the intake." },
-  { title: "Finish Button", element: "#finishBtn", text: "Ends the intake early." },
-  { title: "Repeat Button", element: "#repeatBtn", text: "Repeats the last message." },
-  { title: "Skip Button", element: "#skipBtn", text: "Skips the current question." },
-  { title: "Reset Button", element: "#resetBtn", text: "Restarts the entire intake." },
-  { title: "Language Select", element: "#languageSelect", text: "Choose the patient’s preferred language." },
-  { title: "Language Search", element: "#languageSearch", text: "Search for a language by typing." },
-  { title: "Voice Mode", element: "#voiceModeToggle", text: "Enable voice input." },
-  { title: "Read Aloud", element: "#readAloudToggle", text: "Sam will read messages aloud." },
-  { title: "Microphone", element: "#micBtn", text: "Tap to speak instead of typing." },
-  { title: "Tour Complete", element: null, text: "You're ready to begin!" }
-];
+document.addEventListener("DOMContentLoaded", () => {
 
-let currentStep = 0;
+  const demoOverlay = document.getElementById("demoOverlay");
+  const startDemoBtn = document.getElementById("startDemoBtn");
+  const exitDemoBtn = document.getElementById("exitDemoBtn");
 
-const overlay = document.getElementById("tourOverlay");
-const tooltip = document.getElementById("tourTooltip");
-const titleEl = document.getElementById("tourTitle");
-const textEl = document.getElementById("tourText");
+  const tourOverlay = document.getElementById("tourOverlay");
+  const tourTooltip = document.getElementById("tourTooltip");
+  const tourTitle = document.getElementById("tourTitle");
+  const tourText = document.getElementById("tourText");
+  const tourNextBtn = document.getElementById("tourNextBtn");
+  const tourExitBtn = document.getElementById("tourExitBtn");
 
-function clearHighlights() {
-  document.querySelectorAll(".highlighted").forEach(el => {
-    el.classList.remove("highlighted");
+  const chatWindow = document.getElementById("chatWindow");
+  const userInput = document.getElementById("userInput");
+  const sendBtn = document.getElementById("sendBtn");
+
+  const controls = {
+    Start: document.getElementById("startBtn"),
+    Pause: document.getElementById("pauseBtn"),
+    Finish: document.getElementById("finishBtn"),
+    Repeat: document.getElementById("repeatBtn"),
+    Skip: document.getElementById("skipBtn"),
+    Reset: document.getElementById("resetBtn"),
+    "Language Select": document.getElementById("languageSelect"),
+    "Language Search": document.getElementById("languageSearch"),
+    "Read Aloud": document.getElementById("readAloudToggle"),
+    "Voice Mode": document.getElementById("voiceModeToggle"),
+    Microphone: document.getElementById("micBtn"),
+  };
+
+  function clearHighlights() {
+    Object.values(controls).forEach((el) => el.classList.remove("highlight"));
+  }
+
+  function addMessage(sender, text) {
+    const msg = document.createElement("div");
+    msg.textContent = `${sender}: ${text}`;
+    chatWindow.appendChild(msg);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  sendBtn.addEventListener("click", () => {
+    const text = userInput.value.trim();
+    if (!text) return;
+    addMessage("You", text);
+    userInput.value = "";
   });
-}
 
-function showStep() {
-  clearHighlights();
+  userInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendBtn.click();
+  });
 
-  const step = steps[currentStep];
-  titleEl.textContent = step.title;
-  textEl.textContent = step.text;
+  /* LANGUAGE LISTS */
+  const top10 = [
+    "English","Spanish","Chinese","Tagalog","Vietnamese",
+    "Arabic","French","Korean","Russian","German"
+  ];
 
-  if (step.element) {
-    const el = document.querySelector(step.element);
-    if (el) el.classList.add("highlighted");
-    overlay.classList.remove("hidden");
-  } else {
-    overlay.classList.add("hidden");
+  const allLanguages = [
+    "English","Spanish","Chinese","Tagalog","Vietnamese","Arabic","French","Korean",
+    "Russian","German","Italian","Portuguese","Hindi","Japanese","Polish","Dutch",
+    "Greek","Urdu","Persian","Hebrew","Thai","Swedish"
+  ];
+
+  const orderedLanguages = [
+    "English",
+    ...top10.filter((l) => l !== "English"),
+    ...allLanguages.filter((l) => !top10.includes(l)).sort(),
+  ];
+
+  const languageSelect = document.getElementById("languageSelect");
+
+  orderedLanguages.forEach((lang) => {
+    const opt = document.createElement("option");
+    opt.value = lang;
+    opt.textContent = lang;
+    languageSelect.appendChild(opt);
+  });
+
+  languageSelect.value = "English";
+
+  /* TOUR STEPS */
+  const tourSteps = [
+    { title: "Welcome", text: "This is Sam, your Clinical Intake Assistant." },
+    { title: "Chat Window", text: "All conversation appears here in the chat window." },
+    { title: "Input Box", text: "Type your responses here and press Send." },
+    { title: "Start", text: "Start begins the intake process." },
+    { title: "Pause", text: "Pause temporarily stops the intake." },
+    { title: "Finish", text: "Finish ends the intake early." },
+    { title: "Repeat", text: "Repeat makes Sam repeat the last message." },
+    { title: "Skip", text: "Skip moves past the current question." },
+    { title: "Reset", text: "Reset clears the intake and starts over." },
+    { title: "Language Select", text: "Choose the patient's preferred language." },
+    { title: "Language Search", text: "Search for a language by typing its name." },
+    { title: "Voice Mode", text: "Voice Mode allows spoken responses." },
+    { title: "Read Aloud", text: "Sam will read messages out loud when enabled." },
+    { title: "Microphone", text: "Tap the microphone to begin voice input." },
+    { title: "Tour Complete", text: "That's the overview. You're ready to begin." },
+  ];
+
+  let tourStep = 0;
+
+  function showTourStep() {
+    clearHighlights();
+    const step = tourSteps[tourStep];
+
+    tourTitle.textContent = step.title;
+    tourText.textContent = step.text;
+
+    if (controls[step.title]) {
+      controls[step.title].classList.add("highlight");
+    }
+
+    tourTooltip.classList.remove("hidden");
   }
 
-  tooltip.classList.remove("hidden");
-}
+  /* START DEMO */
+  startDemoBtn.addEventListener("click", () => {
+    chatWindow.innerHTML = "";
+    demoOverlay.style.display = "none";
+    tourOverlay.classList.remove("hidden");
+    tourStep = 0;
+    showTourStep();
+  });
 
-document.getElementById("tourNextBtn").onclick = () => {
-  currentStep++;
-  if (currentStep >= steps.length) {
-    endTour();
-  } else {
-    showStep();
-  }
-};
+  /* EXIT DEMO */
+  exitDemoBtn.addEventListener("click", () => {
+    demoOverlay.style.display = "none";
+  });
 
-function endTour() {
-  tooltip.classList.add("hidden");
-  overlay.classList.add("hidden");
-  clearHighlights();
-}
+  /* NEXT STEP */
+  tourNextBtn.addEventListener("click", () => {
+    tourStep++;
+    if (tourStep >= tourSteps.length) {
+      clearHighlights();
+      tourTooltip.classList.add("hidden");
+      tourOverlay.classList.add("hidden");
+      return;
+    }
+    showTourStep();
+  });
 
-document.getElementById("tourExitBtn").onclick = endTour;
+  /* EXIT TOUR */
+  tourExitBtn.addEventListener("click", () => {
+    clearHighlights();
+    tourTooltip.classList.add("hidden");
+    tourOverlay.classList.add("hidden");
+  });
 
-/* --- START DEMO --- */
-document.getElementById("startDemoBtn").onclick = () => {
-  document.getElementById("demoOverlay").style.display = "none";
-  currentStep = 0;
-  showStep();
-};
-
-/* --- EXIT DEMO --- */
-document.getElementById("exitDemoBtn").onclick = () => {
-  document.getElementById("demoOverlay").style.display = "none";
-};
+});
