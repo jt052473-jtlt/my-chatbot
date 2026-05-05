@@ -1,1 +1,69 @@
+/* Centered Header */
+.app-header {
+  text-align: center;
+  padding: 15px 0;
+  width: 100%;
+}
 
+/* Progress Bar: Positioned above the chat box */
+.progress-container {
+  width: 90%;
+  max-width: 800px;
+  height: 10px;
+  background: #ddd;
+  border-radius: 5px;
+  margin: 10px auto; /* Centered horizontally */
+  overflow: hidden;
+}
+
+#progressBar {
+  width: 0%;
+  height: 100%;
+  background: #007bff;
+  transition: width 0.3s ease;
+}
+
+/* Chat Window - The Anchor */
+.chat-window {
+  flex: 1;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 15px;
+  overflow-y: auto;
+  position: relative; /* REQUIRED for the tooltip to anchor here */
+  margin: 0 10px;
+}
+
+/* The Overlay - Must not block clicks to the buttons inside the tooltip */
+.tour-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 50; /* Lower than tooltip */
+  border-radius: 8px;
+  pointer-events: none; /* Allows clicks to pass through to buttons below if needed */
+}
+
+/* The Floating Tooltip */
+.tour-tooltip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 25px;
+  width: 85%;
+  max-width: 320px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  z-index: 100; /* Higher than overlay */
+  text-align: center;
+  border: 2px solid #007bff;
+}
+
+/* Ensure buttons in the tooltip are clickable */
+.tour-buttons button {
+  position: relative;
+  z-index: 101; 
+  cursor: pointer;
+}
