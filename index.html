@@ -4,12 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Clinical Intake Assistant</title>
-<link rel="stylesheet" href="style.css?v=5001" />
+<link rel="stylesheet" href="style.css?v=6001" />
 </head>
 
 <body>
 
-<!-- INTRO OVERLAY (NO DIMMING) -->
+<!-- INTRO OVERLAY -->
 <div id="demoOverlay">
   <div class="demo-content">
     <h1>Clinical Intake Assistant</h1>
@@ -22,7 +22,7 @@
   </div>
 </div>
 
-<!-- TOUR DIM OVERLAY -->
+<!-- TOUR OVERLAY -->
 <div id="tourOverlay" class="tour-overlay hidden"></div>
 
 <!-- TOUR TOOLTIP -->
@@ -69,10 +69,10 @@
 
     <div class="control-buttons">
       <button id="startBtn" class="btn-primary">Start</button>
-      <button id="pauseBtn">Pause</button>
-      <button id="finishBtn">Finish</button>
-      <button id="repeatBtn">Repeat</button>
-      <button id="skipBtn">Skip</button>
+      <button id="pauseBtn" class="btn-secondary">Pause</button>
+      <button id="finishBtn" class="btn-primary">Finish</button>
+      <button id="repeatBtn" class="btn-secondary">Repeat</button>
+      <button id="skipBtn" class="btn-secondary">Skip</button>
       <button id="resetBtn" class="btn-danger">Reset</button>
     </div>
 
@@ -85,13 +85,13 @@
 
 </div>
 
-<!-- YOUR ORIGINAL CHATBOT LOGIC FILES -->
+<!-- CHATBOT LOGIC FILES -->
 <script src="interviewFlow2.js"></script>
 <script src="interviewQuestions2.js"></script>
 <script src="summaryBuilder2.js"></script>
 
-<!-- GUIDED TOUR LOGIC -->
-<script src="script.js?v=5001"></script>
+<!-- GUIDED TOUR -->
+<script src="script.js?v=6001"></script>
 
 </body>
 </html>
