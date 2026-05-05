@@ -51,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") sendBtn.click();
   });
 
-  /* LANGUAGE LISTS */
   const top10 = [
     "English","Spanish","Chinese","Tagalog","Vietnamese",
     "Arabic","French","Korean","Russian","German"
@@ -80,7 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   languageSelect.value = "English";
 
-  /* TOUR STEPS */
   const tourSteps = [
     { title: "Welcome", text: "This is Sam, your Clinical Intake Assistant." },
     { title: "Chat Window", text: "All conversation appears here in the chat window." },
@@ -115,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tourTooltip.classList.remove("hidden");
   }
 
-  /* START DEMO */
   startDemoBtn.addEventListener("click", () => {
     chatWindow.innerHTML = "";
     demoOverlay.style.display = "none";
@@ -124,12 +121,10 @@ document.addEventListener("DOMContentLoaded", () => {
     showTourStep();
   });
 
-  /* EXIT DEMO */
   exitDemoBtn.addEventListener("click", () => {
     demoOverlay.style.display = "none";
   });
 
-  /* NEXT STEP */
   tourNextBtn.addEventListener("click", () => {
     tourStep++;
     if (tourStep >= tourSteps.length) {
@@ -141,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showTourStep();
   });
 
-  /* EXIT TOUR */
   tourExitBtn.addEventListener("click", () => {
     clearHighlights();
     tourTooltip.classList.add("hidden");
