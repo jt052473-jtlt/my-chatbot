@@ -4,20 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinical Intake Assistant</title>
-  <link rel="stylesheet" href="style.css?v=2001" />
+  <link rel="stylesheet" href="style.css?v=3001" />
 </head>
 <body>
 
+  <!-- INTRO OVERLAY -->
   <div id="demoOverlay">
     <div class="demo-content">
       <h1>Clinical Intake Assistant</h1>
       <p>This demo showcases a clinical intake workflow. Click Start Demo to begin.</p>
       <div class="demo-buttons">
         <button id="startDemoBtn" class="btn-primary">Start Demo</button>
+        <button id="exitDemoBtn" class="btn-secondary">Exit</button>
       </div>
     </div>
   </div>
 
+  <!-- DIM BACKGROUND DURING TOUR -->
   <div id="tourOverlay" class="tour-overlay hidden"></div>
 
   <div class="app-container">
@@ -45,12 +48,13 @@
 
     <div id="chatWindow" class="chat-window">
 
+      <!-- TOUR CARD -->
       <div id="tourTooltip" class="tour-tooltip hidden">
         <h3 id="tourTitle"></h3>
         <p id="tourText"></p>
         <div class="tour-buttons">
-          <button id="tourNextBtn" class="btn-primary">Next</button>
-          <button id="tourExitBtn" class="btn-danger">Exit</button>
+          <button id="tourNextBtn" class="btn-secondary">Next</button>
+          <button id="tourExitBtn" class="btn-secondary">Exit</button>
         </div>
       </div>
 
@@ -72,6 +76,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=2002"></script>
+  <script src="script.js?v=3001"></script>
 </body>
 </html>
