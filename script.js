@@ -1,5 +1,5 @@
 // ---------------------------------------------------------
-// SCRIPT.JS — MULTILINGUAL + VOICE + START DEMO + TOUR
+// SCRIPT.JS — FULL VOICE MODE + MULTILINGUAL + TOUR
 // ---------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -28,22 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const tourText = document.getElementById("tourText");
 
   // -------------------------------------------------------
-  // TOP 10 LANGUAGES ONLY
+  // TOP 10 LANGUAGES
   // -------------------------------------------------------
   const top10 = [
-    "English",
-    "Spanish",
-    "Chinese",
-    "Tagalog",
-    "Vietnamese",
-    "Arabic",
-    "French",
-    "Korean",
-    "Russian",
-    "German"
+    "English","Spanish","Chinese","Tagalog","Vietnamese",
+    "Arabic","French","Korean","Russian","German"
   ];
 
-  // Populate dropdown
   top10.forEach(lang => {
     const opt = document.createElement("option");
     opt.value = lang;
@@ -78,11 +69,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // -------------------------------------------------------
-  // LANGUAGE SEARCH FILTER
+  // LANGUAGE SEARCH
   // -------------------------------------------------------
   languageSearch.addEventListener("input", () => {
     const searchValue = languageSearch.value.toLowerCase();
-
     languageSelect.innerHTML = "";
 
     const filtered = top10.filter(lang =>
@@ -103,38 +93,79 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // -------------------------------------------------------
-  // VOICE OUTPUT (TEXT-TO-SPEECH)
+  // TEXT-TO-SPEECH (SLOW FEMALE VOICE)
   // -------------------------------------------------------
-  function speak(text) {
-    if (!readAloudToggle.checked) return;
+  function speak(text, callback = null) {
+    if (!readAloudToggle.checked) {
+      if (callback) callback();
+      return;
+    }
 
     const lang = languageSelect.value;
     const voiceCode = translations[lang].voiceCode;
 
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = voiceCode;
+    utter.rate = 0.85; // SLOWER VOICE
+    utter.pitch = 1.0;
+
+    utter.onend = () => {
+      if (callback) callback();
+    };
 
     speechSynthesis.speak(utter);
   }
 
   // -------------------------------------------------------
-  // VOICE INPUT (SPEECH-TO-TEXT)
+  // SPEECH RECOGNITION
   // -------------------------------------------------------
   let recognition;
+  let retryCount = 0;
 
   if ("webkitSpeechRecognition" in window) {
     recognition = new webkitSpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
 
+    recognition.onstart = () => {
+      micBtn.classList.add("listening");
+    };
+
+    recognition.onend = () => {
+      micBtn.classList.remove("listening");
+    };
+
     recognition.onresult = (event) => {
-      const text = event.results[0][0].transcript;
+      const text = event.results[0][0].transcript.trim();
       userInput.value = text;
+      retryCount = 0;
       sendBtn.click();
+    };
+
+    recognition.onerror = () => {
+      handleNoVoiceCaptured();
     };
   }
 
-  micBtn.addEventListener("click", () => {
+  // -------------------------------------------------------
+  // HANDLE MISSED ANSWERS
+  // -------------------------------------------------------
+  function handleNoVoiceCaptured() {
+    retryCount++;
+
+    if (retryCount === 1) {
+      speak("I didn’t catch that. Please say it again.", startListening);
+    } else if (retryCount === 2) {
+      speak("Still didn’t catch that. You can type your answer in the box.", () => {
+        micBtn.classList.remove("listening");
+      });
+    }
+  }
+
+  // -------------------------------------------------------
+  // START LISTENING (AUTO OR MANUAL)
+  // -------------------------------------------------------
+  function startListening() {
     if (!voiceModeToggle.checked) return;
 
     const lang = languageSelect.value;
@@ -142,10 +173,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     recognition.lang = voiceCode;
     recognition.start();
+  }
+
+  micBtn.addEventListener("click", () => {
+    startListening();
   });
 
   // -------------------------------------------------------
-  // CHAT MESSAGE HELPERS
+  // CHAT MESSAGE
   // -------------------------------------------------------
   function addMessage(sender, text) {
     const msg = document.createElement("div");
@@ -155,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------------------------------------
-  // SEND BUTTON HANDLER
+  // SEND BUTTON
   // -------------------------------------------------------
   sendBtn.addEventListener("click", () => {
     const text = userInput.value.trim();
@@ -174,31 +209,16 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // -------------------------------------------------------
-  // GUIDED TOUR STEPS
+  // GUIDED TOUR
   // -------------------------------------------------------
   let tourStep = 0;
 
   const tourSteps = [
-    {
-      title: "Welcome!",
-      text: "This is the Clinical Intake Assistant. I'll guide you through the interface."
-    },
-    {
-      title: "Language Settings",
-      text: "Use the dropdown to switch languages. Everything updates instantly."
-    },
-    {
-      title: "Voice Features",
-      text: "Enable Read Aloud or Voice Mode for hands-free interaction."
-    },
-    {
-      title: "Chat Controls",
-      text: "Use Start, Pause, Skip, Repeat, and Finish to control the interview."
-    },
-    {
-      title: "You're Ready!",
-      text: "Start the demo anytime using the Start Demo button."
-    }
+    { title: "Welcome!", text: "This is the Clinical Intake Assistant." },
+    { title: "Language Settings", text: "Use the dropdown to switch languages." },
+    { title: "Voice Features", text: "Enable Read Aloud or Voice Mode." },
+    { title: "Chat Controls", text: "Use Start, Pause, Skip, Repeat, Finish." },
+    { title: "You're Ready!", text: "Click Start Demo to begin." }
   ];
 
   function showTourStep() {
@@ -226,22 +246,31 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // -------------------------------------------------------
-  // START DEMO LOGIC (Option C)
+  // START DEMO
   // -------------------------------------------------------
   startDemoBtn.addEventListener("click", () => {
     demoOverlay.style.display = "none";
 
-    // Start the guided tour AFTER the demo begins
     tourStep = 0;
     showTourStep();
 
-    // Start the interview
     startInterview();
   });
 
   exitDemoBtn.addEventListener("click", () => {
     demoOverlay.style.display = "none";
   });
+
+  // -------------------------------------------------------
+  // AUTO-LISTEN AFTER EACH QUESTION
+  // -------------------------------------------------------
+  window.autoListenAfterQuestion = function() {
+    if (!voiceModeToggle.checked) return;
+
+    setTimeout(() => {
+      startListening();
+    }, 3500); // 3.5 second pause
+  };
 
   // -------------------------------------------------------
   // EXPOSE FUNCTIONS
