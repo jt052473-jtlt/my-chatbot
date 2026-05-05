@@ -36,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tourTooltip.classList.remove("hidden");
   }
 
-  // Start Demo button (opens tour, hides overlay)
   startDemoBtn.addEventListener("click", () => {
     demoOverlay.style.display = "none";
 
@@ -48,9 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showTourStep();
   });
 
-  // Next button in tour
-  tourNextBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
+  tourNextBtn.addEventListener("click", () => {
     tourStep++;
     if (tourStep < tourSteps.length) {
       showTourStep();
@@ -60,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Exit button in tour
   tourExitBtn.addEventListener("click", () => {
     tourTooltip.classList.add("hidden");
     tourOverlay.classList.add("hidden");
