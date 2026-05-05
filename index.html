@@ -14,7 +14,6 @@
       <p>This demo showcases a clinical intake workflow. Click Start Demo to begin.</p>
       <div class="demo-buttons">
         <button id="startDemoBtn" class="btn-primary">Start Demo</button>
-        <button id="exitDemoBtn" class="btn-danger">Exit Demo</button>
       </div>
     </div>
   </div>
@@ -28,6 +27,20 @@
 
     <div class="progress-container">
       <div id="progressBar"></div>
+    </div>
+
+    <div class="settings-row">
+      <select id="languageSelect"></select>
+      <input type="text" id="languageSearch" placeholder="Search language..." />
+      <label class="toggle">
+        <input type="checkbox" id="readAloudToggle" />
+        <span>Read Aloud</span>
+      </label>
+      <label class="toggle">
+        <input type="checkbox" id="voiceModeToggle" />
+        <span>Voice Mode</span>
+      </label>
+      <button id="micBtn" class="mic-button">🎤</button>
     </div>
 
     <div id="chatWindow" class="chat-window">
@@ -50,7 +63,6 @@
         <button id="skipBtn">Skip</button>
         <button id="resetBtn" class="btn-danger">Reset</button>
       </div>
-
       <div class="input-area">
         <input type="text" id="userInput" placeholder="Type your response here..." autofocus />
         <button id="sendBtn" class="btn-primary">Send</button>
