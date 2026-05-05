@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const tourExitBtn = document.getElementById("tourExitBtn");
   const chatWindow = document.getElementById("chatWindow");
 
-  // ⭐ FULL guided tour steps (you said: explain each button)
   const tourSteps = [
     { title: "Welcome", text: "This is Sam, your Clinical Intake Assistant." },
     { title: "Chat Window", text: "All conversation appears here." },
@@ -37,11 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
     tourTooltip.classList.remove("hidden");
   }
 
-  // ⭐ Start Demo button (opens overlay)
+  // Start Demo button (opens tour, hides overlay)
   startDemoBtn.addEventListener("click", () => {
     demoOverlay.style.display = "none";
 
-    // Clear chat bubbles only (keep tour tooltip)
     const bubbles = chatWindow.querySelectorAll("div:not(#tourTooltip)");
     bubbles.forEach(b => b.remove());
 
@@ -50,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showTourStep();
   });
 
-  // ⭐ Next button
+  // Next button in tour
   tourNextBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     tourStep++;
@@ -62,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ⭐ Exit button (inside tour)
+  // Exit button in tour
   tourExitBtn.addEventListener("click", () => {
     tourTooltip.classList.add("hidden");
     tourOverlay.classList.add("hidden");
