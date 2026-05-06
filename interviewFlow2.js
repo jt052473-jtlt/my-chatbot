@@ -1,74 +1,85 @@
-/* ---------------------------------------------------
-   INTERVIEW FLOW LOGIC — MATCHED TO YOUR CHAT LAYOUT
----------------------------------------------------- */
+// interviewFlow2.js
+// Controls question flow, language selection, and response storage
 
-let currentQuestion = 0;
+import { getQuestion, getTotalQuestions } from "./interviewQuestions2.js";
+
+let currentQuestionIndex = 0;
+let selectedLanguage = "en";
 let responses = [];
 
-/* Add a message from the bot into the chat window */
-function addBotMessage(text) {
-  const chatWindow = document.getElementById("chatWindow");
-  const div = document.createElement("div");
-  div.textContent = text;
-  chatWindow.appendChild(div);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
+// Called when user selects a language on the intro screen
+function setLanguage(lang) {
+    selectedLanguage = lang;
 }
 
-/* Update progress bar */
-function updateProgress() {
-  const lang = document.getElementById("languageSelect").value;
-  const total = interviewQuestions[lang].length - 1; // last one is "Thank you"
-  const percent = (currentQuestion / total) * 100;
-
-  document.getElementById("progressBar").style.width = percent + "%";
-}
-
-/* Start the interview */
+// Start the interview
 function startInterview() {
-  currentQuestion = 0;
-  responses = [];
-
-  const chatWindow = document.getElementById("chatWindow");
-  chatWindow.innerHTML = ""; // Clear chat
-
-  addBotMessage("Let's begin. Please answer each question.");
-  showQuestion();
-  updateProgress();
+    currentQuestionIndex = 0;
+    responses = [];
+    showQuestion();
 }
 
-/* Show the current question */
+// Display the current question
 function showQuestion() {
-  const lang = document.getElementById("languageSelect").value;
-  const q = interviewQuestions[lang][currentQuestion];
-  addBotMessage(q);
-}
+    const questionText = getQuestion(selectedLanguage, currentQuestionIndex);
+    document.getElementById("questionText").innerText = questionText;
 
-/* Handle user response and move to next question */
-function nextQuestion(userText) {
-  responses.push(userText);
+    // Clear input field
+    const input = document.getElementById("responseInput");
+    input.value = "";
+    input.focus();
 
-  currentQuestion++;
-
-  const lang = document.getElementById("languageSelect").value;
-
-  // If we reached the last question ("Thank you")
-  if (currentQuestion >= interviewQuestions[lang].length - 1) {
-    showSummary();
     updateProgress();
-    return;
-  }
-
-  showQuestion();
-  updateProgress();
 }
 
-/* Build and show the summary */
+// Save response and move to next question
+function nextQuestion() {
+    const input = document.getElementById("responseInput").value.trim();
+    responses[currentQuestionIndex] = input;
+
+    currentQuestionIndex++;
+
+    if (currentQuestionIndex < getTotalQuestions(selectedLanguage)) {
+        showQuestion();
+    } else {
+        showSummary();
+    }
+}
+
+// Update progress bar and counter
+function updateProgress() {
+    const total = getTotalQuestions(selectedLanguage);
+    const progress = ((currentQuestionIndex + 1) / total) * 100;
+
+    document.getElementById("progressBar").style.width = progress + "%";
+    document.getElementById("progressCount").innerText =
+        `${currentQuestionIndex + 1} / ${total}`;
+}
+
+// Build and display the final summary
 function showSummary() {
-  const lang = document.getElementById("languageSelect").value;
-  const summary = buildSummaryTranslated(responses, lang);
+    const summaryContainer = document.getElementById("summaryContent");
+    summaryContainer.innerHTML = "";
 
-  addBotMessage("Here is your summary:");
-  addBotMessage(summary);
+    const total = getTotalQuestions(selectedLanguage);
 
-  updateProgress();
+    for (let i = 0; i < total; i++) {
+        const q = getQuestion(selectedLanguage, i);
+        const a = responses[i] || "";
+
+        const block = document.createElement("div");
+        block.className = "summary-block";
+
+        block.innerHTML = `
+            <h3>${q}</h3>
+            <p>${a}</p>
+        `;
+
+        summaryContainer.appendChild(block);
+    }
+
+    document.getElementById("interviewSection").style.display = "none";
+    document.getElementById("summarySection").style.display = "block";
 }
+
+export { setLanguage, startInterview, nextQuestion };
