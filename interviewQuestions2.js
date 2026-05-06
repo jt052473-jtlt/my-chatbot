@@ -1,3 +1,7 @@
+/* ---------------------------------------------------
+   INTERVIEW QUESTIONS — GENERAL INTAKE (11 QUESTIONS)
+---------------------------------------------------- */
+
 const interviewQuestions = {
   English: [
     "What is your full name?",
