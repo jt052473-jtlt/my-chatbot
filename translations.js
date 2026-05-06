@@ -1,36 +1,35 @@
-/* ---------------------------------------------------
-   TRANSLATIONS — ENGLISH ONLY (EXPANDABLE)
----------------------------------------------------- */
+// translations.js
+// UI text translations for the Clinical Intake Demo
 
-const translations = {
-  English: {
-    summary: {
-      title: "Patient Summary",
-
-      patientSection: "Patient Information",
-      fullName: "Full Name",
-      dob: "Date of Birth",
-
-      reasonSection: "Reason for Visit",
-      primaryComplaint: "Primary Complaint",
-      duration: "Duration",
-
-      healthSection: "Health Information",
-      allergies: "Allergies",
-      medications: "Medications",
-      medicalHistory: "Medical History",
-
-      travelSection: "Travel & Surgical History",
-      recentTravel: "Recent Travel",
-      recentSurgeries: "Recent Surgeries",
-
-      additionalNotes: "Additional Notes"
+const UI_TEXT = {
+    en: {
+        introTitle: "Clinical Intake Demo",
+        introSubtitle: "A simple multilingual intake assistant",
+        startButton: "Start Demo",
+        nextButton: "Next",
+        summaryTitle: "Summary of Responses"
     },
 
-    demo: {
-      title: "Clinical Intake Demo",
-      intro:
-        "This demo showcases a multi‑department clinical intake system. It can be adapted for Sleep Medicine, Cardiology, Neurology, etc. Click Start Demo to begin."
+    es: {
+        introTitle: "Demostración de Admisión Clínica",
+        introSubtitle: "Un asistente de admisión multilingüe",
+        startButton: "Iniciar Demostración",
+        nextButton: "Siguiente",
+        summaryTitle: "Resumen de Respuestas"
+    },
+
+    fr: {
+        introTitle: "Démo d'Admission Clinique",
+        introSubtitle: "Un assistant d'admission multilingue",
+        startButton: "Démarrer la Démo",
+        nextButton: "Suivant",
+        summaryTitle: "Résumé des Réponses"
     }
-  }
 };
+
+// Returns translated UI text
+function t(lang, key) {
+    return UI_TEXT[lang]?.[key] || UI_TEXT["en"][key] || "";
+}
+
+export { UI_TEXT, t };
