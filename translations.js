@@ -1,7 +1,12 @@
+/* ---------------------------------------------------
+   TRANSLATIONS — ENGLISH ONLY (EXPANDABLE)
+---------------------------------------------------- */
+
 const translations = {
   English: {
     summary: {
       title: "Patient Summary",
+
       patientSection: "Patient Information",
       fullName: "Full Name",
       dob: "Date of Birth",
@@ -23,7 +28,7 @@ const translations = {
     },
 
     demo: {
-      title: "Clinical Intake Assistant",
+      title: "Clinical Intake Demo",
       intro:
         "This demo showcases a multi‑department clinical intake system. It can be adapted for Sleep Medicine, Cardiology, Neurology, etc. Click Start Demo to begin."
     }
