@@ -1,208 +1,281 @@
-// ======================================================
-// GLOBAL LANGUAGE STATE
-// ======================================================
-let currentLanguage = "en";
+// ---------------------------------------------------------
+// SCRIPT.JS — FULL VOICE MODE + MULTILINGUAL + TOUR
+// ---------------------------------------------------------
 
-// ======================================================
-// INITIALIZE ON PAGE LOAD
-// ======================================================
 document.addEventListener("DOMContentLoaded", () => {
-    const langSelect = document.getElementById("languageSelect");
 
-    // Set default language
-    langSelect.value = "en";
+// -------------------------------------------------------
+// ELEMENT REFERENCES
+// -------------------------------------------------------
+const chatWindow = document.getElementById("chatWindow");
+const userInput = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+const languageSelect = document.getElementById("languageSelect");
+const languageSearch = document.getElementById("languageSearch");
+const readAloudToggle = document.getElementById("readAloudToggle");
+const voiceModeToggle = document.getElementById("voiceModeToggle");
+const micBtn = document.getElementById("micBtn");
+const demoOverlay = document.getElementById("demoOverlay");
+const startDemoBtn = document.getElementById("startDemoBtn");
+const exitDemoBtn = document.getElementById("exitDemoBtn");
+const tourOverlay = document.getElementById("tourOverlay");
+const tourTooltip = document.getElementById("tourTooltip");
+const tourNextBtn = document.getElementById("tourNextBtn");
+const tourExitBtn = document.getElementById("tourExitBtn");
+const tourTitle = document.getElementById("tourTitle");
+const tourText = document.getElementById("tourText");
 
-    // Apply initial translations
-    applyTranslations("en");
-
-    // When user changes language
-    langSelect.addEventListener("change", (e) => {
-        currentLanguage = e.target.value;
-        applyTranslations(currentLanguage);
-    });
-
-    // Start Demo button
-    document.getElementById("startDemoBtn").addEventListener("click", () => {
-        document.getElementById("startDemoOverlay").style.display = "none";
-        startDemo();
-    });
-
-    // Guided Tour button
-    document.getElementById("tourBtn").addEventListener("click", () => {
-        startGuidedTour();
-    });
-});
-
-// ======================================================
-// APPLY TRANSLATIONS TO ALL UI ELEMENTS
-// ======================================================
-function applyTranslations(lang) {
-    const t = translations[lang];
-
-    if (!t) return;
-
-    // RTL support
-    document.body.dir = t.direction || "ltr";
-
-    // Start Demo Overlay
-    document.getElementById("demoTitle").textContent = t.demoTitle;
-    document.getElementById("demoIntroText").textContent = t.demoIntroText;
-    document.getElementById("startDemoBtn").textContent = t.startDemoBtn;
-    document.getElementById("skipDemoBtn").textContent = t.skipDemoBtn;
-
-    // App Header
-    document.getElementById("appTitle").textContent = t.demoTitle;
-
-    // Settings Row
-    document.getElementById("tourBtn").textContent = t.tourBtn;
-    document.getElementById("voiceBtn").textContent = t.voiceBtn;
-    document.getElementById("readAloudBtn").textContent = t.readAloudBtn;
-
-    // Input Area
-    document.getElementById("sendBtn").textContent = t.sendBtn;
-    document.getElementById("userInput").placeholder =
-        lang === "ar" ? "اكتب رسالتك..." :
-        lang === "zh-CN" ? "输入您的消息..." :
-        lang === "zh-TW" ? "輸入您的訊息..." :
-        "Type your message...";
-}
-
-// ======================================================
-// START DEMO (FIRST BOT MESSAGE)
-// ======================================================
-function startDemo() {
-    const t = translations[currentLanguage];
-
-    addBotMessage(
-        t.questions.reasonForVisit
-    );
-}
-
-// ======================================================
-// CHAT WINDOW HELPERS
-// ======================================================
-function addBotMessage(text) {
-    const chat = document.getElementById("chatWindow");
-    const msg = document.createElement("div");
-    msg.className = "bot-message";
-    msg.textContent = text;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-
-    // Read Aloud automatically uses correct language
-    speakText(text);
-}
-
-function addUserMessage(text) {
-    const chat = document.getElementById("chatWindow");
-    const msg = document.createElement("div");
-    msg.className = "user-message";
-    msg.textContent = text;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-}
-
-// ======================================================
-// HANDLE USER INPUT
-// ======================================================
-document.getElementById("sendBtn").addEventListener("click", handleUserInput);
-document.getElementById("userInput").addEventListener("keypress", (e) => {
-    if (e.key === "Enter") handleUserInput();
-});
-
-let questionIndex = 0;
-const questionOrder = [
-    "reasonForVisit",
-    "symptoms",
-    "duration",
-    "medications",
-    "allergies",
-    "history"
+// -------------------------------------------------------
+// TOP 10 LANGUAGES
+// -------------------------------------------------------
+const top10 = [
+"English","Spanish","Chinese","Tagalog","Vietnamese",
+"Arabic","French","Korean","Russian","German"
 ];
 
-function handleUserInput() {
-    const input = document.getElementById("userInput");
-    const text = input.value.trim();
-    if (!text) return;
-
-    addUserMessage(text);
-    input.value = "";
-
-    const t = translations[currentLanguage];
-
-    // Move to next question
-    questionIndex++;
-
-    if (questionIndex < questionOrder.length) {
-        const nextKey = questionOrder[questionIndex];
-        addBotMessage(t.questions[nextKey]);
-    } else {
-        showSummary();
-    }
-}
-
-// ======================================================
-// SUMMARY
-// ======================================================
-function showSummary() {
-    const t = translations[currentLanguage];
-
-    addBotMessage(t.summaryTitle);
-    addBotMessage(t.summaryComplete);
-}
-
-// ======================================================
-// READ ALOUD (TEXT-TO-SPEECH)
-// ======================================================
-function speakText(text) {
-    const utter = new SpeechSynthesisUtterance(text);
-
-    // Match language voice
-    utter.lang = getVoiceCode(currentLanguage);
-
-    speechSynthesis.speak(utter);
-}
-
-function getVoiceCode(lang) {
-    switch (lang) {
-        case "es": return "es-ES";
-        case "zh-CN": return "zh-CN";
-        case "zh-TW": return "zh-TW";
-        case "tl": return "tl-PH";
-        case "vi": return "vi-VN";
-        case "ar": return "ar-SA";
-        case "fr": return "fr-FR";
-        case "ko": return "ko-KR";
-        case "ru": return "ru-RU";
-        default: return "en-US";
-    }
-}
-
-// ======================================================
-// VOICE MODE (SPEECH RECOGNITION)
-// ======================================================
-document.getElementById("voiceBtn").addEventListener("click", () => {
-    startVoiceRecognition();
+top10.forEach(lang => {
+const opt = document.createElement("option");
+opt.value = lang;
+opt.textContent = lang;
+languageSelect.appendChild(opt);
 });
 
-function startVoiceRecognition() {
-    const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
+languageSelect.value = "English";
 
-    if (!SpeechRecognition) {
-        alert("Speech recognition not supported.");
-        return;
-    }
+// -------------------------------------------------------
+// APPLY LANGUAGE TO UI
+// -------------------------------------------------------
+function applyLanguage(lang) {
+const t = translations[lang];
 
-    const recog = new SpeechRecognition();
-    recog.lang = getVoiceCode(currentLanguage);
-    recog.interimResults = false;
+document.querySelector(".app-header h2").textContent = t.ui.appTitle;
 
-    recog.onresult = (event) => {
-        const text = event.results[0][0].transcript;
-        document.getElementById("userInput").value = text;
-        handleUserInput();
-    };
+document.getElementById("startBtn").textContent = t.ui.start;
+document.getElementById("pauseBtn").textContent = t.ui.pause;
+document.getElementById("finishBtn").textContent = t.ui.finish;
+document.getElementById("repeatBtn").textContent = t.ui.repeat;
+document.getElementById("skipBtn").textContent = t.ui.skip;
+document.getElementById("resetBtn").textContent = t.ui.reset;
 
-    recog.start();
+sendBtn.textContent = t.ui.send;
+userInput.placeholder = t.ui.typeHere;
+
+// RTL support
+document.body.dir = (lang === "Arabic") ? "rtl" : "ltr";
 }
+
+applyLanguage("English");
+
+languageSelect.addEventListener("change", () => {
+applyLanguage(languageSelect.value);
+});
+
+// -------------------------------------------------------
+// LANGUAGE SEARCH
+// -------------------------------------------------------
+languageSearch.addEventListener("input", () => {
+const searchValue = languageSearch.value.toLowerCase();
+languageSelect.innerHTML = "";
+
+const filtered = top10.filter(lang =>
+lang.toLowerCase().includes(searchValue)
+);
+
+filtered.forEach(lang => {
+const opt = document.createElement("option");
+opt.value = lang;
+opt.textContent = lang;
+languageSelect.appendChild(opt);
+});
+
+if (filtered.length > 0) {
+languageSelect.value = filtered[0];
+applyLanguage(filtered[0]);
+}
+});
+
+// -------------------------------------------------------
+// TEXT-TO-SPEECH
+// -------------------------------------------------------
+function speak(text, callback = null) {
+if (!readAloudToggle.checked) {
+if (callback) callback();
+return;
+}
+
+const lang = languageSelect.value;
+const voiceCode = translations[lang].voiceCode;
+
+const utter = new SpeechSynthesisUtterance(text);
+utter.lang = voiceCode;
+utter.rate = 0.85;
+utter.pitch = 1.0;
+
+utter.onend = () => {
+if (callback) callback();
+};
+
+speechSynthesis.speak(utter);
+}
+
+// -------------------------------------------------------
+// SPEECH RECOGNITION
+// -------------------------------------------------------
+let recognition;
+let retryCount = 0;
+
+if ("webkitSpeechRecognition" in window) {
+recognition = new webkitSpeechRecognition();
+recognition.continuous = false;
+recognition.interimResults = false;
+
+recognition.onstart = () => {
+micBtn.classList.add("listening");
+};
+
+recognition.onend = () => {
+micBtn.classList.remove("listening");
+};
+
+recognition.onresult = (event) => {
+const text = event.results[0][0].transcript.trim();
+userInput.value = text;
+retryCount = 0;
+sendBtn.click();
+};
+
+recognition.onerror = () => {
+handleNoVoiceCaptured();
+};
+}
+
+function handleNoVoiceCaptured() {
+retryCount++;
+if (retryCount === 1) {
+speak("I didn’t catch that. Please say it again.", startListening);
+} else if (retryCount === 2) {
+speak("Still didn’t catch that. You can type your answer in the box.", () => {
+micBtn.classList.remove("listening");
+});
+}
+}
+
+function startListening() {
+if (!voiceModeToggle.checked) return;
+if (!recognition) return;
+
+const lang = languageSelect.value;
+recognition.lang = translations[lang].voiceCode;
+recognition.start();
+}
+
+micBtn.addEventListener("click", () => {
+startListening();
+});
+
+// -------------------------------------------------------
+// CHAT MESSAGE
+// -------------------------------------------------------
+function addMessage(sender, text) {
+const msg = document.createElement("div");
+msg.textContent = `${sender}: ${text}`;
+chatWindow.appendChild(msg);
+chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+// -------------------------------------------------------
+// SEND BUTTON
+// -------------------------------------------------------
+sendBtn.addEventListener("click", () => {
+const text = userInput.value.trim();
+if (!text) return;
+
+addMessage("You", text);
+userInput.value = "";
+
+if (window.handleUserResponse) {
+window.handleUserResponse(text);
+}
+});
+
+userInput.addEventListener("keypress", (e) => {
+if (e.key === "Enter") sendBtn.click();
+});
+
+// -------------------------------------------------------
+// ⭐⭐ MULTILINGUAL GUIDED TOUR ⭐⭐
+// -------------------------------------------------------
+let tourStep = 0;
+
+function showTourStep() {
+const lang = languageSelect.value;
+const t = translations[lang].tour;
+
+const step = t.steps[tourStep];
+
+tourTitle.textContent = step.title;
+tourText.textContent = step.text;
+
+tourNextBtn.textContent = t.next;
+tourExitBtn.textContent = t.exit;
+
+document.body.dir = (lang === "Arabic") ? "rtl" : "ltr";
+
+tourOverlay.classList.remove("hidden");
+tourTooltip.classList.remove("hidden");
+}
+
+tourNextBtn.addEventListener("click", () => {
+const lang = languageSelect.value;
+const t = translations[lang].tour;
+
+tourStep++;
+
+if (tourStep >= t.steps.length) {
+tourOverlay.classList.add("hidden");
+tourTooltip.classList.add("hidden");
+return;
+}
+
+showTourStep();
+});
+
+tourExitBtn.addEventListener("click", () => {
+tourOverlay.classList.add("hidden");
+tourTooltip.classList.add("hidden");
+});
+
+// -------------------------------------------------------
+// START DEMO
+// -------------------------------------------------------
+startDemoBtn.addEventListener("click", () => {
+demoOverlay.style.display = "none";
+tourStep = 0;
+showTourStep();
+
+if (window.startInterview) {
+window.startInterview();
+}
+});
+
+exitDemoBtn.addEventListener("click", () => {
+demoOverlay.style.display = "none";
+});
+
+// -------------------------------------------------------
+// AUTO-LISTEN AFTER EACH QUESTION
+// -------------------------------------------------------
+window.autoListenAfterQuestion = function() {
+if (!voiceModeToggle.checked) return;
+setTimeout(() => {
+startListening();
+}, 3500);
+};
+
+// -------------------------------------------------------
+// EXPOSE FUNCTIONS
+// -------------------------------------------------------
+window.speak = speak;
+window.applyLanguage = applyLanguage;
+
+});
