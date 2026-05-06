@@ -1,168 +1,273 @@
-/* Global layout */
+/* GLOBAL LAYOUT */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+  margin: 0;
+  padding: 0;
+  background: #f4f4f4;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.container {
-    width: 90%;
-    max-width: 700px;
-    margin: 40px auto;
-    text-align: center;
+.app-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Intro Section */
-#introSection {
-    display: block;
+/* HEADER */
+.app-header {
+  text-align: center;
+  padding: 10px 0;
+  background: white;
+  border-bottom: 1px solid #ddd;
 }
 
-.lang-btn {
-    padding: 10px 18px;
-    margin: 5px;
-    border: none;
-    background: #e0e0e0;
-    cursor: pointer;
-    border-radius: 6px;
-    font-size: 16px;
-}
-
-.lang-btn:hover {
-    background: #d0d0d0;
-}
-
-#startDemoBtn {
-    margin-top: 20px;
-    padding: 12px 24px;
-    background: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-#startDemoBtn:hover {
-    background: #3b7ac0;
-}
-
-/* Interview Section */
-#interviewSection {
-    display: none;
-}
-
-#questionText {
-    font-size: 22px;
-    margin-bottom: 20px;
-}
-
-#responseInput {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    margin-bottom: 20px;
-}
-
-#nextBtn {
-    padding: 12px 24px;
-    background: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-#nextBtn:hover {
-    background: #3b7ac0;
-}
-
-/* Progress Bar */
 .progress-container {
-    width: 100%;
-    background: #ddd;
-    border-radius: 6px;
-    margin-top: 20px;
+  width: 90%;
+  margin: 10px auto 0;
+  height: 8px;
+  background: #e5e5e5;
+  border-radius: 999px;
 }
 
 #progressBar {
-    width: 0%;
-    height: 12px;
-    background: #4a90e2;
-    border-radius: 6px;
+  width: 0%;
+  height: 100%;
+  background: #007aff;
+  border-radius: 999px;
 }
 
-#progressCount {
-    margin-top: 8px;
-    font-size: 14px;
+/* SETTINGS ROW */
+.settings-row {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  flex-wrap: wrap;
+  background: white;
+  border-bottom: 1px solid #ddd;
 }
 
-/* Summary Section */
-#summarySection {
-    display: none;
+input[type="text"], select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
 }
 
-.summary-block {
-    background: white;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 6px;
-    text-align: left;
-    border: 1px solid #ddd;
+/* CHAT WINDOW */
+.chat-window {
+  flex: 1;
+  background: white;
+  padding: 15px;
+  overflow-y: auto;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
 }
 
-.summary-block h3 {
-    margin: 0 0 8px 0;
-    font-size: 18px;
+/* CHAT BUBBLES */
+.chat-window div {
+  background: #eef4ff;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  font-size: 15px;
+  line-height: 1.4;
+  max-width: 80%;
 }
 
-.summary-block p {
-    margin: 0;
-    font-size: 16px;
+.chat-window div:nth-child(even) {
+  background: #ffffff;
+  margin-left: auto;
+  border: 1px solid #e5e5e5;
 }
 
-/* Guided Tour Overlay */
-#tourOverlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.65);
-    color: white;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 30px;
+/* INPUT AREA */
+.input-controls-row {
+  padding: 10px;
+  background: white;
 }
 
-#tourBox {
-    background: #222;
-    padding: 25px;
-    border-radius: 8px;
-    max-width: 500px;
+.control-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
-#tourText {
-    font-size: 18px;
-    margin-bottom: 20px;
+.input-area {
+  display: flex;
+  gap: 10px;
 }
 
-#tourNextBtn {
-    padding: 10px 20px;
-    background: #4a90e2;
-    border: none;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
+#userInput {
+  flex: 1;
+  border-radius: 12px;
 }
 
-#tourNextBtn:hover {
-    background: #3b7ac0;
+/* -------------------------------------- */
+/* MODERN iOS / APPLE-STYLE BUTTONS       */
+/* -------------------------------------- */
+
+button {
+  padding: 12px 22px;
+  font-size: 15px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
+
+/* PRIMARY */
+.btn-primary {
+  background: linear-gradient(180deg, #4da3ff, #007aff);
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 122, 255, 0.25);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg, #5ab0ff, #0a84ff);
+  transform: translateY(-1px);
+}
+
+/* SECONDARY */
+.btn-secondary {
+  background: white;
+  color: #007aff;
+  border: 2px solid #007aff;
+  box-shadow: 0 3px 8px rgba(0, 122, 255, 0.15);
+}
+
+.btn-secondary:hover {
+  background: #f0f7ff;
+  transform: translateY(-1px);
+}
+
+/* DANGER */
+.btn-danger {
+  background: linear-gradient(180deg, #ff6b6b, #ff3b30);
+  color: white;
+  box-shadow: 0 4px 10px rgba(255, 59, 48, 0.25);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(180deg, #ff7c7c, #ff453a);
+  transform: translateY(-1px);
+}
+
+/* -------------------------------------- */
+/* MIC BUTTON — ENLARGED + LISTENING STATE */
+/* -------------------------------------- */
+
+.mic-button {
+  background: white;
+  border: 2px solid #007aff;
+  color: #007aff;
+  border-radius: 999px;
+
+  /* Larger desktop size */
+  width: 55px;
+  height: 55px;
+
+  /* Bigger mic icon */
+  font-size: 28px;
+
+  /* Center the icon */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  box-shadow: 0 3px 8px rgba(0, 122, 255, 0.15);
+  transition: all 0.25s ease;
+}
+
+.mic-button:hover {
+  background: #f0f7ff;
+  transform: translateY(-1px);
+}
+
+/* LISTENING STATE — BLUE LIKE PRIMARY BUTTONS */
+.mic-button.listening {
+  background: linear-gradient(180deg, #4da3ff, #007aff);
+  color: white;
+  border-color: #007aff;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+  transform: scale(1.05);
+}
+
+/* -------------------------------------- */
+/* MOBILE RESPONSIVE MIC SIZE             */
+/* -------------------------------------- */
+
+@media (max-width: 480px) {
+  .mic-button {
+    width: 45px;
+    height: 45px;
+    font-size: 22px;
+  }
+}
+
+/* OVERLAYS */
+#demoOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9000;
+}
+
+.demo-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 80%;
+  max-width: 450px;
+  text-align: center;
+  border: 2px solid #007aff;
+}
+
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 8000;
+}
+
+.hidden {
+  display: none;
+}
+
+/* TOUR TOOLTIP */
+.tour-tooltip {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  width: 70%;
+  max-width: 350px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  z-index: 9999;
+  text-align: center;
+  border: 2px solid #007aff;
+}
+
+.tour-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* HIGHLIGHT */
+.highlight {
+  background: #007aff !important;
+  color: white !important;
+  box-shadow: 0 0 12px #007aff;
+}
+
