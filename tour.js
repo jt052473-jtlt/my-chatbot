@@ -1,67 +1,65 @@
-// tour.js
-// Guided tour for the Clinical Intake Demo
-
-import { t } from "./translations.js";
+// tour.js — Centered Tooltip Guided Tour for YOUR Layout
 
 let tourStep = 0;
-let tourLanguage = "en";
 
-const TOUR_STEPS = {
-    en: [
-        "Welcome to the Clinical Intake Demo. This quick tour will show you how it works.",
-        "Use the language selector to choose English, Spanish, or French.",
-        "Click 'Start Demo' to begin the intake process.",
-        "Answer each question and click Next to continue.",
-        "At the end, you'll see a clean summary of all your responses."
-    ],
-    es: [
-        "Bienvenido a la Demostración de Admisión Clínica. Este recorrido le mostrará cómo funciona.",
-        "Use el selector de idioma para elegir inglés, español o francés.",
-        "Haga clic en 'Iniciar Demostración' para comenzar el proceso.",
-        "Responda cada pregunta y haga clic en Siguiente para continuar.",
-        "Al final, verá un resumen limpio de todas sus respuestas."
-    ],
-    fr: [
-        "Bienvenue dans la Démo d'Admission Clinique. Cette visite vous montrera comment cela fonctionne.",
-        "Utilisez le sélecteur de langue pour choisir anglais, espagnol ou français.",
-        "Cliquez sur 'Démarrer la Démo' pour commencer le processus.",
-        "Répondez à chaque question et cliquez sur Suivant pour continuer.",
-        "À la fin, vous verrez un résumé clair de toutes vos réponses."
-    ]
-};
+const TOUR_STEPS = [
+  {
+    title: "Welcome",
+    text: "This guided tour will walk you through the Clinical Intake Assistant."
+  },
+  {
+    title: "Language Options",
+    text: "Use the language selector and search box to choose your preferred language."
+  },
+  {
+    title: "Voice Features",
+    text: "Enable Read Aloud or Voice Mode to enhance accessibility."
+  },
+  {
+    title: "Chat Window",
+    text: "All questions and responses will appear here during the intake."
+  },
+  {
+    title: "Controls",
+    text: "Use Start, Pause, Finish, Repeat, Skip, and Reset to manage the intake flow."
+  },
+  {
+    title: "Input Area",
+    text: "Type your response here and click Send to continue."
+  }
+];
 
-function startTour(lang) {
-    tourLanguage = lang;
-    tourStep = 0;
-    showTourStep();
+function startTour() {
+  tourStep = 0;
+  showTourStep();
 }
 
 function showTourStep() {
-    const overlay = document.getElementById("tourOverlay");
-    const textBox = document.getElementById("tourText");
-    const nextBtn = document.getElementById("tourNextBtn");
+  const overlay = document.getElementById("tourOverlay");
+  const tooltip = document.getElementById("tourTooltip");
 
-    overlay.style.display = "flex";
-    textBox.innerText = TOUR_STEPS[tourLanguage][tourStep];
+  overlay.classList.remove("hidden");
+  tooltip.classList.remove("hidden");
 
-    nextBtn.innerText = t(tourLanguage, "nextButton");
+  document.getElementById("tourTitle").textContent = TOUR_STEPS[tourStep].title;
+  document.getElementById("tourText").textContent = TOUR_STEPS[tourStep].text;
 }
 
 function nextTourStep() {
-    tourStep++;
-
-    if (tourStep >= TOUR_STEPS[tourLanguage].length) {
-        endTour();
-        return;
-    }
-
-    showTourStep();
+  tourStep++;
+  if (tourStep >= TOUR_STEPS.length) {
+    endTour();
+    return;
+  }
+  showTourStep();
 }
 
 function endTour() {
-    document.getElementById("tourOverlay").style.display = "none";
+  document.getElementById("tourOverlay").classList.add("hidden");
+  document.getElementById("tourTooltip").classList.add("hidden");
 }
 
 document.getElementById("tourNextBtn").addEventListener("click", nextTourStep);
+document.getElementById("tourExitBtn").addEventListener("click", endTour);
 
-export { startTour, nextTourStep, endTour };
+export { startTour };
