@@ -1,8 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  /* -----------------------------
+     ELEMENT REFERENCES
+  ----------------------------- */
   const languageSelect = document.getElementById("languageSelect");
   const demoLanguageSelect = document.getElementById("demoLanguageSelect");
 
+  const demoOverlay = document.getElementById("demoOverlay");
   const demoTitle = document.getElementById("demoTitle");
   const demoIntro = document.getElementById("demoIntro");
 
@@ -24,7 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const restartBtn = document.getElementById("restartBtn");
   const exitBtn = document.getElementById("exitBtn");
 
-  // Populate language dropdowns
+  const progressBar = document.getElementById("progressBar");
+
+  /* -----------------------------
+     POPULATE LANGUAGE SELECTORS
+  ----------------------------- */
   Object.keys(translations).forEach(lang => {
     const opt1 = document.createElement("option");
     opt1.value = lang;
@@ -40,14 +48,15 @@ document.addEventListener("DOMContentLoaded", () => {
   languageSelect.value = "English";
   demoLanguageSelect.value = "English";
 
-  // Update demo intro when language changes
   demoLanguageSelect.addEventListener("change", () => {
     const lang = translations[demoLanguageSelect.value];
     demoTitle.textContent = lang.demo.title;
     demoIntro.textContent = lang.demo.intro;
   });
 
-  // Guided tour steps
+  /* -----------------------------
+     GUIDED TOUR STEPS
+  ----------------------------- */
   window.tourSteps = [
     {
       title: "Welcome",
@@ -63,6 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ];
 
+  let tourIndex = 0;
+
   function updateFinalTourSlide() {
     const langName = languageSelect.value;
     const count = interviewQuestions[langName].length;
@@ -72,21 +83,33 @@ document.addEventListener("DOMContentLoaded", () => {
       `This example form uses a General Intake Form with ${count} questions.`;
   }
 
-  // Start demo
-  startDemoBtn.addEventListener("click", () => {
-    document.getElementById("demoOverlay").style.display = "none";
+  function showTourStep() {
+    const step = tourSteps[tourIndex];
+    tourTitle.textContent = step.title;
+    tourText.textContent = step.text;
 
-    languageSelect.value = demoLanguageSelect.value;
+    tourOverlay.classList.remove("hidden");
+    tourTooltip.classList.remove("hidden");
+  }
 
-    updateFinalTourSlide();
-    startInterview();
+  tourNextBtn.addEventListener("click", () => {
+    tourIndex++;
+    if (tourIndex >= tourSteps.length) {
+      tourOverlay.classList.add("hidden");
+      tourTooltip.classList.add("hidden");
+      return;
+    }
+    showTourStep();
   });
 
-  exitDemoBtn.addEventListener("click", () => {
-    document.getElementById("demoOverlay").style.display = "none";
+  tourExitBtn.addEventListener("click", () => {
+    tourOverlay.classList.add("hidden");
+    tourTooltip.classList.add("hidden");
   });
 
-  // Chat helpers
+  /* -----------------------------
+     CHAT HELPERS
+  ----------------------------- */
   window.addBotMessage = function (text) {
     const div = document.createElement("div");
     div.textContent = text;
@@ -94,7 +117,9 @@ document.addEventListener("DOMContentLoaded", () => {
     chatWindow.scrollTop = chatWindow.scrollHeight;
   };
 
-  // User input
+  /* -----------------------------
+     USER INPUT HANDLING
+  ----------------------------- */
   userInput.addEventListener("keydown", e => {
     if (e.key === "Enter") {
       const text = userInput.value.trim();
@@ -106,6 +131,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  /* -----------------------------
+     DEMO OVERLAY
+  ----------------------------- */
+  startDemoBtn.addEventListener("click", () => {
+    demoOverlay.style.display = "none";
+
+    languageSelect.value = demoLanguageSelect.value;
+
+    updateFinalTourSlide();
+    tourIndex = 0;
+    showTourStep();
+
+    startInterview();
+  });
+
+  exitDemoBtn.addEventListener("click", () => {
+    demoOverlay.style.display = "none";
+  });
+
+  /* -----------------------------
+     CONTROL BUTTONS
+  ----------------------------- */
   startBtn.addEventListener("click", startInterview);
   restartBtn.addEventListener("click", startInterview);
   exitBtn.addEventListener("click", () => location.reload());
