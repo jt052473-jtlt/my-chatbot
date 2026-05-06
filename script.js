@@ -1,4 +1,4 @@
-// script.js — Main Controller for YOUR Layout
+// script.js — Main Controller
 
 import { startTour } from "./tour.js";
 import { QUESTIONS, getQuestion } from "./interviewQuestions2.js";
@@ -8,7 +8,6 @@ let currentQuestion = 0;
 let responses = [];
 let intakeActive = false;
 
-// Utility: Add message to chat window
 function addMessage(sender, text) {
   const chat = document.getElementById("chatWindow");
   const bubble = document.createElement("div");
@@ -18,18 +17,13 @@ function addMessage(sender, text) {
   chat.scrollTop = chat.scrollHeight;
 }
 
-// Start Demo Overlay
 document.getElementById("startDemoBtn").addEventListener("click", () => {
   document.getElementById("demoOverlay").style.display = "none";
   startTour();
 });
 
-// Exit Demo
-document.getElementById("exitDemoBtn").addEventListener("click", () => {
-  window.location.reload();
-});
+document.getElementById("exitDemoBtn").addEventListener("click", () => window.location.reload());
 
-// Start Intake
 document.getElementById("startBtn").addEventListener("click", () => {
   intakeActive = true;
   currentQuestion = 0;
@@ -38,14 +32,12 @@ document.getElementById("startBtn").addEventListener("click", () => {
   askQuestion();
 });
 
-// Ask Question
 function askQuestion() {
   const q = getQuestion("en", currentQuestion);
   addMessage("bot", q);
   updateProgress();
 }
 
-// Handle Send
 document.getElementById("sendBtn").addEventListener("click", () => {
   if (!intakeActive) return;
 
@@ -66,29 +58,17 @@ document.getElementById("sendBtn").addEventListener("click", () => {
   }
 });
 
-// Finish Intake
 function finishIntake() {
   intakeActive = false;
   addMessage("bot", "Thank you. Generating your summary...");
-
   const summaryHTML = buildSummary(responses, "en");
   addMessage("bot", "Summary:\n" + summaryHTML);
-
   updateProgress(true);
 }
 
-// Progress Bar
 function updateProgress(done = false) {
   const bar = document.getElementById("progressBar");
-  if (done) {
-    bar.style.width = "100%";
-    return;
-  }
-  const pct = ((currentQuestion) / QUESTIONS.en.length) * 100;
-  bar.style.width = pct + "%";
+  bar.style.width = done ? "100%" : ((currentQuestion / QUESTIONS.en.length) * 100) + "%";
 }
 
-// Reset
-document.getElementById("resetBtn").addEventListener("click", () => {
-  window.location.reload();
-});
+document.getElementById("resetBtn").addEventListener("click", () => window.location.reload());
