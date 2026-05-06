@@ -167,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------------------------------
   function startListening() {
     if (!voiceModeToggle.checked) return;
+    if (!recognition) return;
 
     const lang = languageSelect.value;
     const voiceCode = translations[lang].voiceCode;
@@ -209,16 +210,39 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // -------------------------------------------------------
-  // GUIDED TOUR
-  // -------------------------------------------------------
+  // GUIDED TOUR (WITH PROGRESS BAR + LANGUAGE SEARCH + MIC)
+// -------------------------------------------------------
   let tourStep = 0;
 
   const tourSteps = [
-    { title: "Welcome!", text: "This is the Clinical Intake Assistant." },
-    { title: "Language Settings", text: "Use the dropdown to switch languages." },
-    { title: "Voice Features", text: "Enable Read Aloud or Voice Mode." },
-    { title: "Chat Controls", text: "Use Start, Pause, Skip, Repeat, Finish." },
-    { title: "You're Ready!", text: "Click Start Demo to begin." }
+    {
+      title: "Welcome!",
+      text: "This is the Clinical Intake Assistant. I’ll guide you through the main parts of the screen."
+    },
+    {
+      title: "Progress Bar",
+      text: "This bar shows how far the patient is in the intake process. It fills as questions are completed."
+    },
+    {
+      title: "Language Settings",
+      text: "Use the language dropdown to switch languages. The interface and questions will follow your choice."
+    },
+    {
+      title: "Language Search",
+      text: "Use the Search language box to quickly find one of the top 10 supported languages."
+    },
+    {
+      title: "Voice Features",
+      text: "Turn on Read Aloud to hear questions, and Voice Mode to answer by speaking. The mic turns blue when listening."
+    },
+    {
+      title: "Chat Controls",
+      text: "Use Start, Pause, Skip, Repeat, and Finish to control the interview flow."
+    },
+    {
+      title: "You're Ready!",
+      text: "You’re all set. Start the demo to see the full intake experience."
+    }
   ];
 
   function showTourStep() {
@@ -254,7 +278,9 @@ document.addEventListener("DOMContentLoaded", () => {
     tourStep = 0;
     showTourStep();
 
-    startInterview();
+    if (window.startInterview) {
+      window.startInterview();
+    }
   });
 
   exitDemoBtn.addEventListener("click", () => {
@@ -262,14 +288,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // -------------------------------------------------------
-  // AUTO-LISTEN AFTER EACH QUESTION
-  // -------------------------------------------------------
+  // AUTO-LISTEN AFTER EACH QUESTION (QUESTIONS ONLY)
+// -------------------------------------------------------
   window.autoListenAfterQuestion = function() {
     if (!voiceModeToggle.checked) return;
 
     setTimeout(() => {
       startListening();
-    }, 3500); // 3.5 second pause
+    }, 3500); // ~3.5 second pause between question and listening
   };
 
   // -------------------------------------------------------
