@@ -1,75 +1,208 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clinical Intake Assistant</title>
-    <link rel="stylesheet" href="style.css" />
-</head>
+// ======================================================
+// GLOBAL LANGUAGE STATE
+// ======================================================
+let currentLanguage = "en";
 
-<body>
+// ======================================================
+// INITIALIZE ON PAGE LOAD
+// ======================================================
+document.addEventListener("DOMContentLoaded", () => {
+    const langSelect = document.getElementById("languageSelect");
 
-    <!-- START DEMO OVERLAY -->
-    <div id="startDemoOverlay" class="overlay">
-        <div class="overlay-content">
+    // Set default language
+    langSelect.value = "en";
 
-            <!-- TITLE (TRANSLATABLE) -->
-            <h1 id="demoTitle">Clinical Intake Assistant</h1>
+    // Apply initial translations
+    applyTranslations("en");
 
-            <!-- LANGUAGE DROPDOWN (NEW) -->
-            <label for="languageSelect" id="languageSelectLabel"></label>
-            <select id="languageSelect" class="language-dropdown">
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="zh-CN">Mandarin Chinese (简体)</option>
-                <option value="zh-TW">Cantonese Chinese (繁體)</option>
-                <option value="tl">Tagalog</option>
-                <option value="vi">Vietnamese</option>
-                <option value="ar">Arabic (العربية)</option>
-                <option value="fr">French</option>
-                <option value="ko">Korean</option>
-                <option value="ru">Russian</option>
-            </select>
+    // When user changes language
+    langSelect.addEventListener("change", (e) => {
+        currentLanguage = e.target.value;
+        applyTranslations(currentLanguage);
+    });
 
-            <!-- INTRO TEXT (TRANSLATABLE) -->
-            <p id="demoIntroText">
-                This demo showcases a clinical intake workflow. Click Start Demo to begin.
-            </p>
+    // Start Demo button
+    document.getElementById("startDemoBtn").addEventListener("click", () => {
+        document.getElementById("startDemoOverlay").style.display = "none";
+        startDemo();
+    });
 
-            <!-- BUTTONS (TRANSLATABLE) -->
-            <button id="startDemoBtn" class="primary-btn">Start Demo</button>
-            <button id="skipDemoBtn" class="secondary-btn">Skip</button>
-        </div>
-    </div>
+    // Guided Tour button
+    document.getElementById("tourBtn").addEventListener("click", () => {
+        startGuidedTour();
+    });
+});
 
-    <!-- MAIN APP -->
-    <div id="appContainer">
+// ======================================================
+// APPLY TRANSLATIONS TO ALL UI ELEMENTS
+// ======================================================
+function applyTranslations(lang) {
+    const t = translations[lang];
 
-        <!-- HEADER -->
-        <header>
-            <h2 id="appTitle">Clinical Intake Assistant</h2>
-        </header>
+    if (!t) return;
 
-        <!-- SETTINGS ROW -->
-        <div id="settingsRow">
-            <button id="tourBtn">Guided Tour</button>
-            <button id="voiceBtn">Voice Mode</button>
-            <button id="readAloudBtn">Read Aloud</button>
-        </div>
+    // RTL support
+    document.body.dir = t.direction || "ltr";
 
-        <!-- CHAT WINDOW -->
-        <div id="chatWindow"></div>
+    // Start Demo Overlay
+    document.getElementById("demoTitle").textContent = t.demoTitle;
+    document.getElementById("demoIntroText").textContent = t.demoIntroText;
+    document.getElementById("startDemoBtn").textContent = t.startDemoBtn;
+    document.getElementById("skipDemoBtn").textContent = t.skipDemoBtn;
 
-        <!-- INPUT AREA -->
-        <div id="inputArea">
-            <input type="text" id="userInput" placeholder="Type your message..." />
-            <button id="sendBtn">Send</button>
-        </div>
-    </div>
+    // App Header
+    document.getElementById("appTitle").textContent = t.demoTitle;
 
-    <script src="translations.js"></script>
-    <script src="tour.js"></script>
-    <script src="script.js"></script>
+    // Settings Row
+    document.getElementById("tourBtn").textContent = t.tourBtn;
+    document.getElementById("voiceBtn").textContent = t.voiceBtn;
+    document.getElementById("readAloudBtn").textContent = t.readAloudBtn;
 
-</body>
-</html>
+    // Input Area
+    document.getElementById("sendBtn").textContent = t.sendBtn;
+    document.getElementById("userInput").placeholder =
+        lang === "ar" ? "اكتب رسالتك..." :
+        lang === "zh-CN" ? "输入您的消息..." :
+        lang === "zh-TW" ? "輸入您的訊息..." :
+        "Type your message...";
+}
+
+// ======================================================
+// START DEMO (FIRST BOT MESSAGE)
+// ======================================================
+function startDemo() {
+    const t = translations[currentLanguage];
+
+    addBotMessage(
+        t.questions.reasonForVisit
+    );
+}
+
+// ======================================================
+// CHAT WINDOW HELPERS
+// ======================================================
+function addBotMessage(text) {
+    const chat = document.getElementById("chatWindow");
+    const msg = document.createElement("div");
+    msg.className = "bot-message";
+    msg.textContent = text;
+    chat.appendChild(msg);
+    chat.scrollTop = chat.scrollHeight;
+
+    // Read Aloud automatically uses correct language
+    speakText(text);
+}
+
+function addUserMessage(text) {
+    const chat = document.getElementById("chatWindow");
+    const msg = document.createElement("div");
+    msg.className = "user-message";
+    msg.textContent = text;
+    chat.appendChild(msg);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+// ======================================================
+// HANDLE USER INPUT
+// ======================================================
+document.getElementById("sendBtn").addEventListener("click", handleUserInput);
+document.getElementById("userInput").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") handleUserInput();
+});
+
+let questionIndex = 0;
+const questionOrder = [
+    "reasonForVisit",
+    "symptoms",
+    "duration",
+    "medications",
+    "allergies",
+    "history"
+];
+
+function handleUserInput() {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if (!text) return;
+
+    addUserMessage(text);
+    input.value = "";
+
+    const t = translations[currentLanguage];
+
+    // Move to next question
+    questionIndex++;
+
+    if (questionIndex < questionOrder.length) {
+        const nextKey = questionOrder[questionIndex];
+        addBotMessage(t.questions[nextKey]);
+    } else {
+        showSummary();
+    }
+}
+
+// ======================================================
+// SUMMARY
+// ======================================================
+function showSummary() {
+    const t = translations[currentLanguage];
+
+    addBotMessage(t.summaryTitle);
+    addBotMessage(t.summaryComplete);
+}
+
+// ======================================================
+// READ ALOUD (TEXT-TO-SPEECH)
+// ======================================================
+function speakText(text) {
+    const utter = new SpeechSynthesisUtterance(text);
+
+    // Match language voice
+    utter.lang = getVoiceCode(currentLanguage);
+
+    speechSynthesis.speak(utter);
+}
+
+function getVoiceCode(lang) {
+    switch (lang) {
+        case "es": return "es-ES";
+        case "zh-CN": return "zh-CN";
+        case "zh-TW": return "zh-TW";
+        case "tl": return "tl-PH";
+        case "vi": return "vi-VN";
+        case "ar": return "ar-SA";
+        case "fr": return "fr-FR";
+        case "ko": return "ko-KR";
+        case "ru": return "ru-RU";
+        default: return "en-US";
+    }
+}
+
+// ======================================================
+// VOICE MODE (SPEECH RECOGNITION)
+// ======================================================
+document.getElementById("voiceBtn").addEventListener("click", () => {
+    startVoiceRecognition();
+});
+
+function startVoiceRecognition() {
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Speech recognition not supported.");
+        return;
+    }
+
+    const recog = new SpeechRecognition();
+    recog.lang = getVoiceCode(currentLanguage);
+    recog.interimResults = false;
+
+    recog.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        document.getElementById("userInput").value = text;
+        handleUserInput();
+    };
+
+    recog.start();
+}
