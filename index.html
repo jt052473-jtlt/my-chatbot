@@ -1,23 +1,51 @@
-<div class="settings-bar">
-    <select id="language-select" onchange="updateLanguageState()">
-        <option value="en">English</option>
-        <option value="es">Spanish</option>
-        <option value="zh">Chinese</option>
-        <option value="tl">Tagalog</option>
-        <option value="vi">Vietnamese</option>
-    </select>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Intake Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Clinical Intake Assistant</h1>
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+        </header>
 
-<div class="controls-grid">
-    <button id="start-btn" class="btn-primary" onclick="handleStart()">Start</button>
-    <button id="pause-btn" class="btn-secondary" onclick="togglePause()">Pause</button>
-    <button id="finish-btn" class="btn-primary" onclick="generateSummary()">Finish</button>
-    <button id="repeat-btn" class="btn-secondary" onclick="repeatLast()">Repeat</button>
-    <button id="skip-btn" class="btn-secondary" onclick="skipQuestion()">Skip</button>
-    <button id="reset-btn" class="btn-danger" onclick="resetApp()">Reset</button>
-</div>
+        <main>
+            <div class="settings-bar">
+                <select id="language-select" onchange="updateLanguageState()">
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="zh">Chinese</option>
+                    <option value="tl">Tagalog</option>
+                    <option value="vi">Vietnamese</option>
+                </select>
+                <div class="voice-controls">
+                    <label><input type="checkbox" id="read-aloud-chk" checked> Read Aloud</label>
+                    <label><input type="checkbox" id="voice-mode-chk" checked> Voice Mode</label>
+                </div>
+            </div>
 
-<script src="translations.js"></script>
-<script src="interviewQuestions2.js"></script>
-<script src="summaryBuilder2.js"></script>
-<script src="script.js"></script>
+            <div id="chat-container" class="chat-window"></div>
+
+            <div class="controls-grid">
+                <button id="start-btn" class="btn-primary" onclick="handleStart()">Start</button>
+                <button id="pause-btn" class="btn-secondary" onclick="togglePause()">Pause</button>
+                <button id="finish-btn" class="btn-primary" onclick="generateSummary()">Finish</button>
+                <button id="repeat-btn" class="btn-secondary" onclick="repeatLast()">Repeat</button>
+                <button id="skip-btn" class="btn-secondary" onclick="skipQuestion()">Skip</button>
+                <button id="reset-btn" class="btn-danger" onclick="resetApp()">Reset</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="interviewQuestions2.js"></script>
+    <script src="summaryBuilder2.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
