@@ -13,7 +13,14 @@
 <div id="demoOverlay">
   <div class="demo-content">
     <h1>Clinical Intake Assistant</h1>
+
+    <!-- ⭐ INTRO SCREEN LANGUAGE SELECTOR -->
+    <select id="introLanguageSelect"
+            style="margin: 12px 0; padding: 10px; border-radius: 10px; border: 1px solid #ccc; width: 100%;">
+    </select>
+
     <p>This demo showcases a clinical intake workflow. Click Start Demo to begin.</p>
+
     <div class="demo-buttons">
       <button id="startDemoBtn" class="btn-primary">Start Demo</button>
       <button id="exitDemoBtn" class="btn-secondary">Exit</button>
@@ -26,11 +33,6 @@
 
 <!-- TOUR TOOLTIP -->
 <div id="tourTooltip" class="tour-tooltip hidden">
-
-  <!-- ⭐ NEW: Guided Tour Language Selector -->
-  <select id="tourLanguageSelect" style="margin-bottom: 12px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; width: 100%;">
-  </select>
-
   <h3 id="tourTitle"></h3>
   <p id="tourText"></p>
 
