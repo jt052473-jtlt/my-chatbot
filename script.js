@@ -1,17 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Corrected references to match your CSS
-    const chatContainer = document.getElementById("chat-container");
+    // Standard references
+    const chatWindow = document.getElementById("chatWindow");
     const userInput = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
     const languageSelect = document.getElementById("languageSelect");
     const resetBtn = document.getElementById("resetBtn");
-    const readAloudLabel = document.getElementById("readAloudLabel");
-    const voiceModeLabel = document.getElementById("voiceModeLabel");
 
-    // 1. Total Language Change Function
-    function applyLanguage(lang) {
+    // 1. THE TOTAL LANGUAGE CHANGER
+    function applyGlobalLanguage(lang) {
         const t = translations[lang];
-        document.getElementById("appTitle").textContent = t.ui.appTitle;
+        
+        // Update Header and UI Buttons
+        document.querySelector(".app-header h2").textContent = t.ui.appTitle;
         document.getElementById("startBtn").textContent = t.ui.start;
         document.getElementById("pauseBtn").textContent = t.ui.pause;
         document.getElementById("finishBtn").textContent = t.ui.finish;
@@ -19,35 +19,40 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("skipBtn").textContent = t.ui.skip;
         document.getElementById("resetBtn").textContent = t.ui.reset;
         
-        // Translates the labels next to the checkboxes
-        if (readAloudLabel) readAloudLabel.textContent = t.ui.readAloud;
-        if (voiceModeLabel) voiceModeLabel.textContent = t.ui.voiceMode;
-
+        // Update Input and Send Button
         sendBtn.textContent = t.ui.send;
         userInput.placeholder = t.ui.typeHere;
-    }
 
-    // 2. Message Logic (Rounded Bubbles)
-    function addMessage(sender, text) {
-        const msg = document.createElement("div");
-        const lang = languageSelect.value;
-        const displayName = (sender === "Sam") ? (translations[lang].samName || "Sam") : sender;
-        
-        // Classes match your 'Apple-style' CSS
-        msg.className = sender === "You" ? "message user-message" : "message system-message";
-        msg.textContent = `${displayName}: ${text}`;
-        chatContainer.appendChild(msg);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    // 3. Interactions
-    userInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            sendBtn.click();
+        // Update Sam's personality in the chat
+        // If we are mid-interview, have Sam re-ask the question in the new language
+        if (typeof currentStep !== 'undefined' && currentStep > 0) {
+            const localizedSam = t.samName || "Sam";
+            const localizedQuestion = interviewQuestions[lang][currentStep];
+            addMessage(localizedSam, localizedQuestion);
+            speak(localizedQuestion);
         }
+    }
+
+    // Listener for the Language Dropdown
+    languageSelect.addEventListener("change", () => {
+        const newLang = languageSelect.value;
+        applyGlobalLanguage(newLang);
     });
 
+    // 2. UPDATED ADD MESSAGE (Supports Localized Names)
+    function addMessage(sender, text) {
+        const msg = document.createElement("div");
+        // If the sender is 'Sam', we use the localized name from translations
+        const lang = languageSelect.value;
+        const displayName = (sender === "Sam") ? translations[lang].samName : sender;
+        
+        msg.className = sender === "You" ? "message user-message" : "message system-message";
+        msg.textContent = `${displayName}: ${text}`;
+        chatWindow.appendChild(msg);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // 3. ENTER KEY & SEND LOGIC
     sendBtn.addEventListener("click", () => {
         const text = userInput.value.trim();
         if (!text) return;
@@ -56,23 +61,23 @@ document.addEventListener("DOMContentLoaded", () => {
         if (window.handleUserResponse) window.handleUserResponse(text);
     });
 
-    // 4. Clean Reset (No "Sam: Reset" bubble)
+    userInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            sendBtn.click();
+        }
+    });
+
+    // 4. CLEAN RESET (Issue #3 Fix)
     resetBtn.addEventListener("click", () => {
-        chatContainer.innerHTML = ""; 
+        chatWindow.innerHTML = "";
         userInput.value = "";
         if (window.resetInterview) window.resetInterview();
     });
 
-    // Language Dropdown Setup
-    const top10 = ["English","Spanish","Chinese","Tagalog","Vietnamese", "Arabic","French","Korean","Russian","German"];
-    top10.forEach(lang => {
-        const opt = document.createElement("option");
-        opt.value = lang;
-        opt.textContent = lang;
-        languageSelect.appendChild(opt);
-    });
+    // Initialize with default language
+    applyGlobalLanguage("English");
 
-    languageSelect.addEventListener("change", () => applyLanguage(languageSelect.value));
-    languageSelect.value = "English";
-    applyLanguage("English");
+    // Expose for other scripts
+    window.addMessage = addMessage;
 });
