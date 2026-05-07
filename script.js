@@ -45,6 +45,8 @@ function populateIntroLanguageSelector() {
 // -------------------------------
 function populateMainLanguageSelector() {
     const select = document.getElementById("languageSelect");
+    if (!select) return;
+
     select.innerHTML = "";
 
     Object.keys(translations).forEach(lang => {
@@ -89,14 +91,21 @@ function populateTourLanguageSelector() {
 // DEMO OVERLAY BUTTONS
 // -------------------------------
 function wireDemoButtons() {
-    document.getElementById("startDemoBtn").addEventListener("click", () => {
-        document.getElementById("demoOverlay").style.display = "none";
-        startGuidedTour();
-    });
+    const startBtn = document.getElementById("startDemoBtn");
+    const exitBtn = document.getElementById("exitDemoBtn");
 
-    document.getElementById("exitDemoBtn").addEventListener("click", () => {
-        document.getElementById("demoOverlay").style.display = "none";
-    });
+    if (startBtn) {
+        startBtn.addEventListener("click", () => {
+            document.getElementById("demoOverlay").style.display = "none";
+            startGuidedTour();
+        });
+    }
+
+    if (exitBtn) {
+        exitBtn.addEventListener("click", () => {
+            document.getElementById("demoOverlay").style.display = "none";
+        });
+    }
 }
 
 // -------------------------------
@@ -149,7 +158,7 @@ function exitGuidedTour() {
 }
 
 // -------------------------------
-// CHATBOT LOGIC (CALLS OTHER FILES)
+// CHATBOT LOGIC
 // -------------------------------
 function startInterview() {
     currentStep = 0;
