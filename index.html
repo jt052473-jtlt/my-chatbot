@@ -18,8 +18,7 @@
         <main>
             <div class="settings-bar">
                 <div class="language-controls">
-                    <select id="languageSelect">
-                        </select>
+                    <select id="languageSelect"></select>
                     <input type="text" id="languageSearch" placeholder="Search language...">
                 </div>
 
@@ -36,7 +35,7 @@
                 </div>
             </div>
 
-            <div id="chatWindow" class="chat-window"></div>
+            <div id="chat-container" class="chat-window"></div>
 
             <div class="controls-grid">
                 <button id="startBtn" class="btn btn-primary">Start</button>
@@ -48,30 +47,10 @@
             </div>
 
             <div class="input-area">
-                <input type="text" id="userInput" placeholder="Type your response here...">
+                <input type="text" id="userInput" placeholder="Type here...">
                 <button id="sendBtn" class="btn btn-send">Send</button>
             </div>
         </main>
-    </div>
-
-    <div id="demoOverlay" class="overlay">
-        <div class="overlay-content">
-            <h3>Welcome to the Demo</h3>
-            <p>Experience our automated clinical intake process.</p>
-            <button id="startDemoBtn" class="btn btn-primary">Start Demo</button>
-            <button id="exitDemoBtn" class="btn btn-secondary">Exit</button>
-        </div>
-    </div>
-
-    <div id="tourOverlay" class="overlay hidden">
-        <div id="tourTooltip" class="tour-tooltip hidden">
-            <h4 id="tourTitle"></h4>
-            <p id="tourText"></p>
-            <div class="tour-buttons">
-                <button id="tourNextBtn" class="btn btn-sm btn-primary">Next</button>
-                <button id="tourExitBtn" class="btn btn-sm btn-secondary">Exit Tour</button>
-            </div>
-        </div>
     </div>
 
     <script src="translations.js"></script>
