@@ -1,48 +1,101 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // UI References
-    const chatContainer = document.getElementById("chat-container");
-    const languageSelect = document.getElementById("languageSelect");
-    
-    // Voice Label References
-    const readAloudLabel = document.getElementById("readAloudLabel");
-    const voiceModeLabel = document.getElementById("voiceModeLabel");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Clinical Intake Assistant</title>
+<link rel="stylesheet" href="style.css?v=6001" />
+</head>
 
-    // Function to change the entire UI language
-    function applyLanguage(lang) {
-        const t = translations[lang].ui;
+<body>
 
-        // Header & Main Buttons
-        document.getElementById("appTitle").textContent = t.appTitle;
-        document.getElementById("startBtn").textContent = t.start;
-        document.getElementById("pauseBtn").textContent = t.pause;
-        document.getElementById("finishBtn").textContent = t.finish;
-        document.getElementById("repeatBtn").textContent = t.repeat;
-        document.getElementById("skipBtn").textContent = t.skip;
-        document.getElementById("resetBtn").textContent = t.reset;
-        
-        // Voice Mode & Read Aloud Labels (Matching Button Logic)
-        if (readAloudLabel) readAloudLabel.textContent = t.readAloud;
-        if (voiceModeLabel) voiceModeLabel.textContent = t.voiceMode;
+<!-- INTRO OVERLAY -->
+<div id="demoOverlay">
+  <div class="demo-content">
+    <h1>Clinical Intake Assistant</h1>
+    <p>This demo showcases a clinical intake workflow. Click Start Demo to begin.</p>
+    <div class="demo-buttons">
+      <button id="startDemoBtn" class="btn-primary">Start Demo</button>
+      <button id="exitDemoBtn" class="btn-secondary">Exit</button>
+    </div>
+  </div>
+</div>
 
-        // Input Field
-        document.getElementById("sendBtn").textContent = t.send;
-        document.getElementById("userInput").placeholder = t.typeHere;
-    }
+<!-- TOUR OVERLAY -->
+<div id="tourOverlay" class="tour-overlay hidden"></div>
 
-    // Initialize Dropdown
-    const top10 = ["English","Spanish","Chinese","Tagalog","Vietnamese", "Arabic","French","Korean","Russian","German"];
-    top10.forEach(lang => {
-        const opt = document.createElement("option");
-        opt.value = lang;
-        opt.textContent = lang;
-        languageSelect.appendChild(opt);
-    });
+<!-- TOUR TOOLTIP -->
+<div id="tourTooltip" class="tour-tooltip hidden">
 
-    languageSelect.addEventListener("change", () => {
-        applyLanguage(languageSelect.value);
-    });
+  <!-- ⭐ NEW: Guided Tour Language Selector -->
+  <select id="tourLanguageSelect" style="margin-bottom: 12px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; width: 100%;">
+  </select>
 
-    // Default Start
-    languageSelect.value = "English";
-    applyLanguage("English");
-});
+  <h3 id="tourTitle"></h3>
+  <p id="tourText"></p>
+
+  <div class="tour-buttons">
+    <button id="tourNextBtn" class="btn-primary">Next</button>
+    <button id="tourExitBtn" class="btn-secondary">Exit</button>
+  </div>
+</div>
+
+<div class="app-container">
+
+<header class="app-header">
+  <h2>Clinical Intake Assistant</h2>
+  <div class="progress-container">
+    <div id="progressBar"></div>
+  </div>
+</header>
+
+<div class="settings-row">
+  <select id="languageSelect"></select>
+  <input type="text" id="languageSearch" placeholder="Search language..." />
+
+  <label class="toggle">
+    <input type="checkbox" id="readAloudToggle" />
+    <span>Read Aloud</span>
+  </label>
+
+  <label class="toggle">
+    <input type="checkbox" id="voiceModeToggle" />
+    <span>Voice Mode</span>
+  </label>
+
+  <button id="micBtn" class="mic-button">🎤</button>
+</div>
+
+<div id="chatWindow" class="chat-window"></div>
+
+<div class="input-controls-row">
+
+  <div class="control-buttons">
+    <button id="startBtn" class="btn-primary">Start</button>
+    <button id="pauseBtn" class="btn-secondary">Pause</button>
+    <button id="finishBtn" class="btn-primary">Finish</button>
+    <button id="repeatBtn" class="btn-secondary">Repeat</button>
+    <button id="skipBtn" class="btn-secondary">Skip</button>
+    <button id="resetBtn" class="btn-danger">Reset</button>
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Type your response here..." autofocus />
+    <button id="sendBtn" class="btn-primary">Send</button>
+  </div>
+
+</div>
+
+</div>
+
+<!-- CHATBOT LOGIC FILES (correct order) -->
+<script src="translations.js"></script>
+<script src="interviewFlow2.js"></script>
+<script src="interviewQuestions2.js"></script>
+<script src="summaryBuilder2.js"></script>
+
+<!-- GUIDED TOUR + DEMO LOGIC -->
+<script src="script.js?v=6001"></script>
+
+</body>
+</html>
