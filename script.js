@@ -1,52 +1,42 @@
+// --- State & Tour Logic ---
 let currentStep = 0;
 let isPaused = false;
 let currentLanguage = 'en';
 
-function updateLanguageState() {
-    currentLanguage = document.getElementById('language-select').value;
+function startTour() {
+    const tourSteps = [
+        { element: '#tour-step-1', msg: "Welcome! This assistant helps automate patient documentation." },
+        { element: '#tour-step-2', msg: "Select from the top 10 languages here." },
+        { element: '#tour-step-3', msg: "Voice Mode enables the 3.5s Auto-Listen feature." },
+        { element: '#tour-step-4', msg: "Your clinical conversation will appear here." },
+        { element: '#tour-step-5', msg: "Use these to Start, Pause, or Reset the intake." }
+    ];
+    // This triggers your onboarding overlay sequence
+    runOnboardingSequence(tourSteps); 
 }
 
+// --- Combined Start Logic ---
 function handleStart() {
     if (isPaused) {
         isPaused = false;
-        addSystemMessage("Resuming interview..."); 
+        addSystemMessage("Resuming clinical intake..."); 
         displayQuestion(); 
     } else {
+        // Only run tour if it's the very first start
+        if (currentStep === 0) startTour();
         currentStep = 0;
-        isPaused = false;
         displayQuestion();
     }
 }
 
-function togglePause() {
-    isPaused = true;
-    addSystemMessage("Interview paused.");
-}
-
+// --- Reset & Language Logic ---
 function resetApp() {
     document.getElementById('chat-container').innerHTML = '';
     currentStep = 0;
     isPaused = false;
-    if (typeof updateProgressBar === "function") updateProgressBar(0);
+    updateProgressBar(0);
 }
 
-function displayQuestion() {
-    if (isPaused) return;
-    try {
-        const questionText = interviewQuestions[currentLanguage][currentStep];
-        addSystemMessage(questionText);
-        if (typeof speakText === "function") speakText(questionText);
-    } catch (e) {
-        console.error("Question load error:", e);
-    }
-}
-
-// Helper for adding messages (ensure this matches your UI classes)
-function addSystemMessage(text) {
-    const container = document.getElementById('chat-container');
-    const msg = document.createElement('div');
-    msg.className = 'message system';
-    msg.innerText = text;
-    container.appendChild(msg);
-    container.scrollTop = container.scrollHeight;
+function updateLanguageState() {
+    currentLanguage = document.getElementById('language-select').value;
 }
