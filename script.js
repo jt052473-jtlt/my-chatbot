@@ -1,101 +1,161 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Clinical Intake Assistant</title>
-<link rel="stylesheet" href="style.css?v=6001" />
-</head>
+// -------------------------------
+// GLOBAL STATE
+// -------------------------------
+let currentLanguage = "English";
+let currentStep = 0;
+let isPaused = false;
+let isVoiceMode = false;
 
-<body>
+// -------------------------------
+// INITIALIZATION
+// -------------------------------
+window.addEventListener("DOMContentLoaded", () => {
+    populateMainLanguageSelector();
+    populateTourLanguageSelector();
+    wireDemoButtons();
+    wireChatbotButtons();
+});
 
-<!-- INTRO OVERLAY -->
-<div id="demoOverlay">
-  <div class="demo-content">
-    <h1>Clinical Intake Assistant</h1>
-    <p>This demo showcases a clinical intake workflow. Click Start Demo to begin.</p>
-    <div class="demo-buttons">
-      <button id="startDemoBtn" class="btn-primary">Start Demo</button>
-      <button id="exitDemoBtn" class="btn-secondary">Exit</button>
-    </div>
-  </div>
-</div>
+// -------------------------------
+// POPULATE MAIN LANGUAGE SELECTOR
+// -------------------------------
+function populateMainLanguageSelector() {
+    const select = document.getElementById("languageSelect");
+    select.innerHTML = "";
 
-<!-- TOUR OVERLAY -->
-<div id="tourOverlay" class="tour-overlay hidden"></div>
+    Object.keys(translations).forEach(lang => {
+        const option = document.createElement("option");
+        option.value = lang;
+        option.textContent = lang;
+        select.appendChild(option);
+    });
 
-<!-- TOUR TOOLTIP -->
-<div id="tourTooltip" class="tour-tooltip hidden">
+    select.value = currentLanguage;
 
-  <!-- ⭐ NEW: Guided Tour Language Selector -->
-  <select id="tourLanguageSelect" style="margin-bottom: 12px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; width: 100%;">
-  </select>
+    select.addEventListener("change", () => {
+        currentLanguage = select.value;
+        console.log("Language switched to:", currentLanguage);
+    });
+}
 
-  <h3 id="tourTitle"></h3>
-  <p id="tourText"></p>
+// -------------------------------
+// POPULATE GUIDED TOUR LANGUAGE SELECTOR
+// -------------------------------
+function populateTourLanguageSelector() {
+    const select = document.getElementById("tourLanguageSelect");
+    select.innerHTML = "";
 
-  <div class="tour-buttons">
-    <button id="tourNextBtn" class="btn-primary">Next</button>
-    <button id="tourExitBtn" class="btn-secondary">Exit</button>
-  </div>
-</div>
+    Object.keys(translations).forEach(lang => {
+        const option = document.createElement("option");
+        option.value = lang;
+        option.textContent = lang;
+        select.appendChild(option);
+    });
 
-<div class="app-container">
+    select.value = currentLanguage;
 
-<header class="app-header">
-  <h2>Clinical Intake Assistant</h2>
-  <div class="progress-container">
-    <div id="progressBar"></div>
-  </div>
-</header>
+    select.addEventListener("change", () => {
+        currentLanguage = select.value;
+        updateTourText();
+    });
+}
 
-<div class="settings-row">
-  <select id="languageSelect"></select>
-  <input type="text" id="languageSearch" placeholder="Search language..." />
+// -------------------------------
+// DEMO OVERLAY BUTTONS
+// -------------------------------
+function wireDemoButtons() {
+    document.getElementById("startDemoBtn").addEventListener("click", () => {
+        document.getElementById("demoOverlay").style.display = "none";
+        startGuidedTour();
+    });
 
-  <label class="toggle">
-    <input type="checkbox" id="readAloudToggle" />
-    <span>Read Aloud</span>
-  </label>
+    document.getElementById("exitDemoBtn").addEventListener("click", () => {
+        document.getElementById("demoOverlay").style.display = "none";
+    });
+}
 
-  <label class="toggle">
-    <input type="checkbox" id="voiceModeToggle" />
-    <span>Voice Mode</span>
-  </label>
+// -------------------------------
+// CHATBOT BUTTONS
+// -------------------------------
+function wireChatbotButtons() {
+    document.getElementById("startBtn").addEventListener("click", startInterview);
+    document.getElementById("pauseBtn").addEventListener("click", pauseInterview);
+    document.getElementById("finishBtn").addEventListener("click", finishInterview);
+    document.getElementById("repeatBtn").addEventListener("click", repeatQuestion);
+    document.getElementById("skipBtn").addEventListener("click", skipQuestion);
+    document.getElementById("resetBtn").addEventListener("click", resetInterview);
+    document.getElementById("sendBtn").addEventListener("click", sendUserInput);
+}
 
-  <button id="micBtn" class="mic-button">🎤</button>
-</div>
+// -------------------------------
+// GUIDED TOUR LOGIC
+// -------------------------------
+function startGuidedTour() {
+    currentStep = 0;
+    document.getElementById("tourOverlay").classList.remove("hidden");
+    document.getElementById("tourTooltip").classList.remove("hidden");
+    updateTourText();
 
-<div id="chatWindow" class="chat-window"></div>
+    document.getElementById("tourNextBtn").onclick = () => {
+        currentStep++;
+        if (currentStep >= translations[currentLanguage].tour.length) {
+            exitGuidedTour();
+        } else {
+            updateTourText();
+        }
+    };
 
-<div class="input-controls-row">
+    document.getElementById("tourExitBtn").onclick = exitGuidedTour;
+}
 
-  <div class="control-buttons">
-    <button id="startBtn" class="btn-primary">Start</button>
-    <button id="pauseBtn" class="btn-secondary">Pause</button>
-    <button id="finishBtn" class="btn-primary">Finish</button>
-    <button id="repeatBtn" class="btn-secondary">Repeat</button>
-    <button id="skipBtn" class="btn-secondary">Skip</button>
-    <button id="resetBtn" class="btn-danger">Reset</button>
-  </div>
+function updateTourText() {
+    const tour = translations[currentLanguage].tour;
+    document.getElementById("tourTitle").textContent = tour[currentStep].title;
+    document.getElementById("tourText").textContent = tour[currentStep].text;
+}
 
-  <div class="input-area">
-    <input type="text" id="userInput" placeholder="Type your response here..." autofocus />
-    <button id="sendBtn" class="btn-primary">Send</button>
-  </div>
+function exitGuidedTour() {
+    document.getElementById("tourOverlay").classList.add("hidden");
+    document.getElementById("tourTooltip").classList.add("hidden");
+}
 
-</div>
+// -------------------------------
+// CHATBOT LOGIC (CALLS OTHER FILES)
+// -------------------------------
+function startInterview() {
+    currentStep = 0;
+    isPaused = false;
+    showQuestion();
+}
 
-</div>
+function pauseInterview() {
+    isPaused = true;
+}
 
-<!-- CHATBOT LOGIC FILES (correct order) -->
-<script src="translations.js"></script>
-<script src="interviewFlow2.js"></script>
-<script src="interviewQuestions2.js"></script>
-<script src="summaryBuilder2.js"></script>
+function finishInterview() {
+    buildSummary();
+}
 
-<!-- GUIDED TOUR + DEMO LOGIC -->
-<script src="script.js?v=6001"></script>
+function repeatQuestion() {
+    showQuestion();
+}
 
-</body>
-</html>
+function skipQuestion() {
+    currentStep++;
+    showQuestion();
+}
+
+function resetInterview() {
+    currentStep = 0;
+    document.getElementById("chatWindow").innerHTML = "";
+}
+
+function sendUserInput() {
+    const input = document.getElementById("userInput").value.trim();
+    if (!input) return;
+
+    addUserMessage(input);
+    document.getElementById("userInput").value = "";
+
+    processUserResponse(input);
+}
