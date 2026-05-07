@@ -1,14 +1,13 @@
-// -------------------------------
-// INTERVIEW FLOW STATE
-// -------------------------------
-// Uses currentStep and isPaused from script.js
+// ---------------------------------------------
+// INTERVIEW FLOW LOGIC
+// Uses global variables from script.js:
+// currentStep, currentLanguage, isPaused
+// ---------------------------------------------
 
-// -------------------------------
-// CORE QUESTION HELPERS
-// -------------------------------
+// ---------------------------------------------
+// GET QUESTIONS FOR CURRENT LANGUAGE
+// ---------------------------------------------
 function getQuestionsForLanguage() {
-    // Assumes questions are stored in translations.js under each language
-    // e.g., translations["English"].questions = [ { id, text, ... }, ... ]
     if (!translations[currentLanguage] || !translations[currentLanguage].questions) {
         console.warn("No questions found for language:", currentLanguage);
         return [];
@@ -16,9 +15,9 @@ function getQuestionsForLanguage() {
     return translations[currentLanguage].questions;
 }
 
-// -------------------------------
-// RENDERING MESSAGES
-// -------------------------------
+// ---------------------------------------------
+// RENDER USER MESSAGE
+// ---------------------------------------------
 function addUserMessage(text) {
     const chatWindow = document.getElementById("chatWindow");
     const msg = document.createElement("div");
@@ -28,6 +27,9 @@ function addUserMessage(text) {
     chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
+// ---------------------------------------------
+// RENDER BOT MESSAGE
+// ---------------------------------------------
 function addBotMessage(text) {
     const chatWindow = document.getElementById("chatWindow");
     const msg = document.createElement("div");
@@ -39,24 +41,9 @@ function addBotMessage(text) {
     handleReadAloud(text);
 }
 
-// -------------------------------
-// PROGRESS BAR
-// -------------------------------
-function updateProgressBar() {
-    const questions = getQuestionsForLanguage();
-    const progressBar = document.getElementById("progressBar");
-    if (!progressBar || questions.length === 0) return;
-
-    const percent = Math.min(
-        100,
-        Math.round((currentStep / questions.length) * 100)
-    );
-    progressBar.style.width = percent + "%";
-}
-
-// -------------------------------
+// ---------------------------------------------
 // READ ALOUD SUPPORT
-// -------------------------------
+// ---------------------------------------------
 function handleReadAloud(text) {
     const toggle = document.getElementById("readAloudToggle");
     if (!toggle || !toggle.checked) return;
@@ -64,17 +51,36 @@ function handleReadAloud(text) {
     if (!("speechSynthesis" in window)) return;
 
     const utterance = new SpeechSynthesisUtterance(text);
+
     const langConfig = translations[currentLanguage];
     if (langConfig && langConfig.voiceCode) {
         utterance.lang = langConfig.voiceCode;
     }
+
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
 }
 
-// -------------------------------
+// ---------------------------------------------
+// PROGRESS BAR
+// ---------------------------------------------
+function updateProgressBar() {
+    const questions = getQuestionsForLanguage();
+    const progressBar = document.getElementById("progressBar");
+
+    if (!progressBar || questions.length === 0) return;
+
+    const percent = Math.min(
+        100,
+        Math.round((currentStep / questions.length) * 100)
+    );
+
+    progressBar.style.width = percent + "%";
+}
+
+// ---------------------------------------------
 // SHOW QUESTION
-// -------------------------------
+// ---------------------------------------------
 function showQuestion() {
     if (isPaused) return;
 
@@ -83,11 +89,13 @@ function showQuestion() {
     if (currentStep >= questions.length) {
         addBotMessage("Thank you. We've reached the end of the interview.");
         updateProgressBar();
+
         try {
             buildSummary();
         } catch (e) {
-            console.warn("buildSummary not available or failed:", e);
+            console.warn("Summary builder not available:", e);
         }
+
         return;
     }
 
@@ -96,11 +104,12 @@ function showQuestion() {
     updateProgressBar();
 }
 
-// -------------------------------
+// ---------------------------------------------
 // PROCESS USER RESPONSE
-// -------------------------------
+// ---------------------------------------------
 function processUserResponse(input) {
     const questions = getQuestionsForLanguage();
+
     if (currentStep >= questions.length) {
         addBotMessage("We've already completed the interview.");
         return;
@@ -108,10 +117,11 @@ function processUserResponse(input) {
 
     const q = questions[currentStep];
 
-    // Basic storage hook: you can expand this to store answers by id
+    // Store answers globally
     if (!window.interviewAnswers) {
         window.interviewAnswers = {};
     }
+
     window.interviewAnswers[q.id || currentStep] = input;
 
     currentStep++;
