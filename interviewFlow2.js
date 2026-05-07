@@ -1,167 +1,142 @@
 // ---------------------------------------------------------
-// INTERVIEW FLOW CONTROLLER — MULTILINGUAL + VOICE MODE
+// INTERVIEW FLOW — MULTILINGUAL + VOICE + AUTO-LISTEN
 // ---------------------------------------------------------
 
-let currentStep = 0;
-let interviewActive = false;
-let lastBotMessage = "";
-let responses = [];
+let currentQuestionIndex = 0;
+let currentQuestions = translations["English"].questions;
+let currentSummaryLabels = translations["English"].summaryLabels;
+
+let patientAnswers = {
+    name: "",
+    dob: "",
+    complaint: "",
+    duration: "",
+    allergies: "",
+    medications: "",
+    chronic: "",
+    travel: "",
+    surgeries: "",
+    notes: ""
+};
 
 // ---------------------------------------------------------
-// GET CURRENT LANGUAGE BLOCK
+// SET LANGUAGE (called by script.js)
 // ---------------------------------------------------------
-function getLang() {
-  return translations[document.getElementById("languageSelect").value];
-}
-
-// ---------------------------------------------------------
-// UPDATE PROGRESS BAR
-// ---------------------------------------------------------
-function updateProgress() {
-  const lang = getLang();
-  const total = lang.questions.length;
-  const percent = Math.floor((currentStep / total) * 100);
-
-  document.getElementById("progressBar").style.width = percent + "%";
-}
-
-// ---------------------------------------------------------
-// BOT MESSAGE (WITH VOICE + AUTO-LISTEN)
-// ---------------------------------------------------------
-function botSay(text, isQuestion = false) {
-  lastBotMessage = text;
-
-  const chatWindow = document.getElementById("chatWindow");
-  const msg = document.createElement("div");
-  msg.textContent = "Sam: " + text;
-  chatWindow.appendChild(msg);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
-
-  // Speak in selected language
-  if (window.speak) {
-    window.speak(text, () => {
-      // Auto-listen ONLY for questions
-      if (isQuestion && window.autoListenAfterQuestion) {
-        window.autoListenAfterQuestion();
-      }
-    });
-  }
-}
-
-// ---------------------------------------------------------
-// USER MESSAGE
-// ---------------------------------------------------------
-function userSay(text) {
-  const chatWindow = document.getElementById("chatWindow");
-  const msg = document.createElement("div");
-  msg.textContent = "You: " + text;
-  chatWindow.appendChild(msg);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
-}
+window.setInterviewLanguage = function(lang) {
+    currentQuestions = translations[lang].questions;
+    currentSummaryLabels = translations[lang].summaryLabels;
+};
 
 // ---------------------------------------------------------
 // START INTERVIEW
 // ---------------------------------------------------------
-function startInterview() {
-  interviewActive = true;
-  currentStep = 0;
-  responses = [];
+window.startInterview = function() {
+    currentQuestionIndex = 0;
 
-  const lang = getLang();
-  updateProgress();
-  botSay(lang.questions[currentStep], true);
-}
+    const lang = languageSelect.value;
+    currentQuestions = translations[lang].questions;
+    currentSummaryLabels = translations[lang].summaryLabels;
 
-// ---------------------------------------------------------
-// PAUSE
-// ---------------------------------------------------------
-function pauseInterview() {
-  interviewActive = false;
-  botSay(getLang().ui.pause);
-}
+    askNextQuestion();
+};
 
 // ---------------------------------------------------------
-// FINISH
+// ASK NEXT QUESTION
 // ---------------------------------------------------------
-function finishInterview() {
-  interviewActive = false;
+function askNextQuestion() {
+    if (currentQuestionIndex >= currentQuestions.length) {
+        buildSummary();
+        return;
+    }
 
-  const lang = getLang();
-  botSay(lang.ui.finish);
+    const question = currentQuestions[currentQuestionIndex];
 
-  const summary = buildSummaryTranslated(responses, lang);
-
-  // Summary should NOT trigger auto-listen
-  botSay(summary, false);
-}
-
-// ---------------------------------------------------------
-// REPEAT LAST BOT MESSAGE
-// ---------------------------------------------------------
-function repeatLast() {
-  if (lastBotMessage) botSay(lastBotMessage);
-}
-
-// ---------------------------------------------------------
-// SKIP STEP
-// ---------------------------------------------------------
-function skipStep() {
-  if (!interviewActive) return;
-
-  currentStep++;
-  updateProgress();
-
-  const lang = getLang();
-
-  if (currentStep >= lang.questions.length) {
-    finishInterview();
-  } else {
-    botSay(lang.questions[currentStep], true);
-  }
-}
-
-// ---------------------------------------------------------
-// RESET INTERVIEW
-// ---------------------------------------------------------
-function resetInterview() {
-  interviewActive = false;
-  currentStep = 0;
-  responses = [];
-
-  document.getElementById("chatWindow").innerHTML = "";
-
-  updateProgress();
-  botSay(getLang().ui.reset);
+    addMessage("Assistant", question);
+    speak(question, () => {
+        window.autoListenAfterQuestion();
+    });
 }
 
 // ---------------------------------------------------------
 // HANDLE USER RESPONSE
 // ---------------------------------------------------------
-window.handleUserResponse = function (text) {
-  userSay(text);
-
-  const lang = getLang();
-  responses[currentStep] = text;
-
-  if (interviewActive) {
-    currentStep++;
-    updateProgress();
-
-    if (currentStep >= lang.questions.length) {
-      finishInterview();
-    } else {
-      botSay(lang.questions[currentStep], true);
-    }
-  }
+window.handleUserResponse = function(text) {
+    saveAnswer(text);
+    currentQuestionIndex++;
+    askNextQuestion();
 };
 
 // ---------------------------------------------------------
-// BUTTON EVENTS
+// SAVE ANSWERS INTO SUMMARY OBJECT
 // ---------------------------------------------------------
-document.getElementById("startBtn").addEventListener("click", startInterview);
-document.getElementById("pauseBtn").addEventListener("click", pauseInterview);
-document.getElementById("finishBtn").addEventListener("click", finishInterview);
-document.getElementById("repeatBtn").addEventListener("click", repeatLast);
-document.getElementById("skipBtn").addEventListener("click", skipStep);
-document.getElementById("resetBtn").addEventListener("click", resetInterview);
+function saveAnswer(text) {
+    switch (currentQuestionIndex) {
+        case 0: patientAnswers.name = text; break;
+        case 1: patientAnswers.dob = text; break;
+        case 2: patientAnswers.complaint = text; break;
+        case 3: patientAnswers.duration = text; break;
+        case 4: patientAnswers.allergies = text; break;
+        case 5: patientAnswers.medications = text; break;
+        case 6: patientAnswers.chronic = text; break;
+        case 7: patientAnswers.travel = text; break;
+        case 8: patientAnswers.surgeries = text; break;
+        case 9: patientAnswers.notes = text; break;
+    }
+}
 
+// ---------------------------------------------------------
+// REPEAT CURRENT QUESTION
+// ---------------------------------------------------------
+document.getElementById("repeatBtn").addEventListener("click", () => {
+    const question = currentQuestions[currentQuestionIndex];
+    addMessage("Assistant", question);
+    speak(question, () => {
+        window.autoListenAfterQuestion();
+    });
+});
+
+// ---------------------------------------------------------
+// SKIP QUESTION
+// ---------------------------------------------------------
+document.getElementById("skipBtn").addEventListener("click", () => {
+    currentQuestionIndex++;
+    askNextQuestion();
+});
+
+// ---------------------------------------------------------
+// FINISH EARLY
+// ---------------------------------------------------------
+document.getElementById("finishBtn").addEventListener("click", () => {
+    buildSummary();
+});
+
+// ---------------------------------------------------------
+// RESET INTERVIEW
+// ---------------------------------------------------------
+document.getElementById("resetBtn").addEventListener("click", () => {
+    currentQuestionIndex = 0;
+
+    patientAnswers = {
+        name: "",
+        dob: "",
+        complaint: "",
+        duration: "",
+        allergies: "",
+        medications: "",
+        chronic: "",
+        travel: "",
+        surgeries: "",
+        notes: ""
+    };
+
+    addMessage("Assistant", "Interview reset.");
+});
+
+// ---------------------------------------------------------
+// BUILD SUMMARY (delegates to summaryBuilder2.js)
+// ---------------------------------------------------------
+function buildSummary() {
+    if (window.buildSummary) {
+        window.buildSummary(patientAnswers, currentSummaryLabels);
+    }
+}
