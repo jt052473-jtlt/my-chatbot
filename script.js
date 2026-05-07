@@ -2,40 +2,26 @@ let currentStep = 0;
 let isPaused = false;
 let currentLanguage = 'en';
 
-// --- RESTORED: Your Original Tour Logic ---
-function startTour() {
-    // These steps look for the IDs we put back in the HTML
-    const steps = [
-        { element: '#tour-step-1', intro: "Welcome! This helps automate clinical intake." },
-        { element: '#tour-step-2', intro: "Switch between the top 10 languages here." },
-        { element: '#tour-step-3', intro: "Voice mode enables the automated 3.5s listener." },
-        { element: '#tour-step-4', intro: "The clinical conversation appears here." },
-        { element: '#tour-step-5', intro: "Use these buttons to control the session." }
-    ];
-    // This calls your onboarding library (e.g., intro.js or custom overlay)
-    if (typeof introJs === "function") {
-        introJs().setOptions({ steps: steps }).start();
-    }
+// Fixes the "Sam: Reset" bubble issue by clearing the window properly
+function resetApp() {
+    const chatContainer = document.getElementById('chat-container');
+    if (chatContainer) chatContainer.innerHTML = ''; 
+    currentStep = 0;
+    isPaused = false;
+    if (typeof updateProgressBar === "function") updateProgressBar(0);
 }
 
-// --- ADDED: Smart Feature Logic ---
 function handleStart() {
     if (isPaused) {
         isPaused = false;
-        addSystemMessage("Resuming interview..."); 
+        addSystemMessage("Resuming..."); 
         displayQuestion(); 
     } else {
-        // Triggers the tour only on the very first start
-        if (currentStep === 0) startTour();
+        // This triggers your 7-step guided tour logic
+        if (currentStep === 0 && typeof startTour === "function") startTour();
         currentStep = 0;
         displayQuestion();
     }
 }
 
-function resetApp() {
-    // Clears screen WITHOUT typing "Reset"
-    document.getElementById('chat-container').innerHTML = '';
-    currentStep = 0;
-    isPaused = false;
-    if (typeof updateProgressBar === "function") updateProgressBar(0);
-}
+// ... include your existing displayQuestion and speakText functions here ...
