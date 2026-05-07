@@ -2,57 +2,40 @@ let currentStep = 0;
 let isPaused = false;
 let currentLanguage = 'en';
 
-// --- Guided Tour Logic ---
+// --- RESTORED: Your Original Tour Logic ---
 function startTour() {
-    const tourSteps = [
-        { element: '#tour-step-1', msg: "Welcome! This helps automate clinical documentation." },
-        { element: '#tour-step-2', msg: "You can change languages here at any time." },
-        { element: '#tour-step-3', msg: "Voice Mode enables the automated 3.5s listener." },
-        { element: '#tour-step-4', msg: "The conversation will appear in this window." },
-        { element: '#tour-step-5', msg: "Use these controls to manage the flow." }
+    // These steps look for the IDs we put back in the HTML
+    const steps = [
+        { element: '#tour-step-1', intro: "Welcome! This helps automate clinical intake." },
+        { element: '#tour-step-2', intro: "Switch between the top 10 languages here." },
+        { element: '#tour-step-3', intro: "Voice mode enables the automated 3.5s listener." },
+        { element: '#tour-step-4', intro: "The clinical conversation appears here." },
+        { element: '#tour-step-5', intro: "Use these buttons to control the session." }
     ];
-    if (typeof runOnboardingSequence === "function") {
-        runOnboardingSequence(tourSteps);
+    // This calls your onboarding library (e.g., intro.js or custom overlay)
+    if (typeof introJs === "function") {
+        introJs().setOptions({ steps: steps }).start();
     }
 }
 
-// --- Combined Flow Logic ---
+// --- ADDED: Smart Feature Logic ---
 function handleStart() {
     if (isPaused) {
         isPaused = false;
-        addSystemMessage("Resuming intake..."); 
+        addSystemMessage("Resuming interview..."); 
         displayQuestion(); 
     } else {
-        if (currentStep === 0) startTour(); // Triggers tour on first start
+        // Triggers the tour only on the very first start
+        if (currentStep === 0) startTour();
         currentStep = 0;
         displayQuestion();
     }
 }
 
 function resetApp() {
+    // Clears screen WITHOUT typing "Reset"
     document.getElementById('chat-container').innerHTML = '';
     currentStep = 0;
     isPaused = false;
     if (typeof updateProgressBar === "function") updateProgressBar(0);
-}
-
-function updateLanguageState() {
-    currentLanguage = document.getElementById('language-select').value;
-}
-
-function displayQuestion() {
-    if (isPaused) return;
-    try {
-        const questionText = interviewQuestions[currentLanguage][currentStep];
-        addSystemMessage(questionText);
-    } catch (e) { console.error(e); }
-}
-
-function addSystemMessage(text) {
-    const container = document.getElementById('chat-container');
-    const msg = document.createElement('div');
-    msg.className = 'message system';
-    msg.innerText = text;
-    container.appendChild(msg);
-    container.scrollTop = container.scrollHeight;
 }
