@@ -10,6 +10,7 @@ let isVoiceMode = false;
 // INITIALIZATION
 // -------------------------------
 window.addEventListener("DOMContentLoaded", () => {
+    populateIntroLanguageSelector();
     populateMainLanguageSelector();
     populateTourLanguageSelector();
     wireDemoButtons();
@@ -17,7 +18,30 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // -------------------------------
-// POPULATE MAIN LANGUAGE SELECTOR
+// INTRO SCREEN LANGUAGE SELECTOR
+// -------------------------------
+function populateIntroLanguageSelector() {
+    const select = document.getElementById("introLanguageSelect");
+    if (!select) return;
+
+    select.innerHTML = "";
+
+    Object.keys(translations).forEach(lang => {
+        const option = document.createElement("option");
+        option.value = lang;
+        option.textContent = lang;
+        select.appendChild(option);
+    });
+
+    select.value = currentLanguage;
+
+    select.addEventListener("change", () => {
+        currentLanguage = select.value;
+    });
+}
+
+// -------------------------------
+// MAIN LANGUAGE SELECTOR
 // -------------------------------
 function populateMainLanguageSelector() {
     const select = document.getElementById("languageSelect");
@@ -34,15 +58,16 @@ function populateMainLanguageSelector() {
 
     select.addEventListener("change", () => {
         currentLanguage = select.value;
-        console.log("Language switched to:", currentLanguage);
     });
 }
 
 // -------------------------------
-// POPULATE GUIDED TOUR LANGUAGE SELECTOR
+// GUIDED TOUR LANGUAGE SELECTOR
 // -------------------------------
 function populateTourLanguageSelector() {
     const select = document.getElementById("tourLanguageSelect");
+    if (!select) return;
+
     select.innerHTML = "";
 
     Object.keys(translations).forEach(lang => {
@@ -92,13 +117,17 @@ function wireChatbotButtons() {
 // -------------------------------
 function startGuidedTour() {
     currentStep = 0;
+
     document.getElementById("tourOverlay").classList.remove("hidden");
     document.getElementById("tourTooltip").classList.remove("hidden");
+
     updateTourText();
 
     document.getElementById("tourNextBtn").onclick = () => {
+        const steps = translations[currentLanguage].tour.steps;
+
         currentStep++;
-        if (currentStep >= translations[currentLanguage].tour.length) {
+        if (currentStep >= steps.length) {
             exitGuidedTour();
         } else {
             updateTourText();
@@ -109,9 +138,9 @@ function startGuidedTour() {
 }
 
 function updateTourText() {
-    const tour = translations[currentLanguage].tour;
-    document.getElementById("tourTitle").textContent = tour[currentStep].title;
-    document.getElementById("tourText").textContent = tour[currentStep].text;
+    const steps = translations[currentLanguage].tour.steps;
+    document.getElementById("tourTitle").textContent = steps[currentStep].title;
+    document.getElementById("tourText").textContent = steps[currentStep].text;
 }
 
 function exitGuidedTour() {
