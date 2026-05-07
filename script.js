@@ -2,13 +2,10 @@ let currentStep = 0;
 let isPaused = false;
 let currentLanguage = 'en';
 
-// Updates language state when dropdown changes
 function updateLanguageState() {
     currentLanguage = document.getElementById('language-select').value;
-    // Optional: add a message saying language changed
 }
 
-// Logic to handle both initial Start and Resuming from Pause
 function handleStart() {
     if (isPaused) {
         isPaused = false;
@@ -16,7 +13,8 @@ function handleStart() {
         displayQuestion(); 
     } else {
         currentStep = 0;
-        startInterview();
+        isPaused = false;
+        displayQuestion();
     }
 }
 
@@ -25,7 +23,6 @@ function togglePause() {
     addSystemMessage("Interview paused.");
 }
 
-// Clears the screen and resets the progress
 function resetApp() {
     document.getElementById('chat-container').innerHTML = '';
     currentStep = 0;
@@ -33,16 +30,23 @@ function resetApp() {
     if (typeof updateProgressBar === "function") updateProgressBar(0);
 }
 
-// Fetches the question based on the selected language
 function displayQuestion() {
     if (isPaused) return;
-
-    // Pulls from the language-specific array in interviewQuestions2.js
-    const questionText = interviewQuestions[currentLanguage][currentStep];
-    
-    addSystemMessage(questionText);
-    
-    if (typeof speakText === "function") {
-        speakText(questionText);
+    try {
+        const questionText = interviewQuestions[currentLanguage][currentStep];
+        addSystemMessage(questionText);
+        if (typeof speakText === "function") speakText(questionText);
+    } catch (e) {
+        console.error("Question load error:", e);
     }
+}
+
+// Helper for adding messages (ensure this matches your UI classes)
+function addSystemMessage(text) {
+    const container = document.getElementById('chat-container');
+    const msg = document.createElement('div');
+    msg.className = 'message system';
+    msg.innerText = text;
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
 }
