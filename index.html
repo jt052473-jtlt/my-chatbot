@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Clinical Intake Assistant</title>
-<link rel="stylesheet" href="style.css?v=6001" />
+<link rel="stylesheet" href="style.css?v=7001" />
 </head>
 
 <body>
@@ -14,7 +14,7 @@
   <div class="demo-content">
     <h1>Clinical Intake Assistant</h1>
 
-    <!-- ⭐ INTRO SCREEN LANGUAGE SELECTOR -->
+    <!-- Language selector on intro screen -->
     <select id="introLanguageSelect"
             style="margin: 12px 0; padding: 10px; border-radius: 10px; border: 1px solid #ccc; width: 100%;">
     </select>
@@ -28,10 +28,10 @@
   </div>
 </div>
 
-<!-- TOUR OVERLAY -->
+<!-- GUIDED TOUR OVERLAY -->
 <div id="tourOverlay" class="tour-overlay hidden"></div>
 
-<!-- TOUR TOOLTIP -->
+<!-- GUIDED TOUR TOOLTIP -->
 <div id="tourTooltip" class="tour-tooltip hidden">
   <h3 id="tourTitle"></h3>
   <p id="tourText"></p>
@@ -42,6 +42,7 @@
   </div>
 </div>
 
+<!-- MAIN APP -->
 <div class="app-container">
 
 <header class="app-header">
@@ -51,6 +52,7 @@
   </div>
 </header>
 
+<!-- SETTINGS ROW -->
 <div class="settings-row">
   <select id="languageSelect"></select>
   <input type="text" id="languageSearch" placeholder="Search language..." />
@@ -68,8 +70,10 @@
   <button id="micBtn" class="mic-button">🎤</button>
 </div>
 
+<!-- CHAT WINDOW -->
 <div id="chatWindow" class="chat-window"></div>
 
+<!-- INPUT CONTROLS -->
 <div class="input-controls-row">
 
   <div class="control-buttons">
@@ -90,14 +94,12 @@
 
 </div>
 
-<!-- CHATBOT LOGIC FILES (correct order) -->
+<!-- LOGIC FILES -->
 <script src="translations.js"></script>
 <script src="interviewFlow2.js"></script>
 <script src="interviewQuestions2.js"></script>
 <script src="summaryBuilder2.js"></script>
-
-<!-- GUIDED TOUR + DEMO LOGIC -->
-<script src="script.js?v=6001"></script>
+<script src="script.js?v=7001"></script>
 
 </body>
 </html>
