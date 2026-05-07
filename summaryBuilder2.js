@@ -1,46 +1,56 @@
-// ---------------------------------------------------------
-// SUMMARY BUILDER — MULTILINGUAL + CLEAN OUTPUT
-// ---------------------------------------------------------
+// ------------------------------------------------------
+// SUMMARY BUILDER
+// Uses:
+// - translations[currentLanguage].summaryLabels
+// - translations[currentLanguage].questions
+// - window.interviewAnswers (from interviewFlow2.js)
+// ------------------------------------------------------
 
-window.buildSummary = function(patientAnswers, labels) {
-
+function buildSummary() {
     const chatWindow = document.getElementById("chatWindow");
+    const questions = translations[currentLanguage].questions;
+    const labels = translations[currentLanguage].summaryLabels;
 
-    // Clear chat window
-    chatWindow.innerHTML = "";
-
-    // Header
-    const header = document.createElement("div");
-    header.style.fontWeight = "bold";
-    header.style.fontSize = "18px";
-    header.style.marginBottom = "12px";
-    header.textContent = labels.header;
-    chatWindow.appendChild(header);
-
-    // Helper to add summary rows
-    function addRow(label, value) {
-        const row = document.createElement("div");
-        row.style.background = "#f7f9ff";
-        row.style.border = "1px solid #e0e6f5";
-        row.style.padding = "10px 12px";
-        row.style.borderRadius = "10px";
-        row.style.marginBottom = "8px";
-        row.textContent = `${label}: ${value || "—"}`;
-        chatWindow.appendChild(row);
+    if (!window.interviewAnswers) {
+        addBotMessage("No answers available to summarize.");
+        return;
     }
 
-    // Add each summary field
-    addRow(labels.name, patientAnswers.name);
-    addRow(labels.dob, patientAnswers.dob);
-    addRow(labels.complaint, patientAnswers.complaint);
-    addRow(labels.duration, patientAnswers.duration);
-    addRow(labels.allergies, patientAnswers.allergies);
-    addRow(labels.medications, patientAnswers.medications);
-    addRow(labels.chronic, patientAnswers.chronic);
-    addRow(labels.travel, patientAnswers.travel);
-    addRow(labels.surgeries, patientAnswers.surgeries);
-    addRow(labels.notes, patientAnswers.notes);
+    // Create summary container
+    const summaryDiv = document.createElement("div");
+    summaryDiv.className = "summary-container";
 
-    // Scroll to bottom
+    const title = document.createElement("h3");
+    title.textContent = labels.summaryTitle || "Summary";
+    summaryDiv.appendChild(title);
+
+    // Loop through questions and answers
+    questions.forEach((q, index) => {
+        const qId = q.id || index;
+        const answer = window.interviewAnswers[qId];
+
+        if (answer !== undefined) {
+            const row = document.createElement("div");
+            row.className = "summary-row";
+
+            const label = document.createElement("div");
+            label.className = "summary-label";
+            label.textContent = q.text;
+
+            const value = document.createElement("div");
+            value.className = "summary-value";
+            value.textContent = answer;
+
+            row.appendChild(label);
+            row.appendChild(value);
+            summaryDiv.appendChild(row);
+        }
+    });
+
+    // Append summary to chat window
+    chatWindow.appendChild(summaryDiv);
     chatWindow.scrollTop = chatWindow.scrollHeight;
-};
+
+    // Optional: read aloud summary title
+    handleReadAloud(title.textContent);
+}
