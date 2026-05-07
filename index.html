@@ -1,100 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Clinical Intake Assistant</title>
-<link rel="stylesheet" href="style.css?v=6001" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Intake Assistant</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+    <div class="app-container">
+        <header class="app-header">
+            <h2 id="appTitle">Clinical Intake Assistant</h2>
+            <div class="progress-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+        </header>
 
-<!-- INTRO OVERLAY -->
-<div id="demoOverlay">
-  <div class="demo-content">
-    <h1>Clinical Intake Assistant</h1>
-    <p>This demo showcases a clinical intake workflow. Click Start Demo to begin.</p>
+        <main>
+            <div class="settings-bar">
+                <div class="language-controls">
+                    <select id="languageSelect">
+                        </select>
+                    <input type="text" id="languageSearch" placeholder="Search language...">
+                </div>
 
-    <div class="demo-buttons">
-      <button id="startDemoBtn" class="btn-primary">Start Demo</button>
-      <button id="exitDemoBtn" class="btn-secondary">Exit</button>
-    </div>
-  </div>
-</div>
+                <div class="voice-controls">
+                    <label>
+                        <input type="checkbox" id="readAloudToggle" checked> 
+                        <span id="readAloudLabel">Read Aloud</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="voiceModeToggle" checked> 
+                        <span id="voiceModeLabel">Voice Mode</span>
+                    </label>
+                    <button id="micBtn" class="mic-button">🎤</button>
+                </div>
+            </div>
 
-<!-- TOUR OVERLAY -->
-<div id="tourOverlay" class="tour-overlay hidden"></div>
+            <div id="chatWindow" class="chat-window"></div>
 
-<!-- TOUR TOOLTIP -->
-<div id="tourTooltip" class="tour-tooltip hidden">
-  <h3 id="tourTitle"></h3>
-  <p id="tourText"></p>
+            <div class="controls-grid">
+                <button id="startBtn" class="btn btn-primary">Start</button>
+                <button id="pauseBtn" class="btn btn-secondary">Pause</button>
+                <button id="finishBtn" class="btn btn-success">Finish</button>
+                <button id="repeatBtn" class="btn btn-info">Repeat</button>
+                <button id="skipBtn" class="btn btn-warning">Skip</button>
+                <button id="resetBtn" class="btn btn-danger">Reset</button>
+            </div>
 
-  <div class="tour-buttons">
-    <button id="tourNextBtn" class="btn-primary">Next</button>
-    <button id="tourExitBtn" class="btn-secondary">Exit</button>
-  </div>
-</div>
-
-<div class="app-container">
-
-  <header class="app-header">
-    <h2>Clinical Intake Assistant</h2>
-
-    <div class="progress-container">
-      <div id="progressBar"></div>
-    </div>
-  </header>
-
-  <div class="settings-row">
-    <select id="languageSelect"></select>
-    <input type="text" id="languageSearch" placeholder="Search language..." />
-
-    <label class="toggle">
-      <input type="checkbox" id="readAloudToggle" />
-      <span>Read Aloud</span>
-    </label>
-
-    <label class="toggle">
-      <input type="checkbox" id="voiceModeToggle" />
-      <span>Voice Mode</span>
-    </label>
-
-    <button id="micBtn" class="mic-button">🎤</button>
-  </div>
-
-  <div id="chatWindow" class="chat-window"></div>
-
-  <div class="input-controls-row">
-
-    <div class="control-buttons">
-      <button id="startBtn" class="btn-primary">Start</button>
-      <button id="pauseBtn" class="btn-secondary">Pause</button>
-      <button id="finishBtn" class="btn-primary">Finish</button>
-      <button id="repeatBtn" class="btn-secondary">Repeat</button>
-      <button id="skipBtn" class="btn-secondary">Skip</button>
-      <button id="resetBtn" class="btn-danger">Reset</button>
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Type your response here...">
+                <button id="sendBtn" class="btn btn-send">Send</button>
+            </div>
+        </main>
     </div>
 
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Type your response here..." autofocus />
-      <button id="sendBtn" class="btn-primary">Send</button>
+    <div id="demoOverlay" class="overlay">
+        <div class="overlay-content">
+            <h3>Welcome to the Demo</h3>
+            <p>Experience our automated clinical intake process.</p>
+            <button id="startDemoBtn" class="btn btn-primary">Start Demo</button>
+            <button id="exitDemoBtn" class="btn btn-secondary">Exit</button>
+        </div>
     </div>
 
-  </div>
+    <div id="tourOverlay" class="overlay hidden">
+        <div id="tourTooltip" class="tour-tooltip hidden">
+            <h4 id="tourTitle"></h4>
+            <p id="tourText"></p>
+            <div class="tour-buttons">
+                <button id="tourNextBtn" class="btn btn-sm btn-primary">Next</button>
+                <button id="tourExitBtn" class="btn btn-sm btn-secondary">Exit Tour</button>
+            </div>
+        </div>
+    </div>
 
-</div>
-
-<!-- CHATBOT LOGIC FILES (correct order) -->
-<script src="translations.js"></script>
-<script src="interviewFlow2.js"></script>
-<script src="interviewQuestions2.js"></script>
-<script src="summaryBuilder2.js"></script>
-
-<!-- GUIDED TOUR + DEMO LOGIC -->
-<script src="script.js?v=6001"></script>
-
+    <script src="translations.js"></script>
+    <script src="interviewQuestions2.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
-
-
