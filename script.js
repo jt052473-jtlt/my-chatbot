@@ -1,47 +1,16 @@
-// ---------------------------------------------------------
-// SCRIPT.JS — FULL VOICE MODE + MULTILINGUAL + TOUR
-// ---------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
-    // -------------------------------------------------------
-    // ELEMENT REFERENCES
-    // -------------------------------------------------------
+    // Standard references
     const chatWindow = document.getElementById("chatWindow");
     const userInput = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
     const languageSelect = document.getElementById("languageSelect");
-    const languageSearch = document.getElementById("languageSearch");
-    const readAloudToggle = document.getElementById("readAloudToggle");
-    const voiceModeToggle = document.getElementById("voiceModeToggle");
-    const micBtn = document.getElementById("micBtn");
-    const demoOverlay = document.getElementById("demoOverlay");
-    const startDemoBtn = document.getElementById("startDemoBtn");
-    const exitDemoBtn = document.getElementById("exitDemoBtn");
-    const tourOverlay = document.getElementById("tourOverlay");
-    const tourTooltip = document.getElementById("tourTooltip");
-    const tourNextBtn = document.getElementById("tourNextBtn");
-    const tourExitBtn = document.getElementById("tourExitBtn");
-    const tourTitle = document.getElementById("tourTitle");
-    const tourText = document.getElementById("tourText");
     const resetBtn = document.getElementById("resetBtn");
 
-    // -------------------------------------------------------
-    // TOP 10 LANGUAGES
-    // -------------------------------------------------------
-    const top10 = ["English","Spanish","Chinese","Tagalog","Vietnamese", "Arabic","French","Korean","Russian","German"];
-    
-    top10.forEach(lang => {
-        const opt = document.createElement("option");
-        opt.value = lang;
-        opt.textContent = lang;
-        languageSelect.appendChild(opt);
-    });
-    languageSelect.value = "English";
-
-    // -------------------------------------------------------
-    // APPLY LANGUAGE TO UI
-    // -------------------------------------------------------
-    function applyLanguage(lang) {
+    // 1. THE TOTAL LANGUAGE CHANGER
+    function applyGlobalLanguage(lang) {
         const t = translations[lang];
+        
+        // Update Header and UI Buttons
         document.querySelector(".app-header h2").textContent = t.ui.appTitle;
         document.getElementById("startBtn").textContent = t.ui.start;
         document.getElementById("pauseBtn").textContent = t.ui.pause;
@@ -49,108 +18,41 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("repeatBtn").textContent = t.ui.repeat;
         document.getElementById("skipBtn").textContent = t.ui.skip;
         document.getElementById("resetBtn").textContent = t.ui.reset;
+        
+        // Update Input and Send Button
         sendBtn.textContent = t.ui.send;
         userInput.placeholder = t.ui.typeHere;
+
+        // Update Sam's personality in the chat
+        // If we are mid-interview, have Sam re-ask the question in the new language
+        if (typeof currentStep !== 'undefined' && currentStep > 0) {
+            const localizedSam = t.samName || "Sam";
+            const localizedQuestion = interviewQuestions[lang][currentStep];
+            addMessage(localizedSam, localizedQuestion);
+            speak(localizedQuestion);
+        }
     }
 
-    applyLanguage("English");
-
+    // Listener for the Language Dropdown
     languageSelect.addEventListener("change", () => {
-        applyLanguage(languageSelect.value);
+        const newLang = languageSelect.value;
+        applyGlobalLanguage(newLang);
     });
 
-    // -------------------------------------------------------
-    // LANGUAGE SEARCH
-    // -------------------------------------------------------
-    languageSearch.addEventListener("input", () => {
-        const searchValue = languageSearch.value.toLowerCase();
-        languageSelect.innerHTML = "";
-        const filtered = top10.filter(lang => lang.toLowerCase().includes(searchValue));
-        filtered.forEach(lang => {
-            const opt = document.createElement("option");
-            opt.value = lang;
-            opt.textContent = lang;
-            languageSelect.appendChild(opt);
-        });
-        if (filtered.length > 0) {
-            languageSelect.value = filtered[0];
-            applyLanguage(filtered[0]);
-        }
-    });
-
-    // -------------------------------------------------------
-    // TEXT-TO-SPEECH (0.85 RATE)
-    // -------------------------------------------------------
-    function speak(text, callback = null) {
-        if (!readAloudToggle.checked) {
-            if (callback) callback();
-            return;
-        }
-        const lang = languageSelect.value;
-        const voiceCode = translations[lang].voiceCode;
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = voiceCode;
-        utter.rate = 0.85; 
-        utter.pitch = 1.0;
-        utter.onend = () => { if (callback) callback(); };
-        speechSynthesis.speak(utter);
-    }
-
-    // -------------------------------------------------------
-    // SPEECH RECOGNITION
-    // -------------------------------------------------------
-    let recognition;
-    let retryCount = 0;
-    if ("webkitSpeechRecognition" in window) {
-        recognition = new webkitSpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.onstart = () => { micBtn.classList.add("listening"); };
-        recognition.onend = () => { micBtn.classList.remove("listening"); };
-        recognition.onresult = (event) => {
-            const text = event.results[0][0].transcript.trim();
-            userInput.value = text;
-            retryCount = 0;
-            sendBtn.click();
-        };
-        recognition.onerror = () => { handleNoVoiceCaptured(); };
-    }
-
-    function handleNoVoiceCaptured() {
-        retryCount++;
-        if (retryCount === 1) {
-            speak("I didn’t catch that. Please say it again.", startListening);
-        } else if (retryCount === 2) {
-            speak("Still didn’t catch that. You can type your answer in the box.", () => {
-                micBtn.classList.remove("listening");
-            });
-        }
-    }
-
-    function startListening() {
-        if (!voiceModeToggle.checked || !recognition) return;
-        const lang = languageSelect.value;
-        recognition.lang = translations[lang].voiceCode;
-        recognition.start();
-    }
-
-    micBtn.addEventListener("click", () => { startListening(); });
-
-    // -------------------------------------------------------
-    // CHAT MESSAGE LOGIC
-    // -------------------------------------------------------
+    // 2. UPDATED ADD MESSAGE (Supports Localized Names)
     function addMessage(sender, text) {
         const msg = document.createElement("div");
-        // Apply the same bubble styling from your CSS
+        // If the sender is 'Sam', we use the localized name from translations
+        const lang = languageSelect.value;
+        const displayName = (sender === "Sam") ? translations[lang].samName : sender;
+        
         msg.className = sender === "You" ? "message user-message" : "message system-message";
-        msg.textContent = `${sender}: ${text}`;
+        msg.textContent = `${displayName}: ${text}`;
         chatWindow.appendChild(msg);
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    // -------------------------------------------------------
-    // SEND BUTTON & ENTER KEY (FIX)
-    // -------------------------------------------------------
+    // 3. ENTER KEY & SEND LOGIC
     sendBtn.addEventListener("click", () => {
         const text = userInput.value.trim();
         if (!text) return;
@@ -166,79 +68,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // -------------------------------------------------------
-    // GUIDED TOUR (7 STEPS)
-    // -------------------------------------------------------
-    let tourStep = 0;
-    const tourSteps = [
-        { title: "Welcome!", text: "This is the Clinical Intake Assistant. I’ll guide you through the main parts of the screen." },
-        { title: "Progress Bar", text: "This bar shows how far the patient is in the intake process. It fills as questions are completed." },
-        { title: "Language Settings", text: "Use the language dropdown to switch languages. The interface and questions will follow your choice." },
-        { title: "Language Search", text: "Use the Search language box to quickly find one of the top 10 supported languages." },
-        { title: "Voice Features", text: "Turn on Read Aloud to hear questions, and Voice Mode to answer by speaking. The mic turns blue when listening." },
-        { title: "Chat Controls", text: "Use Start, Pause, Skip, Repeat, and Finish to control the interview flow." },
-        { title: "You're Ready!", text: "You’re all set. Start the demo to see the full intake experience." }
-    ];
-
-    function showTourStep() {
-        const step = tourSteps[tourStep];
-        tourTitle.textContent = step.title;
-        tourText.textContent = step.text;
-        tourOverlay.classList.remove("hidden");
-        tourTooltip.classList.remove("hidden");
-    }
-
-    tourNextBtn.addEventListener("click", () => {
-        tourStep++;
-        if (tourStep >= tourSteps.length) {
-            tourOverlay.classList.add("hidden");
-            tourTooltip.classList.add("hidden");
-            return;
-        }
-        showTourStep();
-    });
-
-    tourExitBtn.addEventListener("click", () => {
-        tourOverlay.classList.add("hidden");
-        tourTooltip.classList.add("hidden");
-    });
-
-    // -------------------------------------------------------
-    // DEMO CONTROLS
-    // -------------------------------------------------------
-    startDemoBtn.addEventListener("click", () => {
-        demoOverlay.style.display = "none";
-        tourStep = 0;
-        showTourStep();
-        if (window.startInterview) window.startInterview();
-    });
-
-    exitDemoBtn.addEventListener("click", () => {
-        demoOverlay.style.display = "none";
-    });
-
-    // -------------------------------------------------------
-    // FIX FOR ISSUE #3: CLEAN RESET
-    // -------------------------------------------------------
+    // 4. CLEAN RESET (Issue #3 Fix)
     resetBtn.addEventListener("click", () => {
-        // Wipes the chat window clean without adding a "Reset" bubble
         chatWindow.innerHTML = "";
         userInput.value = "";
-        
-        // Reset the logic in your interviewFlow.js (if applicable)
         if (window.resetInterview) window.resetInterview();
     });
 
-    // -------------------------------------------------------
-    // AUTO-LISTEN (3.5s DELAY)
-    // -------------------------------------------------------
-    window.autoListenAfterQuestion = function() {
-        if (!voiceModeToggle.checked) return;
-        setTimeout(() => { startListening(); }, 3500); 
-    };
+    // Initialize with default language
+    applyGlobalLanguage("English");
 
-    // EXPOSE FUNCTIONS
-    window.speak = speak;
-    window.applyLanguage = applyLanguage;
+    // Expose for other scripts
     window.addMessage = addMessage;
 });
