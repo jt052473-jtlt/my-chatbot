@@ -1,3 +1,4 @@
+const translations = {
 English: {
     voiceCode: "en-US",
     samName: "Sam",
@@ -777,4 +778,5 @@ German: {
             }
         ]
     }
-},
+}
+};
