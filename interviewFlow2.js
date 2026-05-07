@@ -1,8 +1,10 @@
 // ---------------------------------------------
 // INTERVIEW FLOW LOGIC
-// Uses global variables from script.js:
-// currentStep, currentLanguage, isPaused
+// Controls question progression, answers,
+// progress bar, and bot/user messages.
 // ---------------------------------------------
+
+let interviewAnswers = {};
 
 // ---------------------------------------------
 // GET QUESTIONS FOR CURRENT LANGUAGE
@@ -117,12 +119,7 @@ function processUserResponse(input) {
 
     const q = questions[currentStep];
 
-    // Store answers globally
-    if (!window.interviewAnswers) {
-        window.interviewAnswers = {};
-    }
-
-    window.interviewAnswers[q.id || currentStep] = input;
+    interviewAnswers[q.id || currentStep] = input;
 
     currentStep++;
     showQuestion();
