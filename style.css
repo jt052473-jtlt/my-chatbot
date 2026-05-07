@@ -109,6 +109,13 @@ button {
   margin-bottom: 12px;
 }
 
+.app-header h2 {
+  width: 100%;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+}
+
 .progress-container {
   width: 40%;
   height: 8px;
@@ -134,8 +141,16 @@ button {
   margin-bottom: 12px;
 }
 
-.settings-row select,
-.settings-row input[type="text"] {
+#languageSelect {
+  width: 160px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+#languageSearch {
+  width: 180px;
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
