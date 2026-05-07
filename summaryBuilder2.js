@@ -1,52 +1,46 @@
-
 // ---------------------------------------------------------
-// SUMMARY BUILDER — MULTILINGUAL VERSION
+// SUMMARY BUILDER — MULTILINGUAL + CLEAN OUTPUT
 // ---------------------------------------------------------
 
-// Helper: return "N/A" if empty
-function safe(v) {
-  return v && v.trim() !== "" ? v : "N/A";
-}
+window.buildSummary = function(patientAnswers, labels) {
 
-// Build summary in the selected language
-function buildSummaryTranslated(responses, lang) {
-  const t = lang.summary; // summary labels from translations.js
+    const chatWindow = document.getElementById("chatWindow");
 
-  return `
-${t.title}
+    // Clear chat window
+    chatWindow.innerHTML = "";
 
-${t.patientSection}
-- ${t.fullName}: ${safe(responses[0])}
-- ${t.dob}: ${safe(responses[1])}
+    // Header
+    const header = document.createElement("div");
+    header.style.fontWeight = "bold";
+    header.style.fontSize = "18px";
+    header.style.marginBottom = "12px";
+    header.textContent = labels.header;
+    chatWindow.appendChild(header);
 
-${t.reasonSection}
-- ${t.primaryComplaint}: ${safe(responses[2])}
-- ${t.duration}: ${safe(responses[3])}
+    // Helper to add summary rows
+    function addRow(label, value) {
+        const row = document.createElement("div");
+        row.style.background = "#f7f9ff";
+        row.style.border = "1px solid #e0e6f5";
+        row.style.padding = "10px 12px";
+        row.style.borderRadius = "10px";
+        row.style.marginBottom = "8px";
+        row.textContent = `${label}: ${value || "—"}`;
+        chatWindow.appendChild(row);
+    }
 
-${t.sleepSymptomsSection}
-- ${t.snoring}: ${safe(responses[4])}
-- ${t.apnea}: ${safe(responses[5])}
-- ${t.daytimeSleepiness}: ${safe(responses[6])}
-- ${t.insomnia}: ${safe(responses[7])}
-- ${t.awakenings}: ${safe(responses[8])}
+    // Add each summary field
+    addRow(labels.name, patientAnswers.name);
+    addRow(labels.dob, patientAnswers.dob);
+    addRow(labels.complaint, patientAnswers.complaint);
+    addRow(labels.duration, patientAnswers.duration);
+    addRow(labels.allergies, patientAnswers.allergies);
+    addRow(labels.medications, patientAnswers.medications);
+    addRow(labels.chronic, patientAnswers.chronic);
+    addRow(labels.travel, patientAnswers.travel);
+    addRow(labels.surgeries, patientAnswers.surgeries);
+    addRow(labels.notes, patientAnswers.notes);
 
-${t.sleepHabitsSection}
-- ${t.bedtime}: ${safe(responses[9])}
-- ${t.wakeTime}: ${safe(responses[10])}
-- ${t.naps}: ${safe(responses[11])}
-
-${t.lifestyleSection}
-- ${t.caffeine}: ${safe(responses[12])}
-- ${t.alcohol}: ${safe(responses[13])}
-
-${t.healthSection}
-- ${t.medications}: ${safe(responses[14])}
-- ${t.medicalHistory}: ${safe(responses[15])}
-- ${t.allergies}: ${safe(responses[16])}
-
-${t.additionalNotes}
-${safe(responses[17])}
-`.trim();
-}
-
-
+    // Scroll to bottom
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+};
