@@ -1,5 +1,8 @@
 const translations = {
 
+    // ------------------------------------------------------
+    // ENGLISH (FULLY FILLED)
+    // ------------------------------------------------------
     English: {
         voiceCode: "en-US",
         samName: "Sam",
@@ -63,85 +66,112 @@ const translations = {
         }
     },
 
+    // ------------------------------------------------------
+    // SPANISH
+    // ------------------------------------------------------
     Spanish: {
         voiceCode: "es-ES",
         samName: "Sam",
-        ui: { ... },          // ← fill in later
-        questions: [ ... ],   // ← fill in later
-        summaryLabels: { ... },
-        tour: { steps: [ ... ] }
+        ui: {},
+        questions: [],
+        summaryLabels: {},
+        tour: { steps: [] }
     },
 
+    // ------------------------------------------------------
+    // FRENCH
+    // ------------------------------------------------------
     French: {
         voiceCode: "fr-FR",
         samName: "Sam",
-        ui: { ... },
-        questions: [ ... ],
-        summaryLabels: { ... },
-        tour: { steps: [ ... ] }
+        ui: {},
+        questions: [],
+        summaryLabels: {},
+        tour: { steps: [] }
     },
 
+    // ------------------------------------------------------
+    // CHINESE (SIMPLIFIED)
+    // ------------------------------------------------------
     Chinese: {
         voiceCode: "zh-CN",
         samName: "Sam",
-        ui: { ... },
-        questions: [ ... ],
-        summaryLabels: { ... },
-        tour: { steps: [ ... ] }
+        ui: {},
+        questions: [],
+        summaryLabels: {},
+        tour: { steps: [] }
     },
 
+    // ------------------------------------------------------
+    // ARABIC
+    // ------------------------------------------------------
     Arabic: {
         voiceCode: "ar-SA",
         samName: "Sam",
-        ui: { ... },
-        questions: [ ... ],
-        summaryLabels: { ... },
-        tour: { steps: [ ... ] }
+        ui: {},
+        questions: [],
+        summaryLabels: {},
+        tour: { steps: [] }
     },
 
+    // ------------------------------------------------------
+    // HINDI
+    // ------------------------------------------------------
     Hindi: {
         voiceCode: "hi-IN",
         samName: "Sam",
-        ui: { ... },
-        questions: [ ... ],
-        summaryLabels: { ... },
-        tour: { steps: [ ... ] }
+        ui: {},
+        questions: [],
+        summaryLabels: {},
+        tour: { steps: [] }
     },
 
+    // ------------------------------------------------------
+    // PORTUGUESE
+    // ------------------------------------------------------
     Portuguese: {
         voiceCode: "pt-PT",
         samName: "Sam",
-        ui: { ... },
-        questions: [ ... ],
-        summaryLabels: { ... },
-        tour: { steps: [ ... ] }
+        ui: {},
+        questions: [],
+        summaryLabels: {},
+        tour: { steps: [] }
     },
 
+    // ------------------------------------------------------
+    // BENGALI
+    // ------------------------------------------------------
     Bengali: {
         voiceCode: "bn-BD",
         samName: "Sam",
-        ui: { ... },
-        questions: [ ... ],
-        summaryLabels: { ... },
-        tour: { steps: [ ... ] }
+        ui: {},
+        questions: [],
+        summaryLabels: {},
+        tour: { steps: [] }
     },
 
+    // ------------------------------------------------------
+    // RUSSIAN
+    // ------------------------------------------------------
     Russian: {
         voiceCode: "ru-RU",
         samName: "Sam",
-        ui: { ... },
-        questions: [ ... ],
-        summaryLabels: { ... },
-        tour: { steps: [ ... ] }
+        ui: {},
+        questions: [],
+        summaryLabels: {},
+        tour: { steps: [] }
     },
 
+    // ------------------------------------------------------
+    // GERMAN
+    // ------------------------------------------------------
     German: {
         voiceCode: "de-DE",
         samName: "Sam",
-        ui: { ... },
-        questions: [ ... ],
-        summaryLabels: { ... },
-        tour: { steps: [ ... ] }
+        ui: {},
+        questions: [],
+        summaryLabels: {},
+        tour: { steps: [] }
     }
 
 };
