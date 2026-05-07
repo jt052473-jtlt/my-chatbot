@@ -1,142 +1,119 @@
-// ---------------------------------------------------------
-// INTERVIEW FLOW — MULTILINGUAL + VOICE + AUTO-LISTEN
-// ---------------------------------------------------------
+// -------------------------------
+// INTERVIEW FLOW STATE
+// -------------------------------
+// Uses currentStep and isPaused from script.js
 
-let currentQuestionIndex = 0;
-let currentQuestions = translations["English"].questions;
-let currentSummaryLabels = translations["English"].summaryLabels;
+// -------------------------------
+// CORE QUESTION HELPERS
+// -------------------------------
+function getQuestionsForLanguage() {
+    // Assumes questions are stored in translations.js under each language
+    // e.g., translations["English"].questions = [ { id, text, ... }, ... ]
+    if (!translations[currentLanguage] || !translations[currentLanguage].questions) {
+        console.warn("No questions found for language:", currentLanguage);
+        return [];
+    }
+    return translations[currentLanguage].questions;
+}
 
-let patientAnswers = {
-    name: "",
-    dob: "",
-    complaint: "",
-    duration: "",
-    allergies: "",
-    medications: "",
-    chronic: "",
-    travel: "",
-    surgeries: "",
-    notes: ""
-};
+// -------------------------------
+// RENDERING MESSAGES
+// -------------------------------
+function addUserMessage(text) {
+    const chatWindow = document.getElementById("chatWindow");
+    const msg = document.createElement("div");
+    msg.className = "chat-message user-message";
+    msg.textContent = text;
+    chatWindow.appendChild(msg);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
 
-// ---------------------------------------------------------
-// SET LANGUAGE (called by script.js)
-// ---------------------------------------------------------
-window.setInterviewLanguage = function(lang) {
-    currentQuestions = translations[lang].questions;
-    currentSummaryLabels = translations[lang].summaryLabels;
-};
+function addBotMessage(text) {
+    const chatWindow = document.getElementById("chatWindow");
+    const msg = document.createElement("div");
+    msg.className = "chat-message bot-message";
+    msg.textContent = text;
+    chatWindow.appendChild(msg);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 
-// ---------------------------------------------------------
-// START INTERVIEW
-// ---------------------------------------------------------
-window.startInterview = function() {
-    currentQuestionIndex = 0;
+    handleReadAloud(text);
+}
 
-    const lang = languageSelect.value;
-    currentQuestions = translations[lang].questions;
-    currentSummaryLabels = translations[lang].summaryLabels;
+// -------------------------------
+// PROGRESS BAR
+// -------------------------------
+function updateProgressBar() {
+    const questions = getQuestionsForLanguage();
+    const progressBar = document.getElementById("progressBar");
+    if (!progressBar || questions.length === 0) return;
 
-    askNextQuestion();
-};
+    const percent = Math.min(
+        100,
+        Math.round((currentStep / questions.length) * 100)
+    );
+    progressBar.style.width = percent + "%";
+}
 
-// ---------------------------------------------------------
-// ASK NEXT QUESTION
-// ---------------------------------------------------------
-function askNextQuestion() {
-    if (currentQuestionIndex >= currentQuestions.length) {
-        buildSummary();
+// -------------------------------
+// READ ALOUD SUPPORT
+// -------------------------------
+function handleReadAloud(text) {
+    const toggle = document.getElementById("readAloudToggle");
+    if (!toggle || !toggle.checked) return;
+
+    if (!("speechSynthesis" in window)) return;
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const langConfig = translations[currentLanguage];
+    if (langConfig && langConfig.voiceCode) {
+        utterance.lang = langConfig.voiceCode;
+    }
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+}
+
+// -------------------------------
+// SHOW QUESTION
+// -------------------------------
+function showQuestion() {
+    if (isPaused) return;
+
+    const questions = getQuestionsForLanguage();
+
+    if (currentStep >= questions.length) {
+        addBotMessage("Thank you. We've reached the end of the interview.");
+        updateProgressBar();
+        try {
+            buildSummary();
+        } catch (e) {
+            console.warn("buildSummary not available or failed:", e);
+        }
         return;
     }
 
-    const question = currentQuestions[currentQuestionIndex];
-
-    addMessage("Assistant", question);
-    speak(question, () => {
-        window.autoListenAfterQuestion();
-    });
+    const q = questions[currentStep];
+    addBotMessage(q.text);
+    updateProgressBar();
 }
 
-// ---------------------------------------------------------
-// HANDLE USER RESPONSE
-// ---------------------------------------------------------
-window.handleUserResponse = function(text) {
-    saveAnswer(text);
-    currentQuestionIndex++;
-    askNextQuestion();
-};
-
-// ---------------------------------------------------------
-// SAVE ANSWERS INTO SUMMARY OBJECT
-// ---------------------------------------------------------
-function saveAnswer(text) {
-    switch (currentQuestionIndex) {
-        case 0: patientAnswers.name = text; break;
-        case 1: patientAnswers.dob = text; break;
-        case 2: patientAnswers.complaint = text; break;
-        case 3: patientAnswers.duration = text; break;
-        case 4: patientAnswers.allergies = text; break;
-        case 5: patientAnswers.medications = text; break;
-        case 6: patientAnswers.chronic = text; break;
-        case 7: patientAnswers.travel = text; break;
-        case 8: patientAnswers.surgeries = text; break;
-        case 9: patientAnswers.notes = text; break;
+// -------------------------------
+// PROCESS USER RESPONSE
+// -------------------------------
+function processUserResponse(input) {
+    const questions = getQuestionsForLanguage();
+    if (currentStep >= questions.length) {
+        addBotMessage("We've already completed the interview.");
+        return;
     }
-}
 
-// ---------------------------------------------------------
-// REPEAT CURRENT QUESTION
-// ---------------------------------------------------------
-document.getElementById("repeatBtn").addEventListener("click", () => {
-    const question = currentQuestions[currentQuestionIndex];
-    addMessage("Assistant", question);
-    speak(question, () => {
-        window.autoListenAfterQuestion();
-    });
-});
+    const q = questions[currentStep];
 
-// ---------------------------------------------------------
-// SKIP QUESTION
-// ---------------------------------------------------------
-document.getElementById("skipBtn").addEventListener("click", () => {
-    currentQuestionIndex++;
-    askNextQuestion();
-});
-
-// ---------------------------------------------------------
-// FINISH EARLY
-// ---------------------------------------------------------
-document.getElementById("finishBtn").addEventListener("click", () => {
-    buildSummary();
-});
-
-// ---------------------------------------------------------
-// RESET INTERVIEW
-// ---------------------------------------------------------
-document.getElementById("resetBtn").addEventListener("click", () => {
-    currentQuestionIndex = 0;
-
-    patientAnswers = {
-        name: "",
-        dob: "",
-        complaint: "",
-        duration: "",
-        allergies: "",
-        medications: "",
-        chronic: "",
-        travel: "",
-        surgeries: "",
-        notes: ""
-    };
-
-    addMessage("Assistant", "Interview reset.");
-});
-
-// ---------------------------------------------------------
-// BUILD SUMMARY (delegates to summaryBuilder2.js)
-// ---------------------------------------------------------
-function buildSummary() {
-    if (window.buildSummary) {
-        window.buildSummary(patientAnswers, currentSummaryLabels);
+    // Basic storage hook: you can expand this to store answers by id
+    if (!window.interviewAnswers) {
+        window.interviewAnswers = {};
     }
+    window.interviewAnswers[q.id || currentStep] = input;
+
+    currentStep++;
+    showQuestion();
 }
