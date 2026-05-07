@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // -------------------------------------------------------
-    // TEXT-TO-SPEECH (SLOW FEMALE VOICE)
+    // TEXT-TO-SPEECH (0.85 RATE)
     // -------------------------------------------------------
     function speak(text, callback = null) {
         if (!readAloudToggle.checked) {
@@ -90,11 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const voiceCode = translations[lang].voiceCode;
         const utter = new SpeechSynthesisUtterance(text);
         utter.lang = voiceCode;
-        utter.rate = 0.85; // SLOWER VOICE
+        utter.rate = 0.85; 
         utter.pitch = 1.0;
-        utter.onend = () => {
-            if (callback) callback();
-        };
+        utter.onend = () => { if (callback) callback(); };
         speechSynthesis.speak(utter);
     }
 
@@ -130,45 +128,46 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function startListening() {
-        if (!voiceModeToggle.checked) return;
-        if (!recognition) return;
+        if (!voiceModeToggle.checked || !recognition) return;
         const lang = languageSelect.value;
-        const voiceCode = translations[lang].voiceCode;
-        recognition.lang = voiceCode;
+        recognition.lang = translations[lang].voiceCode;
         recognition.start();
     }
 
     micBtn.addEventListener("click", () => { startListening(); });
 
     // -------------------------------------------------------
-    // CHAT MESSAGE
+    // CHAT MESSAGE LOGIC
     // -------------------------------------------------------
     function addMessage(sender, text) {
         const msg = document.createElement("div");
+        // Apply the same bubble styling from your CSS
+        msg.className = sender === "You" ? "message user-message" : "message system-message";
         msg.textContent = `${sender}: ${text}`;
         chatWindow.appendChild(msg);
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
     // -------------------------------------------------------
-    // SEND BUTTON
+    // SEND BUTTON & ENTER KEY (FIX)
     // -------------------------------------------------------
     sendBtn.addEventListener("click", () => {
         const text = userInput.value.trim();
         if (!text) return;
         addMessage("You", text);
         userInput.value = "";
-        if (window.handleUserResponse) {
-            window.handleUserResponse(text);
-        }
+        if (window.handleUserResponse) window.handleUserResponse(text);
     });
 
     userInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") sendBtn.click();
+        if (e.key === "Enter") {
+            e.preventDefault();
+            sendBtn.click();
+        }
     });
 
     // -------------------------------------------------------
-    // GUIDED TOUR
+    // GUIDED TOUR (7 STEPS)
     // -------------------------------------------------------
     let tourStep = 0;
     const tourSteps = [
@@ -205,15 +204,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // -------------------------------------------------------
-    // START DEMO
+    // DEMO CONTROLS
     // -------------------------------------------------------
     startDemoBtn.addEventListener("click", () => {
         demoOverlay.style.display = "none";
         tourStep = 0;
         showTourStep();
-        if (window.startInterview) {
-            window.startInterview();
-        }
+        if (window.startInterview) window.startInterview();
     });
 
     exitDemoBtn.addEventListener("click", () => {
@@ -224,32 +221,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // FIX FOR ISSUE #3: CLEAN RESET
     // -------------------------------------------------------
     resetBtn.addEventListener("click", () => {
-        // 1. Clear the chat window visually
+        // Wipes the chat window clean without adding a "Reset" bubble
         chatWindow.innerHTML = "";
-        
-        // 2. Clear input box
         userInput.value = "";
         
-        // 3. Logic Reset (Communicates with interviewFlow.js if needed)
-        if (window.resetInterview) {
-            window.resetInterview(); 
-        }
-        
-        // 4. Confirmation (Optional - remove if you want total silence)
-        // console.log("System Reset Complete.");
+        // Reset the logic in your interviewFlow.js (if applicable)
+        if (window.resetInterview) window.resetInterview();
     });
 
     // -------------------------------------------------------
-    // AUTO-LISTEN AFTER EACH QUESTION
+    // AUTO-LISTEN (3.5s DELAY)
     // -------------------------------------------------------
     window.autoListenAfterQuestion = function() {
         if (!voiceModeToggle.checked) return;
         setTimeout(() => { startListening(); }, 3500); 
     };
 
-    // -------------------------------------------------------
     // EXPOSE FUNCTIONS
-    // -------------------------------------------------------
     window.speak = speak;
     window.applyLanguage = applyLanguage;
     window.addMessage = addMessage;
