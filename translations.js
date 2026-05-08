@@ -146,7 +146,7 @@ const translations = {
         samName: "Sam",
         ui: {},
         questions: [],
-        summaryLabels: {},
+       summaryLabels: {},
         tour: { steps: [] }
     },
 
