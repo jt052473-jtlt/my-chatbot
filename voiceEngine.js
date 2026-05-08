@@ -1,47 +1,60 @@
-// voiceEngine.js
-// Handles voice input and optional voice output for the Clinical Intake Demo
+// ------------------------------------------------------
+// VOICE ENGINE (TEXT‑TO‑SPEECH)
+// Handles:
+// - Read Aloud toggle
+// - Language‑specific voices
+// - Smooth cancellation
+// ------------------------------------------------------
 
-let recognition = null;
-let synth = window.speechSynthesis;
+let currentUtterance = null;
 
-// Initialize speech recognition
-function initVoice() {
-    const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
+// Speak text using the correct language voice
+function speakText(text) {
+    const toggle = document.getElementById("readAloudToggle");
+    if (!toggle || !toggle.checked) return;
 
-    if (!SpeechRecognition) {
-        console.warn("Speech recognition not supported in this browser.");
-        return;
-    }
+    const langConfig = translations[currentLanguage];
+    const voiceCode = langConfig.voiceCode || "en-US";
 
-    recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
+    // Stop any previous speech
+    window.speechSynthesis.cancel();
 
-    recognition.addEventListener("result", (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById("responseInput").value = transcript;
-    });
+    currentUtterance = new SpeechSynthesisUtterance(text);
+    currentUtterance.lang = voiceCode;
 
-    recognition.addEventListener("end", () => {
-        console.log("Voice input ended.");
-    });
+    // Try to match a voice
+    const voices = window.speechSynthesis.getVoices();
+    const match = voices.find(v => v.lang === voiceCode);
+    if (match) currentUtterance.voice = match;
+
+    window.speechSynthesis.speak(currentUtterance);
 }
 
-// Start listening
-function startListening() {
-    if (recognition) {
-        recognition.start();
-    }
+// Stop speaking immediately
+function stopSpeaking() {
+    window.speechSynthesis.cancel();
 }
 
-// Optional: speak text aloud
-function speak(text, lang = "en-US") {
-    if (!synth) return;
+// Re‑speak last bot message (for Repeat button)
+function repeatLastBotMessage() {
+    const chat = document.getElementById("chatWindow");
+    const messages = chat.querySelectorAll(".bot-message");
+    if (messages.length === 0) return;
 
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = lang;
-    synth.speak(utter);
+    const last = messages[messages.length - 1].textContent;
+    speakText(last);
 }
 
-export { initVoice, startListening, speak };
+// Auto‑speak bot messages
+function handleReadAloud(text) {
+    speakText(text);
+}
+
+// Expose globally
+window.speakText = speakText;
+window.stopSpeaking = stopSpeaking;
+window.repeatLastBotMessage = repeatLastBotMessage;
+window.handleReadAloud = handleReadAloud;
+
+// Load voices (Chrome requires async load)
+window.speechSynthesis.onvoiceschanged = () => {};
