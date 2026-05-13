@@ -1,1 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Intake Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
 
+<body>
+
+<!-- ⭐ DEMO INTRO OVERLAY (REQUIRED FOR START DEMO) -->
+<div id="demoOverlay" style="
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+">
+    <h2 style="color: white; margin-bottom: 20px;">Choose Language</h2>
+
+    <select id="introLanguageSelect" style="padding: 10px; font-size: 18px; margin-bottom: 20px;"></select>
+
+    <button id="startDemoBtn" style="padding: 12px 20px; font-size: 18px; margin-bottom: 10px;">
+        Start Demo
+    </button>
+
+    <button id="introExitBtn" style="padding: 12px 20px; font-size: 18px;">
+        Exit
+    </button>
+</div>
+
+<!-- ⭐ MAIN APP CONTAINER -->
+<div class="app-container">
+
+    <h1 id="appTitle">Clinical Intake Assistant</h1>
+
+    <!-- Language Selector -->
+    <div class="language-bar">
+        <input id="languageSearch" type="text" placeholder="Search language...">
+        <select id="languageSelect"></select>
+    </div>
+
+    <!-- Chat Window -->
+    <div id="chatWindow" class="chat-window"></div>
+
+    <!-- User Input -->
+    <div class="input-row">
+        <input id="userInput" type="text" placeholder="Type your response here...">
+        <button id="sendBtn">Send</button>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="repeatBtn">Repeat</button>
+        <button id="skipBtn">Skip</button>
+        <button id="finishBtn">Finish</button>
+        <button id="resetBtn">Reset</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div id="progressBar" class="progress-bar"></div>
+
+</div>
+
+<!-- ⭐ GUIDED TOUR OVERLAY -->
+<div id="tourOverlay" class="tour-overlay" style="display:none;">
+    <div id="tourBox" class="tour-box">
+        <p id="tourText"></p>
+        <button id="tourNextBtn">Next</button>
+        <button id="tourExitBtn">Exit</button>
+    </div>
+</div>
+
+<!-- ⭐ SCRIPTS -->
+<script src="translations.js"></script>
+<script src="interviewFlow2.js"></script>
+<script src="interviewQuestions2.js"></script>
+<script src="summaryBuilder2.js"></script>
+<script src="mic.js"></script>
+<script src="uiController.js"></script>
+<script src="tour.js"></script>
+<script src="voiceEngine.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
