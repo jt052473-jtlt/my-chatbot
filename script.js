@@ -6,7 +6,6 @@ let currentStep = 0;
 let isPaused = false;
 let isTourActive = false;
 let tourStep = 0;
-let interviewAnswers = {};
 
 /* ------------------------------------------------------
    INITIALIZATION
@@ -50,21 +49,20 @@ function setupEventListeners() {
     /* Start Demo */
     document.getElementById("startDemoBtn").addEventListener("click", startDemo);
 
-    /* Exit Demo (intro screen) — FIXED VERSION */
+    /* Exit Demo (intro screen) — FIXED */
     document.getElementById("introExitBtn").addEventListener("click", () => {
         const overlay = document.getElementById("demoOverlay");
         overlay.style.display = "none";
         overlay.style.pointerEvents = "none";
         overlay.style.opacity = "0";
-
-        isTourActive = false; // Skip tour
+        // No redirect — just show the intake form
     });
 
     /* Guided Tour Buttons */
     document.getElementById("tourNextBtn").addEventListener("click", nextTourStep);
 
     document.getElementById("tourExitBtn").addEventListener("click", (e) => {
-        e.stopPropagation();
+        e.stopPropagation();   // prevents click from reaching intro overlay
         endTour();
     });
 
@@ -125,7 +123,7 @@ function setupEventListeners() {
 }
 
 /* ------------------------------------------------------
-   START DEMO — FIXED VERSION
+   START DEMO — FIXED
 ------------------------------------------------------ */
 function startDemo() {
     currentLanguage = document.getElementById("introLanguageSelect").value;
@@ -134,6 +132,7 @@ function startDemo() {
     updateUIForLanguage();
     updateTourButtons();
 
+    /* Disable overlay completely */
     const overlay = document.getElementById("demoOverlay");
     overlay.style.display = "none";
     overlay.style.pointerEvents = "none";
