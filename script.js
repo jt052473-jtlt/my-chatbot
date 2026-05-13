@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ------------------------------------------------------
    POPULATE LANGUAGE DROPDOWNS
-   (ONLY YOUR 5 LANGUAGES)
 ------------------------------------------------------ */
 function populateLanguageSelectors() {
     const introSelect = document.getElementById("introLanguageSelect");
@@ -50,7 +49,7 @@ function setupEventListeners() {
     /* Start Demo */
     document.getElementById("startDemoBtn").addEventListener("click", startDemo);
 
-    /* Exit Demo (intro screen) — FIXED */
+    /* Exit Demo */
     document.getElementById("introExitBtn").addEventListener("click", () => {
         const overlay = document.getElementById("demoOverlay");
         overlay.style.display = "none";
@@ -123,7 +122,7 @@ function setupEventListeners() {
 }
 
 /* ------------------------------------------------------
-   START DEMO — FIXED
+   START DEMO
 ------------------------------------------------------ */
 function startDemo() {
     currentLanguage = document.getElementById("introLanguageSelect").value;
