@@ -1,27 +1,22 @@
-/* UNIFIED BUTTON STYLING */
-button, 
-.btn, 
-#startDemoBtn, 
-#introExitBtn, 
-#tourExitBtn, 
-#tourNextBtn {
-    padding: 10px 20px;
-    border-radius: 8px;
+/* --- UNIFIED PROFESSIONAL BUTTONS --- */
+button, .btn, #startDemoBtn, #tourExitBtn, #tourNextBtn, #sendBtn, #startBtn, #resetBtn {
+    padding: 12px 24px;
+    border-radius: 6px;
     border: none;
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s ease;
+    font-weight: bold;
     text-transform: uppercase;
-    font-size: 0.9rem;
+    transition: 0.2s;
+    font-family: inherit;
 }
 
-/* Primary Style (Blue) */
+/* Medical Blue Primary */
 #startDemoBtn, #tourNextBtn, #sendBtn, #startBtn {
     background-color: #007bff;
     color: white;
 }
 
-/* Secondary Style (Grey/Red for Exit/Reset) */
+/* Neutral Grey Secondary */
 #introExitBtn, #tourExitBtn, #resetBtn, #pauseBtn {
     background-color: #6c757d;
     color: white;
@@ -29,9 +24,5 @@ button,
 
 button:hover {
     filter: brightness(90%);
-    transform: translateY(-1px);
-}
-
-button:active {
-    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
