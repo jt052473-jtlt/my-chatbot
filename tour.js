@@ -1,121 +1,72 @@
 /* ------------------------------------------------------ 
-
    GUIDED TOUR CONTROLLER 
+------------------------------------------------------ */
+function startTour() {
+    // translations is global from translations.js
+    const tourData = translations[currentLanguage].tour;
+    if (!tourData || !tourData.steps) return;
 
------------------------------------------------------- */ 
+    isTourActive = true;
+    tourStep = 0;
+    
+    // Show the tour elements defined in index.html
+    const tourOverlay = document.getElementById("tourOverlay");
+    const tourTooltip = document.getElementById("tourTooltip");
+    
+    if (tourOverlay && tourTooltip) {
+        tourOverlay.classList.remove("hidden");
+        tourOverlay.style.display = "flex"; // Ensure it's visible
+        tourTooltip.classList.remove("hidden");
+        showTourStep();
+    }
+}
 
-  
+function showTourStep() {
+    const steps = translations[currentLanguage].tour.steps;
+    if (!steps || tourStep >= steps.length) {
+        endTour();
+        return;
+    }
 
-function startTour() { 
+    const step = steps[tourStep];
+    document.getElementById("tourTitle").textContent = step.title;
+    document.getElementById("tourText").textContent = step.text;
+    
+    if (typeof updateTourButtons === "function") updateTourButtons();
+}
 
-    const tourData = translations[currentLanguage].tour; 
+function nextTourStep() {
+    tourStep++;
+    showTourStep();
+}
 
-  
+function endTour() {
+    isTourActive = false;
+    const tourOverlay = document.getElementById("tourOverlay");
+    const tourTooltip = document.getElementById("tourTooltip");
 
-    if (!tourData || !tourData.steps) return; 
-
-  
-
-    isTourActive = true; 
-
-    tourStep = 0; 
-
-  
-
-    updateTourButtons(); 
-
-    showTourStep(); 
-
-} 
-
-  
-
-function showTourStep() { 
-
-    const steps = translations[currentLanguage].tour.steps; 
-
-  
-
-    if (!steps || tourStep >= steps.length) { 
-
-        endTour(); 
-
-        return; 
-
-    } 
-
-  
-
-    const step = steps[tourStep]; 
-
-  
-
-    document.getElementById("tourTitle").textContent = step.title; 
-
-    document.getElementById("tourText").textContent = step.text; 
-
-  
-
-    updateTourButtons(); 
-
-  
-
-    document.getElementById("tourOverlay").classList.remove("hidden"); 
-
-    document.getElementById("tourTooltip").classList.remove("hidden"); 
-
-} 
-
-  
-
-function nextTourStep() { 
-
-    tourStep++; 
-
-    showTourStep(); 
-
-} 
-
-  
-
-function endTour() { 
-
-    isTourActive = false; 
-
-    document.getElementById("tourOverlay").classList.add("hidden"); 
-
-    document.getElementById("tourTooltip").classList.add("hidden"); 
-
-} 
-
-  
+    if (tourOverlay) {
+        tourOverlay.classList.add("hidden");
+        tourOverlay.style.display = "none";
+    }
+    if (tourTooltip) {
+        tourTooltip.classList.add("hidden");
+    }
+    console.log("Tour ended.");
+}
 
 /* ------------------------------------------------------ 
+   EXPORT TO GLOBAL SCOPE
+------------------------------------------------------ */
+window.startTour = startTour;
+window.nextTourStep = nextTourStep;
+window.endTour = endTour;
 
-   FIX: Prevent Exit from closing the entire demo 
-
------------------------------------------------------- */ 
-
-document.getElementById("tourExitBtn").addEventListener("click", (e) => { 
-
-    e.stopPropagation();   // ⭐ prevents click from reaching intro overlay 
-
-    endTour();             // closes ONLY the tour 
-
-}); 
-
-  
-
-/* ------------------------------------------------------ 
-
-   EXPORT FUNCTIONS 
-
------------------------------------------------------- */ 
-
-window.startTour = startTour; 
-
-window.nextTourStep = nextTourStep; 
-
-window.endTour = endTour; 
-
-window.updateTourButtons = updateTourButtons; 
+// Ensure the Exit button works whenever it appears
+document.addEventListener("click", (e) => {
+    if (e.target && e.target.id === "tourExitBtn") {
+        e.preventDefault();
+        e.stopPropagation();
+        endTour();
+    }
+});
