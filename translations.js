@@ -1,8 +1,8 @@
 const translations = {
 
-  // -------------------------------------------------------
-  // 1. ENGLISH
-  // -------------------------------------------------------
+  /* -------------------------------------------------------
+     1. ENGLISH
+  ------------------------------------------------------- */
   English: {
     voiceCode: "en-US",
 
@@ -23,37 +23,34 @@ const translations = {
     },
 
     questions: [
-      "Hello! What is your full name?",
+      "What is your full name?",
       "What is your date of birth?",
       "What brings you in today?",
-      "How long have you been experiencing this issue?",
-      "Do you have any allergies?",
-      "Are you currently taking any medications?",
-      "Do you have any chronic conditions?",
-      "Have you recently traveled?",
-      "Have you had any recent surgeries?",
-      "Is there anything else you'd like to share?",
-      "Thank you. That completes the intake."
+      "How long have you had these symptoms?",
+      "Do you have any allergies?"
     ],
 
     summaryLabels: {
       header: "Patient Summary",
       name: "Name",
       dob: "Date of Birth",
-      complaint: "Chief Complaint",
+      reason: "Reason for Visit",
       duration: "Duration",
-      allergies: "Allergies",
-      medications: "Medications",
-      chronic: "Chronic Conditions",
-      travel: "Recent Travel",
-      surgeries: "Recent Surgeries",
-      notes: "Additional Notes"
+      allergies: "Allergies"
+    },
+
+    tour: {
+      steps: [
+        { title: "Welcome", text: "This demo shows a 5‑question clinical intake assistant." },
+        { title: "Settings", text: "Choose your language and form type here." },
+        { title: "Chat Window", text: "Your conversation and progress appear in this area." }
+      ]
     }
   },
 
-  // -------------------------------------------------------
-  // 2. SPANISH
-  // -------------------------------------------------------
+  /* -------------------------------------------------------
+     2. SPANISH
+  ------------------------------------------------------- */
   Spanish: {
     voiceCode: "es-ES",
 
@@ -74,37 +71,34 @@ const translations = {
     },
 
     questions: [
-      "¡Hola! ¿Cuál es su nombre completo?",
+      "¿Cuál es su nombre completo?",
       "¿Cuál es su fecha de nacimiento?",
       "¿Qué lo trae hoy?",
-      "¿Cuánto tiempo ha tenido este problema?",
-      "¿Tiene alguna alergia?",
-      "¿Está tomando algún medicamento actualmente?",
-      "¿Tiene alguna condición crónica?",
-      "¿Ha viajado recientemente?",
-      "¿Ha tenido alguna cirugía reciente?",
-      "¿Hay algo más que le gustaría compartir?",
-      "Gracias. Eso completa la admisión."
+      "¿Cuánto tiempo ha tenido estos síntomas?",
+      "¿Tiene alguna alergia?"
     ],
 
     summaryLabels: {
       header: "Resumen del Paciente",
       name: "Nombre",
       dob: "Fecha de Nacimiento",
-      complaint: "Motivo de Consulta",
+      reason: "Motivo de Consulta",
       duration: "Duración",
-      allergies: "Alergias",
-      medications: "Medicamentos",
-      chronic: "Condiciones Crónicas",
-      travel: "Viajes Recientes",
-      surgeries: "Cirugías Recientes",
-      notes: "Notas Adicionales"
+      allergies: "Alergias"
+    },
+
+    tour: {
+      steps: [
+        { title: "Bienvenido", text: "Esta demostración incluye 5 preguntas clínicas." },
+        { title: "Ajustes", text: "Seleccione idioma y tipo de formulario aquí." },
+        { title: "Chat", text: "Su conversación aparece en esta ventana." }
+      ]
     }
   },
 
-  // -------------------------------------------------------
-  // 3. CHINESE (SIMPLIFIED)
-  // -------------------------------------------------------
+  /* -------------------------------------------------------
+     3. CHINESE (SIMPLIFIED)
+  ------------------------------------------------------- */
   Chinese: {
     voiceCode: "zh-CN",
 
@@ -125,37 +119,34 @@ const translations = {
     },
 
     questions: [
-      "您好！您的全名是什么？",
+      "您的全名是什么？",
       "您的出生日期是什么？",
-      "您今天来这里的原因是什么？",
-      "这个问题持续了多久？",
-      "您有任何过敏吗？",
-      "您目前正在服用任何药物吗？",
-      "您有任何慢性疾病吗？",
-      "您最近有旅行吗？",
-      "您最近做过手术吗？",
-      "您还有其他想分享的吗？",
-      "谢谢。这次问诊已完成。"
+      "您今天来看病的原因是什么？",
+      "这些症状持续了多久？",
+      "您有任何过敏吗？"
     ],
 
     summaryLabels: {
       header: "患者总结",
       name: "姓名",
       dob: "出生日期",
-      complaint: "主诉",
+      reason: "就诊原因",
       duration: "持续时间",
-      allergies: "过敏史",
-      medications: "用药情况",
-      chronic: "慢性疾病",
-      travel: "近期旅行",
-      surgeries: "近期手术",
-      notes: "其他备注"
+      allergies: "过敏史"
+    },
+
+    tour: {
+      steps: [
+        { title: "欢迎", text: "此演示包含 5 个问诊问题。" },
+        { title: "设置", text: "在此选择语言和表单类型。" },
+        { title: "聊天窗口", text: "对话和进度显示在这里。" }
+      ]
     }
   },
 
-  // -------------------------------------------------------
-  // 4. HINDI
-  // -------------------------------------------------------
+  /* -------------------------------------------------------
+     4. HINDI
+  ------------------------------------------------------- */
   Hindi: {
     voiceCode: "hi-IN",
 
@@ -176,37 +167,34 @@ const translations = {
     },
 
     questions: [
-      "नमस्ते! आपका पूरा नाम क्या है?",
-      "आपकी जन्म तिथि क्या है?",
+      "आपका पूरा नाम क्या है?",
+      "आपकी जन्मतिथि क्या है?",
       "आज आप किस समस्या के लिए आए हैं?",
-      "आपको यह समस्या कब से है?",
-      "क्या आपको किसी चीज़ से एलर्जी है?",
-      "क्या आप वर्तमान में कोई दवा ले रहे हैं?",
-      "क्या आपको कोई पुरानी बीमारी है?",
-      "क्या आपने हाल ही में यात्रा की है?",
-      "क्या आपने हाल ही में कोई सर्जरी करवाई है?",
-      "क्या आप कुछ और साझा करना चाहेंगे?",
-      "धन्यवाद। आपका इंटेक पूरा हो गया है।"
+      "आपको ये लक्षण कब से हैं?",
+      "क्या आपको कोई एलर्जी है?"
     ],
 
     summaryLabels: {
       header: "रोगी सारांश",
       name: "नाम",
       dob: "जन्म तिथि",
-      complaint: "मुख्य शिकायत",
+      reason: "आने का कारण",
       duration: "अवधि",
-      allergies: "एलर्जी",
-      medications: "दवाएँ",
-      chronic: "पुरानी बीमारियाँ",
-      travel: "हाल की यात्रा",
-      surgeries: "हाल की सर्जरी",
-      notes: "अतिरिक्त नोट्स"
+      allergies: "एलर्जी"
+    },
+
+    tour: {
+      steps: [
+        { title: "स्वागत है", text: "यह डेमो 5 प्रश्नों का एक छोटा इंटेक दिखाता है।" },
+        { title: "सेटिंग्स", text: "यहाँ भाषा और फ़ॉर्म प्रकार चुनें।" },
+        { title: "चैट", text: "आपकी बातचीत यहाँ दिखाई देती है।" }
+      ]
     }
   },
 
-  // -------------------------------------------------------
-  // 5. RUSSIAN
-  // -------------------------------------------------------
+  /* -------------------------------------------------------
+     5. RUSSIAN
+  ------------------------------------------------------- */
   Russian: {
     voiceCode: "ru-RU",
 
@@ -227,32 +215,28 @@ const translations = {
     },
 
     questions: [
-      "Здравствуйте! Как ваше полное имя?",
+      "Как ваше полное имя?",
       "Какова ваша дата рождения?",
       "Что привело вас сегодня?",
-      "Как долго у вас эта проблема?",
-      "Есть ли у вас аллергии?",
-      "Принимаете ли вы какие-либо лекарства?",
-      "Есть ли у вас хронические заболевания?",
-      "Путешествовали ли вы недавно?",
-      "Были ли у вас недавние операции?",
-      "Есть ли что-то ещё, чем вы хотите поделиться?",
-      "Спасибо. Приём завершён."
+      "Как долго у вас эти симптомы?",
+      "Есть ли у вас аллергии?"
     ],
 
     summaryLabels: {
-      header: "Сводка Пациента",
+      header: "Сводка пациента",
       name: "Имя",
-      dob: "Дата Рождения",
-      complaint: "Основная Жалоба",
+      dob: "Дата рождения",
+      reason: "Причина визита",
       duration: "Длительность",
-      allergies: "Аллергии",
-      medications: "Лекарства",
-      chronic: "Хронические Заболевания",
-      travel: "Недавние Поездки",
-      surgeries: "Недавние Операции",
-      notes: "Дополнительные Заметки"
+      allergies: "Аллергии"
+    },
+
+    tour: {
+      steps: [
+        { title: "Добро пожаловать", text: "Эта демонстрация включает 5 вопросов." },
+        { title: "Настройки", text: "Выберите язык и тип формы здесь." },
+        { title: "Чат", text: "Ваш диалог отображается в этом окне." }
+      ]
     }
   }
-
 };
