@@ -14,18 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof updateUIForLanguage === "function") updateUIForLanguage();
 });
 
-/* ------------------------------------------------------ 
-   RESTORE LANGUAGE OPTIONS
------------------------------------------------------- */
 function populateLanguageSelectors() {
+    const langs = ["English", "Spanish", "Chinese", "Hindi", "Russian"];
     const introSelect = document.getElementById("introLanguageSelect");
     const mainSelect = document.getElementById("languageSelect");
-    const languages = ["English", "Spanish", "Chinese", "Hindi", "Russian"];
 
     if (introSelect && mainSelect) {
-        introSelect.innerHTML = ""; 
+        introSelect.innerHTML = "";
         mainSelect.innerHTML = "";
-        languages.forEach(lang => {
+        langs.forEach(lang => {
             introSelect.add(new Option(lang, lang));
             mainSelect.add(new Option(lang, lang));
         });
@@ -34,10 +31,8 @@ function populateLanguageSelectors() {
     }
 }
 
-/* ------------------------------------------------------ 
-   EVENT LISTENERS 
------------------------------------------------------- */
 function setupEventListeners() {
+    // Start Demo
     document.getElementById("startDemoBtn").addEventListener("click", startDemo);
 
     // Chat Inputs
@@ -58,43 +53,22 @@ function setupEventListeners() {
         if (typeof updateUIForLanguage === "function") updateUIForLanguage();
     });
 
-    // FIXED: Guided Tour Exit - We use a "delegated" listener 
-    // to ensure it works even if the button is added later by tour.js
+    // EXIT BUTTON FIX: Listen at the document level
     document.addEventListener("click", (e) => {
-        if (e.target && e.target.id === "tourExitBtn") {
+        if (e.target && (e.target.id === "tourExitBtn" || e.target.closest("#tourExitBtn"))) {
             e.preventDefault();
-            if (typeof endTour === "function") {
-                endTour();
-            } else {
-                // Fallback: Manually hide the tour overlay if endTour is missing
-                const tourOverlay = document.getElementById("tourOverlay");
-                if (tourOverlay) tourOverlay.style.display = "none";
-            }
+            if (typeof endTour === "function") endTour();
         }
     });
 }
 
-/* ------------------------------------------------------ 
-   START DEMO 
------------------------------------------------------- */
 function startDemo() {
     const overlay = document.getElementById("demoOverlay");
     if (overlay) {
         overlay.style.display = "none";
-        overlay.style.opacity = "0";
     }
-
-    // 1. Show the first bot question
     if (typeof showQuestion === "function") showQuestion();
-    
-    // 2. Start the tour with a tiny delay to ensure layout is ready
-    setTimeout(() => {
-        if (typeof startTour === "function") {
-            startTour();
-        } else {
-            console.error("startTour function not found in tour.js");
-        }
-    }, 300);
+    if (typeof startTour === "function") startTour();
 }
 
 function handleInput() {
