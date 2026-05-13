@@ -9,18 +9,18 @@ let isPaused = false;
    INITIALIZATION 
 ------------------------------------------------------ */
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Populate the language selectors first
+    // 1. Populate the dropdowns so they aren't empty
     populateLanguageSelectors();
     
-    // 2. Setup all button listeners
+    // 2. Setup the "brains" for your buttons
     setupEventListeners();
     
-    // 3. Initialize the UI text (translations)
+    // 3. Initialize UI text
     if (typeof updateUIForLanguage === "function") updateUIForLanguage();
 });
 
 /* ------------------------------------------------------ 
-   POPULATE DROPDOWNS (Restores missing options)
+   RESTORE LANGUAGE OPTIONS
 ------------------------------------------------------ */
 function populateLanguageSelectors() {
     const introSelect = document.getElementById("introLanguageSelect");
@@ -28,8 +28,7 @@ function populateLanguageSelectors() {
     const languages = ["English", "Spanish", "Chinese", "Hindi", "Russian"];
 
     if (introSelect && mainSelect) {
-        // Clear any existing (empty) options
-        introSelect.innerHTML = "";
+        introSelect.innerHTML = ""; // Clear empty state
         mainSelect.innerHTML = "";
 
         languages.forEach(lang => {
@@ -46,16 +45,16 @@ function populateLanguageSelectors() {
    EVENT LISTENERS 
 ------------------------------------------------------ */
 function setupEventListeners() {
-    // Start Demo
+    // Start Demo Logic
     document.getElementById("startDemoBtn").addEventListener("click", startDemo);
 
-    // Chat Inputs
+    // Chat Inputs (Enter & Send)
     document.getElementById("sendBtn").addEventListener("click", handleInput);
     document.getElementById("userInput").addEventListener("keypress", (e) => {
         if (e.key === "Enter") handleInput();
     });
 
-    // Language Syncing
+    // Language Selection Sync
     document.getElementById("introLanguageSelect").addEventListener("change", (e) => {
         currentLanguage = e.target.value;
         document.getElementById("languageSelect").value = currentLanguage;
@@ -67,18 +66,18 @@ function setupEventListeners() {
         if (typeof updateUIForLanguage === "function") updateUIForLanguage();
     });
 
-    // FIXED: Guided Tour Exit Button
+    // FIXED: Guided Tour Exit
     const tourExit = document.getElementById("tourExitBtn");
     if (tourExit) {
         tourExit.addEventListener("click", (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Stop page from jumping
             if (typeof endTour === "function") endTour();
         });
     }
 }
 
 /* ------------------------------------------------------ 
-   START DEMO & INPUT LOGIC
+   CORE ACTIONS
 ------------------------------------------------------ */
 function startDemo() {
     const overlay = document.getElementById("demoOverlay");
@@ -86,6 +85,7 @@ function startDemo() {
         overlay.style.display = "none";
     }
 
+    // Trigger the first question and the tour
     if (typeof showQuestion === "function") showQuestion();
     if (typeof startTour === "function") startTour();
 }
