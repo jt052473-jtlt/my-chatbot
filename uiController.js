@@ -1,76 +1,72 @@
-// ===============================
-// UI CONTROLLER
-// Handles UI updates, button states, and chat rendering
-// ===============================
+/* ------------------------------------------------------ UI CONTROLLER — Handles all language-based UI updates ------------------------------------------------------ */ 
 
-// Enable or disable all control buttons
-function setControlsEnabled(enabled) {
-    document.getElementById("startBtn").disabled = !enabled;
-    document.getElementById("pauseBtn").disabled = !enabled;
-    document.getElementById("repeatBtn").disabled = !enabled;
-    document.getElementById("skipBtn").disabled = !enabled;
-    document.getElementById("resetBtn").disabled = !enabled;
-    document.getElementById("finishBtn").disabled = !enabled;
-}
+function updateUIForLanguage() { const ui = translations[currentLanguage].ui; 
 
-// Add a bot message to the chat window
-function addBotMessage(text) {
-    const chat = document.getElementById("chatWindow");
-    const msg = document.createElement("div");
-    msg.className = "bot-message";
-    msg.textContent = text;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-}
+/* Header */ 
+document.querySelector(".app-header h2").textContent = ui.appTitle; 
+ 
+/* Buttons */ 
+document.getElementById("startBtn").textContent = ui.start; 
+document.getElementById("pauseBtn").textContent = ui.pause; 
+document.getElementById("finishBtn").textContent = ui.finish; 
+document.getElementById("repeatBtn").textContent = ui.repeat; 
+document.getElementById("skipBtn").textContent = ui.skip; 
+document.getElementById("resetBtn").textContent = ui.reset; 
+document.getElementById("sendBtn").textContent = ui.send; 
+ 
+/* Input placeholder */ 
+document.getElementById("userInput").placeholder = ui.typeHere; 
+ 
+/* Toggles */ 
+document.querySelector("label[for='readAloudToggle'] span").textContent = ui.readAloud; 
+document.querySelector("label[for='voiceModeToggle'] span").textContent = ui.voiceMode; 
+ 
+/* Guided Tour Buttons (if active) */ 
+if (document.getElementById("tourNextBtn")) { 
+    document.getElementById("tourNextBtn").textContent = ui.next; 
+} 
+if (document.getElementById("tourExitBtn")) { 
+    document.getElementById("tourExitBtn").textContent = ui.exit; 
+} 
+  
 
-// Add a user message to the chat window
-function addUserMessage(text) {
-    const chat = document.getElementById("chatWindow");
-    const msg = document.createElement("div");
-    msg.className = "user-message";
-    msg.textContent = text;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-}
+} 
 
-// Clear the chat window
-function clearChat() {
-    document.getElementById("chatWindow").innerHTML = "";
-}
+/* ------------------------------------------------------ CHAT WINDOW HELPERS ------------------------------------------------------ */ 
 
-// Update the progress bar
-function updateProgressBar() {
-    const formData = translations[currentLanguage].forms[selectedForm];
-    const total = formData.questions.length;
-    const percent = Math.min((currentStep / total) * 100, 100);
-    document.getElementById("progressBar").style.width = percent + "%";
-}
+function addBotMessage(text) { const chat = document.getElementById("chatWindow"); 
 
-// Apply UI language changes
-function applyLanguage() {
-    const ui = translations[currentLanguage].ui;
+const bubble = document.createElement("div"); 
+bubble.className = "bot-message"; 
+bubble.textContent = text; 
+ 
+chat.appendChild(bubble); 
+chat.scrollTop = chat.scrollHeight; 
+  
 
-    document.getElementById("appTitle").textContent = ui.appTitle;
-    document.getElementById("startBtn").textContent = ui.start;
-    document.getElementById("pauseBtn").textContent = ui.pause;
-    document.getElementById("finishBtn").textContent = ui.finish;
-    document.getElementById("repeatBtn").textContent = ui.repeat;
-    document.getElementById("skipBtn").textContent = ui.skip;
-    document.getElementById("resetBtn").textContent = ui.reset;
-    document.getElementById("sendBtn").textContent = ui.send;
-    document.getElementById("userInput").placeholder = ui.typeHere;
-    document.getElementById("toggleVoice").textContent = ui.voiceMode;
+} 
 
-    resetInterview();
-}
+function addUserMessage(text) { const chat = document.getElementById("chatWindow"); 
 
-// Initialize UI on load
-applyLanguage();
+const bubble = document.createElement("div"); 
+bubble.className = "user-message"; 
+bubble.textContent = text; 
+ 
+chat.appendChild(bubble); 
+chat.scrollTop = chat.scrollHeight; 
+  
 
-// Expose functions globally
-window.applyLanguage = applyLanguage;
-window.addBotMessage = addBotMessage;
-window.addUserMessage = addUserMessage;
-window.clearChat = clearChat;
-window.updateProgressBar = updateProgressBar;
-window.setControlsEnabled = setControlsEnabled;
+} 
+
+/* ------------------------------------------------------ PROGRESS BAR ------------------------------------------------------ */ 
+
+function updateProgressBar() { const total = translations[currentLanguage].questions.length; const percent = (currentStep / total) * 100; 
+
+document.getElementById("progressBar").style.width = percent + "%"; 
+  
+
+} 
+
+/* ------------------------------------------------------ EXPORT FUNCTIONS ------------------------------------------------------ */ window.updateUIForLanguage = updateUIForLanguage; window.addBotMessage = addBotMessage; window.addUserMessage = addUserMessage; window.updateProgressBar = updateProgressBar; 
+
+ 
