@@ -1,93 +1,223 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinical Intake Assistant</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
+<!DOCTYPE html> 
 
-<body>
+<html lang="en"> 
 
-<!-- ⭐ DEMO INTRO OVERLAY (REQUIRED FOR START DEMO) -->
-<div id="demoOverlay" style="
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.75);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-">
-    <h2 style="color: white; margin-bottom: 20px;">Choose Language</h2>
+<head> 
 
-    <select id="introLanguageSelect" style="padding: 10px; font-size: 18px; margin-bottom: 20px;"></select>
+<meta charset="UTF-8" /> 
 
-    <button id="startDemoBtn" style="padding: 12px 20px; font-size: 18px; margin-bottom: 10px;">
-        Start Demo
-    </button>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
 
-    <button id="introExitBtn" style="padding: 12px 20px; font-size: 18px;">
-        Exit
-    </button>
-</div>
+<title>Clinical Intake Assistant</title> 
 
-<!-- ⭐ MAIN APP CONTAINER -->
-<div class="app-container">
+<link rel="stylesheet" href="style.css?v=8002" /> 
 
-    <h1 id="appTitle">Clinical Intake Assistant</h1>
+</head> 
 
-    <!-- Language Selector -->
-    <div class="language-bar">
-        <input id="languageSearch" type="text" placeholder="Search language...">
-        <select id="languageSelect"></select>
-    </div>
+  
 
-    <!-- Chat Window -->
-    <div id="chatWindow" class="chat-window"></div>
+<body> 
 
-    <!-- User Input -->
-    <div class="input-row">
-        <input id="userInput" type="text" placeholder="Type your response here...">
-        <button id="sendBtn">Send</button>
-    </div>
+  
 
-    <!-- Controls -->
-    <div class="controls">
-        <button id="startBtn">Start</button>
-        <button id="pauseBtn">Pause</button>
-        <button id="repeatBtn">Repeat</button>
-        <button id="skipBtn">Skip</button>
-        <button id="finishBtn">Finish</button>
-        <button id="resetBtn">Reset</button>
-    </div>
+<!-- INTRO OVERLAY --> 
 
-    <!-- Progress Bar -->
-    <div id="progressBar" class="progress-bar"></div>
+<div id="demoOverlay"> 
 
-</div>
+  <div class="demo-content"> 
 
-<!-- ⭐ GUIDED TOUR OVERLAY -->
-<div id="tourOverlay" class="tour-overlay" style="display:none;">
-    <div id="tourBox" class="tour-box">
-        <p id="tourText"></p>
-        <button id="tourNextBtn">Next</button>
-        <button id="tourExitBtn">Exit</button>
-    </div>
-</div>
+    <h1>Clinical Intake Assistant</h1> 
 
-<!-- ⭐ SCRIPTS -->
-<script src="translations.js"></script>
-<script src="interviewFlow2.js"></script>
-<script src="interviewQuestions2.js"></script>
-<script src="summaryBuilder2.js"></script>
-<script src="mic.js"></script>
-<script src="uiController.js"></script>
-<script src="tour.js"></script>
-<script src="voiceEngine.js"></script>
-<script src="script.js"></script>
+  
 
-</body>
-</html>
+    <select id="introLanguageSelect" 
+
+            style="margin: 12px 0; padding: 10px; border-radius: 10px; border: 1px solid #ccc; width: 100%;"> 
+
+    </select> 
+
+  
+
+    <p>This demo showcases a clinical intake workflow. Click Start Demo to begin.</p> 
+
+  
+
+    <div class="demo-buttons"> 
+
+      <button id="startDemoBtn" class="btn-primary">Start Demo</button> 
+
+      <button id="introExitBtn" class="btn-secondary">Exit</button> 
+
+    </div> 
+
+  </div> 
+
+</div> 
+
+  
+
+<!-- GUIDED TOUR OVERLAY --> 
+
+<div id="tourOverlay" class="tour-overlay hidden"></div> 
+
+  
+
+<!-- GUIDED TOUR TOOLTIP --> 
+
+<div id="tourTooltip" class="tour-tooltip hidden"> 
+
+  <h3 id="tourTitle"></h3> 
+
+  <p id="tourText"></p> 
+
+  
+
+  <div class="tour-buttons"> 
+
+    <button id="tourNextBtn" class="btn-primary">Next</button> 
+
+    <button id="tourExitBtn" class="btn-secondary">Exit</button> 
+
+  </div> 
+
+</div> 
+
+  
+
+<!-- MAIN APP --> 
+
+<div class="app-container"> 
+
+  
+
+<header class="app-header"> 
+
+  <h2>Clinical Intake Assistant</h2> 
+
+  <div class="progress-container"> 
+
+    <div id="progressBar"></div> 
+
+  </div> 
+
+</header> 
+
+  
+
+<!-- SETTINGS ROW --> 
+
+<div class="settings-row"> 
+
+  <select id="languageSelect"></select> 
+
+  <input type="text" id="languageSearch" placeholder="Search language..." /> 
+
+  
+
+  <label class="toggle"> 
+
+    <input type="checkbox" id="readAloudToggle" /> 
+
+    <span>Read Aloud</span> 
+
+  </label> 
+
+  
+
+  <label class="toggle"> 
+
+    <input type="checkbox" id="voiceModeToggle" /> 
+
+    <span>Voice Mode</span> 
+
+  </label> 
+
+  
+
+  <button id="micBtn" class="mic-button">🎤</button> 
+
+</div> 
+
+  
+
+<!-- CHAT WINDOW --> 
+
+<div id="chatWindow" class="chat-window"></div> 
+
+  
+
+<!-- INPUT CONTROLS --> 
+
+<div class="input-controls-row"> 
+
+  
+
+  <div class="control-buttons"> 
+
+    <button id="startBtn" class="btn-primary">Start</button> 
+
+    <button id="pauseBtn" class="btn-secondary">Pause</button> 
+
+    <button id="finishBtn" class="btn-primary">Finish</button> 
+
+    <button id="repeatBtn" class="btn-secondary">Repeat</button> 
+
+    <button id="skipBtn" class="btn-secondary">Skip</button> 
+
+    <button id="resetBtn" class="btn-danger">Reset</button> 
+
+  </div> 
+
+  
+
+  <div class="input-area"> 
+
+    <input type="text" id="userInput" placeholder="Type your response here..." autofocus /> 
+
+    <button id="sendBtn" class="btn-primary">Send</button> 
+
+  </div> 
+
+  
+
+</div> 
+
+  
+
+</div> 
+
+  
+
+<!-- LOGIC FILES --> 
+
+<script src="translations.js"></script> 
+
+<script src="interviewFlow2.js"></script> 
+
+<script src="interviewQuestions2.js"></script> 
+
+<script src="summaryBuilder2.js"></script> 
+
+<script src="mic.js"></script> 
+
+  
+
+<!-- REQUIRED FILES --> 
+
+<script src="uiController.js"></script> 
+
+<script src="tour.js"></script> 
+
+<script src="voiceEngine.js"></script> 
+
+  
+
+<!-- MAIN SCRIPT --> 
+
+<script src="script.js?v=8002"></script> 
+
+  
+
+</body> 
+
+</html> 
