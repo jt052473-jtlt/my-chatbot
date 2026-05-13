@@ -1,61 +1,31 @@
-/* ------------------------------------------------------ 
+/* ------------------------------------------------------
+   SUMMARY BUILDER — Creates final summary text
+------------------------------------------------------ */
 
-   SUMMARY BUILDER — Creates final summary text 
+function buildSummary(answers) {
+    const labels = forms[currentForm].summaryLabels;
 
------------------------------------------------------- */ 
+    let summary = `${forms[currentForm].name} Summary\n\n`;
 
-  
+    Object.keys(labels).forEach(key => {
+        summary += `${labels[key]}: ${answers[key] || ""}\n`;
+    });
 
-function buildSummary(answers) { 
+    return summary.trim();
+}
 
-    const labels = translations[currentLanguage].summaryLabels; 
+/* ------------------------------------------------------
+   SHOW SUMMARY IN CHAT
+------------------------------------------------------ */
+function displaySummary() {
+    const summary = buildSummary(interviewAnswers);
 
-  
+    addBotMessage(summary);
+    speakText(summary, currentLanguage);
+}
 
-    return ` 
-
-${labels.name}: ${answers.name || ""} 
-
-${labels.dob}: ${answers.dob || ""} 
-
-${labels.reason}: ${answers.reason || ""} 
-
-${labels.duration}: ${answers.duration || ""} 
-
-${labels.allergies}: ${answers.allergies || ""} 
-
-    `.trim(); 
-
-} 
-
-  
-
-/* ------------------------------------------------------ 
-
-   SHOW SUMMARY IN CHAT 
-
------------------------------------------------------- */ 
-
-function displaySummary() { 
-
-    const summary = buildSummary(interviewAnswers); 
-
-  
-
-    addBotMessage(summary); 
-
-    speakText(summary); 
-
-} 
-
-  
-
-/* ------------------------------------------------------ 
-
-   EXPORT FUNCTIONS 
-
------------------------------------------------------- */ 
-
-window.buildSummary = buildSummary; 
-
-window.displaySummary = displaySummary; 
+/* ------------------------------------------------------
+   EXPORT FUNCTIONS
+------------------------------------------------------ */
+window.buildSummary = buildSummary;
+window.displaySummary = displaySummary;
