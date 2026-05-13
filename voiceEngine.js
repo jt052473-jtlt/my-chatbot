@@ -1,5 +1,5 @@
 // ---------------------------------------------------------
-// VOICE ENGINE — ONLY YOUR 5 LANGUAGES
+// VOICE ENGINE — Supports all 5 languages
 // ---------------------------------------------------------
 
 // Map UI language → SpeechSynthesis voice code
@@ -29,3 +29,5 @@ function speakText(text, language) {
 
     window.speechSynthesis.speak(utterance);
 }
+
+window.speakText = speakText;
