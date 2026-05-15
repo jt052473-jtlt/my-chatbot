@@ -48,22 +48,17 @@
       </div>
     </div>
 
-    <!-- SETTINGS ROW (same layout, new visuals) -->
+    <!-- SETTINGS ROW -->
     <div class="settings-row">
-
-      <!-- Language selector -->
       <select id="languageSelect"></select>
 
-      <!-- Search Language -->
-      <input id="languageSearch" type="text" placeholder="Search language..." />
-
-      <!-- Form selector -->
       <select id="formSelect">
         <option value="admission">Admission Form</option>
         <option value="sleep">Sleep Form</option>
       </select>
 
-      <!-- Toggles (checkboxes kept, visuals updated) -->
+      <input id="languageSearch" type="text" placeholder="Search language..." />
+
       <label class="toggle" for="readAloudToggle">
         <input type="checkbox" id="readAloudToggle" />
         <span>Read Aloud</span>
@@ -74,9 +69,7 @@
         <span>Voice Mode</span>
       </label>
 
-      <!-- Mic button (same placement, new style) -->
       <button id="micBtn" class="mic-button">🎤</button>
-
     </div>
 
     <!-- CHAT WINDOW -->
@@ -98,17 +91,17 @@
         <button id="sendBtn" class="btn-primary">Send</button>
       </div>
     </div>
-
   </div>
 
-  <!-- SCRIPTS (order matters) -->
+  <!-- SCRIPTS -->
   <script src="translations.js"></script>
   <script src="forms.js"></script>
   <script src="uiController.js"></script>
   <script src="voiceEngine.js"></script>
-  <script src="interviewFlow2.js"></script>
-  <script src="summaryBuilder2.js"></script>
-  <script src="tour.js"></script>
+  <script src="mic.js"></script>
+  <script src="interviewFlow.js"></script>
+  <script src="summaryBuilder.js"></script>
+  <script src="tourController.js"></script>
   <script src="script.js"></script>
 
 </body>
