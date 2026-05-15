@@ -1,10 +1,24 @@
 /* ------------------------------------------------------
    MIC HANDLING — Speech Recognition Controller
-   (Aligned, cleaned, same logic, same names)
+   (Fixed: language switching support)
 ------------------------------------------------------ */
 
 let recognition;
 let isListening = false;
+
+/* ------------------------------------------------------
+   MAP UI LANGUAGE → BROWSER LANG CODE
+------------------------------------------------------ */
+function getLangCode(language) {
+    const map = {
+        English: "en-US",
+        Spanish: "es-ES",
+        Chinese: "zh-CN",
+        Hindi: "hi-IN",
+        Russian: "ru-RU"
+    };
+    return map[language] || "en-US";
+}
 
 /* ------------------------------------------------------
    INITIALIZE SPEECH RECOGNITION
@@ -19,7 +33,7 @@ function initMic() {
     }
 
     recognition = new SpeechRecognition();
-    recognition.lang = currentLanguage || "en-US";
+    recognition.lang = getLangCode(currentLanguage);
     recognition.interimResults = false;
     recognition.continuous = false;
 
@@ -38,6 +52,14 @@ function initMic() {
         isListening = false;
         updateMicButton(false);
     };
+}
+
+/* ------------------------------------------------------
+   CHANGE RECOGNITION LANGUAGE
+------------------------------------------------------ */
+function setRecognitionLanguage(language) {
+    if (!recognition) return;
+    recognition.lang = getLangCode(language);
 }
 
 /* ------------------------------------------------------
@@ -62,7 +84,6 @@ function toggleMic() {
 ------------------------------------------------------ */
 function updateMicButton(active) {
     const micBtn = document.getElementById("micBtn");
-
     if (!micBtn) return;
 
     if (active) {
@@ -80,3 +101,4 @@ function updateMicButton(active) {
 window.initMic = initMic;
 window.toggleMic = toggleMic;
 window.updateMicButton = updateMicButton;
+window.setRecognitionLanguage = setRecognitionLanguage;
