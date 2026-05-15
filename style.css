@@ -1,1 +1,193 @@
+/* ------------------------------
+   GLOBAL FLUENT STYLE
+------------------------------ */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f5f7fa;
+  margin: 0;
+  padding: 0;
+  color: #1a1a1a;
+}
 
+/* Rounded containers */
+.app-container,
+.demo-content,
+.tour-tooltip {
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* ------------------------------
+   BUTTONS — COPILOT FLUENT BLUE
+------------------------------ */
+button {
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-primary {
+  background: #0A84FF;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #006fe0;
+}
+
+.btn-secondary {
+  background: #e6e6e6;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background: #d5d5d5;
+}
+
+.btn-danger {
+  background: #d9534f;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c64541;
+}
+
+/* ------------------------------
+   MIC BUTTON — MATCH START BUTTON
+------------------------------ */
+.mic-button {
+  background: #ffffff;
+  border: 2px solid #0A84FF;
+  color: #0A84FF;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+}
+
+.mic-button:hover {
+  background: #e8f1ff;
+}
+
+.mic-button.active {
+  background: #0A84FF;
+  color: white;
+  border-color: #0A84FF;
+  box-shadow: 0 0 10px rgba(10,132,255,0.6);
+}
+
+/* ------------------------------
+   INPUTS + DROPDOWNS
+------------------------------ */
+input,
+select {
+  border-radius: 10px;
+  border: 1px solid #c9c9c9;
+  padding: 8px;
+  font-size: 14px;
+  background: #ffffff;
+  transition: 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #0A84FF;
+  box-shadow: 0 0 4px rgba(10,132,255,0.4);
+  outline: none;
+}
+
+/* Fix search bar width */
+#languageSearch {
+  width: 160px;
+}
+
+/* ------------------------------
+   CHECKBOXES — FLUENT STYLE (Option A)
+------------------------------ */
+.toggle input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid #0A84FF;
+  margin-right: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: 0.2s ease;
+}
+
+.toggle input[type="checkbox"]:checked {
+  background: #0A84FF;
+}
+
+.toggle input[type="checkbox"]:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 12px;
+  position: absolute;
+  top: -2px;
+  left: 2px;
+}
+
+/* ------------------------------
+   CHAT WINDOW
+------------------------------ */
+.chat-window {
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 16px;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.05);
+}
+
+/* Chat bubbles */
+.user-message,
+.bot-message {
+  padding: 10px 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  max-width: 80%;
+}
+
+.user-message {
+  background: #0A84FF;
+  color: white;
+  margin-left: auto;
+}
+
+.bot-message {
+  background: #f0f2f5;
+  color: #1a1a1a;
+}
+
+/* ------------------------------
+   GUIDED TOUR
+------------------------------ */
+.tour-tooltip {
+  border-radius: 16px;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+/* ------------------------------
+   DEMO OVERLAY
+------------------------------ */
+#demoOverlay {
+  backdrop-filter: blur(6px);
+}
+
+.demo-content {
+  border-radius: 16px;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
