@@ -1,14 +1,11 @@
 /* ------------------------------------------------------
-   UI CONTROLLER — Handles UI updates + helpers
-   (Aligned, cleaned, same logic, same names)
+   UI CONTROLLER — Handles all UI text + language updates
 ------------------------------------------------------ */
 
-/* ------------------------------------------------------
-   UPDATE LANGUAGE UI TEXT
------------------------------------------------------- */
 function updateUIText() {
     const t = translations[currentLanguage];
 
+    // Buttons
     document.getElementById("startBtn").textContent = t.start;
     document.getElementById("pauseBtn").textContent = t.pause;
     document.getElementById("finishBtn").textContent = t.finish;
@@ -16,36 +13,46 @@ function updateUIText() {
     document.getElementById("skipBtn").textContent = t.skip;
     document.getElementById("resetBtn").textContent = t.reset;
     document.getElementById("sendBtn").textContent = t.send;
-}
 
-/* ------------------------------------------------------
-   SHOW LOADING MESSAGE
------------------------------------------------------- */
-function showLoading() {
-    const t = translations[currentLanguage];
-    addBotMessage(t.searching);
-}
+    // Toggles
+    document.querySelector("label[for='readAloudToggle'] span").textContent = t.readAloud;
+    document.querySelector("label[for='voiceModeToggle'] span").textContent = t.voiceMode;
 
-/* ------------------------------------------------------
-   SHOW LISTENING MESSAGE
------------------------------------------------------- */
-function showListening() {
-    const t = translations[currentLanguage];
-    addBotMessage(t.listening);
-}
+    // Form selector translations
+    const formSelect = document.getElementById("formSelect");
 
-/* ------------------------------------------------------
-   SHOW SPEAK NOW MESSAGE
------------------------------------------------------- */
-function showSpeakNow() {
-    const t = translations[currentLanguage];
-    addBotMessage(t.speakNow);
+    formSelect.options[0].textContent =
+        currentLanguage === "Spanish" ? "Formulario de admisión" :
+        currentLanguage === "Chinese" ? "入院表" :
+        currentLanguage === "Hindi" ? "प्रवेश फ़ॉर्म" :
+        currentLanguage === "Russian" ? "Форма поступления" :
+        "Admission Form";
+
+    formSelect.options[1].textContent =
+        currentLanguage === "Spanish" ? "Formulario de sueño" :
+        currentLanguage === "Chinese" ? "睡眠表" :
+        currentLanguage === "Hindi" ? "नींद फ़ॉर्म" :
+        currentLanguage === "Russian" ? "Форма сна" :
+        "Sleep Form";
+
+    // Search language placeholder
+    document.getElementById("languageSearch").placeholder =
+        currentLanguage === "Spanish" ? "Buscar idioma..." :
+        currentLanguage === "Chinese" ? "搜索语言..." :
+        currentLanguage === "Hindi" ? "भाषा खोजें..." :
+        currentLanguage === "Russian" ? "Поиск языка..." :
+        "Search language...";
+
+    // Chat input placeholder
+    document.getElementById("userInput").placeholder =
+        currentLanguage === "Spanish" ? "Escriba su respuesta aquí..." :
+        currentLanguage === "Chinese" ? "在此输入您的回答..." :
+        currentLanguage === "Hindi" ? "अपना उत्तर यहाँ लिखें..." :
+        currentLanguage === "Russian" ? "Введите свой ответ здесь..." :
+        "Type your response here...";
 }
 
 /* ------------------------------------------------------
    EXPORT
 ------------------------------------------------------ */
 window.updateUIText = updateUIText;
-window.showLoading = showLoading;
-window.showListening = showListening;
-window.showSpeakNow = showSpeakNow;
