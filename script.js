@@ -1,6 +1,6 @@
 /* ------------------------------------------------------
    MAIN APP CONTROLLER
-   (Aligned, cleaned, same logic, same names)
+   (Fixed: demo buttons, language switching, UI text)
 ------------------------------------------------------ */
 
 let currentLanguage = "English";
@@ -15,6 +15,7 @@ window.onload = () => {
     populateFormDropdown();
     initMic();
     attachEventListeners();
+    updateUIText(); // make sure UI matches currentLanguage
 };
 
 /* ------------------------------------------------------
@@ -23,6 +24,8 @@ window.onload = () => {
 function populateLanguageDropdown() {
     const langSelect = document.getElementById("languageSelect");
     const introLangSelect = document.getElementById("introLanguageSelect");
+
+    if (!langSelect || !introLangSelect) return;
 
     langSelect.innerHTML = "";
     introLangSelect.innerHTML = "";
@@ -38,6 +41,7 @@ function populateLanguageDropdown() {
         introLangSelect.appendChild(opt2);
     });
 
+    // Keep everything in sync with currentLanguage
     langSelect.value = currentLanguage;
     introLangSelect.value = currentLanguage;
 }
@@ -47,6 +51,7 @@ function populateLanguageDropdown() {
 ------------------------------------------------------ */
 function populateFormDropdown() {
     const formSelect = document.getElementById("formSelect");
+    if (!formSelect) return;
     formSelect.value = currentForm;
 }
 
@@ -54,33 +59,79 @@ function populateFormDropdown() {
    EVENT LISTENERS
 ------------------------------------------------------ */
 function attachEventListeners() {
-    document.getElementById("startBtn").onclick = startInterview;
-    document.getElementById("sendBtn").onclick = sendUserInput;
-    document.getElementById("resetBtn").onclick = resetInterview;
-    document.getElementById("skipBtn").onclick = skipQuestion;
-    document.getElementById("repeatBtn").onclick = repeatQuestion;
-    document.getElementById("finishBtn").onclick = showSummary;
-    document.getElementById("pauseBtn").onclick = () => addBotMessage("Paused.");
+    const startBtn = document.getElementById("startBtn");
+    const sendBtn = document.getElementById("sendBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const skipBtn = document.getElementById("skipBtn");
+    const repeatBtn = document.getElementById("repeatBtn");
+    const finishBtn = document.getElementById("finishBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const micBtn = document.getElementById("micBtn");
+    const langSelect = document.getElementById("languageSelect");
+    const formSelect = document.getElementById("formSelect");
+    const startDemoBtn = document.getElementById("startDemoBtn");
+    const introExitBtn = document.getElementById("introExitBtn");
+    const introLangSelect = document.getElementById("introLanguageSelect");
 
-    document.getElementById("micBtn").onclick = toggleMic;
+    if (startBtn) startBtn.onclick = startInterview;
+    if (sendBtn) sendBtn.onclick = sendUserInput;
+    if (resetBtn) resetBtn.onclick = resetInterview;
+    if (skipBtn) skipBtn.onclick = skipQuestion;
+    if (repeatBtn) repeatBtn.onclick = repeatQuestion;
+    if (finishBtn) finishBtn.onclick = showSummary;
+    if (pauseBtn) pauseBtn.onclick = () => addBotMessage("Paused.");
 
-    document.getElementById("languageSelect").onchange = (e) => {
-        currentLanguage = e.target.value;
-    };
+    if (micBtn) micBtn.onclick = toggleMic;
 
-    document.getElementById("formSelect").onchange = (e) => {
-        currentForm = e.target.value;
-        resetInterview();
-    };
+    if (langSelect) {
+        langSelect.onchange = (e) => {
+            currentLanguage = e.target.value;
+            // keep intro selector in sync
+            if (introLangSelect) introLangSelect.value = currentLanguage;
+            updateUIText();
+            setRecognitionLanguage(currentLanguage);
+        };
+    }
 
-    document.getElementById("startDemoBtn").onclick = () => {
-        document.getElementById("demoOverlay").style.display = "none";
-        startInterview();
-    };
+    if (formSelect) {
+        formSelect.onchange = (e) => {
+            currentForm = e.target.value;
+            resetInterview();
+        };
+    }
 
-    document.getElementById("introExitBtn").onclick = () => {
-        document.getElementById("demoOverlay").style.display = "none";
-    };
+    if (introLangSelect) {
+        introLangSelect.onchange = (e) => {
+            currentLanguage = e.target.value;
+            if (langSelect) langSelect.value = currentLanguage;
+            updateUIText();
+            setRecognitionLanguage(currentLanguage);
+        };
+    }
+
+    if (startDemoBtn) {
+        startDemoBtn.onclick = () => {
+            const overlay = document.getElementById("demoOverlay");
+            if (overlay) overlay.style.display = "none";
+
+            // ensure language from intro is applied
+            if (introLangSelect) {
+                currentLanguage = introLangSelect.value;
+                if (langSelect) langSelect.value = currentLanguage;
+                updateUIText();
+                setRecognitionLanguage(currentLanguage);
+            }
+
+            startInterview();
+        };
+    }
+
+    if (introExitBtn) {
+        introExitBtn.onclick = () => {
+            const overlay = document.getElementById("demoOverlay");
+            if (overlay) overlay.style.display = "none";
+        };
+    }
 }
 
 /* ------------------------------------------------------
@@ -98,8 +149,9 @@ function startInterview() {
 ------------------------------------------------------ */
 function sendUserInput() {
     const input = document.getElementById("userInput");
-    const text = input.value.trim();
+    if (!input) return;
 
+    const text = input.value.trim();
     if (!text) return;
 
     addUserMessage(text);
@@ -145,6 +197,8 @@ function resetInterview() {
 ------------------------------------------------------ */
 function addBotMessage(text) {
     const chat = document.getElementById("chatWindow");
+    if (!chat) return;
+
     const div = document.createElement("div");
     div.className = "bot-message";
     div.textContent = text;
@@ -154,6 +208,8 @@ function addBotMessage(text) {
 
 function addUserMessage(text) {
     const chat = document.getElementById("chatWindow");
+    if (!chat) return;
+
     const div = document.createElement("div");
     div.className = "user-message";
     div.textContent = text;
@@ -162,16 +218,21 @@ function addUserMessage(text) {
 }
 
 function clearChat() {
-    document.getElementById("chatWindow").innerHTML = "";
+    const chat = document.getElementById("chatWindow");
+    if (!chat) return;
+    chat.innerHTML = "";
 }
 
 /* ------------------------------------------------------
    PROGRESS BAR
 ------------------------------------------------------ */
 function updateProgressBar() {
+    const bar = document.getElementById("progressBar");
+    if (!bar) return;
+
     const total = forms[currentForm].questions.length;
     const percent = Math.min((currentStep / total) * 100, 100);
-    document.getElementById("progressBar").style.width = percent + "%";
+    bar.style.width = percent + "%";
 }
 
 /* ------------------------------------------------------
@@ -183,3 +244,5 @@ window.resetInterview = resetInterview;
 window.skipQuestion = skipQuestion;
 window.repeatQuestion = repeatQuestion;
 window.updateProgressBar = updateProgressBar;
+window.addBotMessage = addBotMessage;
+window.addUserMessage = addUserMessage;
