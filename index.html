@@ -1,1 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clinical Intake Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
+  <!-- INTRO OVERLAY -->
+  <div id="demoOverlay">
+    <div class="demo-content">
+      <h2>Clinical Intake Assistant Demo</h2>
+      <p>Select your language and start a short 5‑question intake.</p>
+
+      <div style="margin-top:15px;">
+        <label for="introLanguageSelect">Language:</label>
+        <select id="introLanguageSelect"></select>
+      </div>
+
+      <div class="demo-buttons">
+        <button id="startDemoBtn" class="btn-primary">Start Demo</button>
+        <button id="introExitBtn" class="btn-secondary">Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUIDED TOUR OVERLAY -->
+  <div id="tourOverlay" class="tour-overlay hidden"></div>
+  <div id="tourTooltip" class="tour-tooltip hidden">
+    <h3 id="tourTitle">Tour</h3>
+    <p id="tourText">Welcome to the Clinical Intake Assistant.</p>
+    <div class="tour-buttons">
+      <button id="tourExitBtn" class="btn-secondary">Exit</button>
+      <button id="tourNextBtn" class="btn-primary">Next</button>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div class="app-container">
+
+    <!-- HEADER -->
+    <div class="app-header">
+      <h2>Clinical Intake Assistant</h2>
+      <div class="progress-container">
+        <div id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS ROW (FIXED + SWAPPED ORDER) -->
+    <div class="settings-row">
+
+      <!-- Language selector -->
+      <select id="languageSelect"></select>
+
+      <!-- Search Language (moved UP) -->
+      <input id="languageSearch" type="text" placeholder="Search language..." />
+
+      <!-- Form selector (moved DOWN) -->
+      <select id="formSelect">
+        <option value="admission">Admission Form</option>
+        <option value="sleep">Sleep Form</option>
+      </select>
+
+      <!-- Toggles -->
+      <label class="toggle" for="readAloudToggle">
+        <input type="checkbox" id="readAloudToggle" />
+        <span>Read Aloud</span>
+      </label>
+
+      <label class="toggle" for="voiceModeToggle">
+        <input type="checkbox" id="voiceModeToggle" />
+        <span>Voice Mode</span>
+      </label>
+
+      <!-- Mic button (RESTORED) -->
+      <button id="micBtn" class="mic-button">🎤</button>
+
+    </div>
+
+    <!-- CHAT WINDOW -->
+    <div id="chatWindow" class="chat-window"></div>
+
+    <!-- INPUT + CONTROLS -->
+    <div class="input-controls-row">
+      <div class="control-buttons">
+        <button id="startBtn" class="btn-primary">Start</button>
+        <button id="pauseBtn" class="btn-secondary">Pause</button>
+        <button id="finishBtn" class="btn-secondary">Finish</button>
+        <button id="repeatBtn" class="btn-secondary">Repeat</button>
+        <button id="skipBtn" class="btn-secondary">Skip</button>
+        <button id="resetBtn" class="btn-danger">Reset</button>
+      </div>
+
+      <div class="input-area">
+        <input id="userInput" type="text" placeholder="Type your response here..." />
+        <button id="sendBtn" class="btn-primary">Send</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SCRIPTS (order matters) -->
+  <script src="translations.js"></script>
+  <script src="forms.js"></script>
+  <script src="uiController.js"></script>
+  <script src="voiceEngine.js"></script>
+  <script src="interviewFlow2.js"></script>
+  <script src="summaryBuilder2.js"></script>
+  <script src="tour.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
