@@ -1,248 +1,205 @@
 /* ------------------------------------------------------
-   MAIN APP CONTROLLER
-   (Fixed: demo buttons, language switching, UI text)
+   GLOBAL STATE
 ------------------------------------------------------ */
-
 let currentLanguage = "English";
 let currentForm = "admission";
-let currentStep = 0;
+let currentQuestionIndex = 0;
+let isVoiceMode = false;
+let isReadAloud = false;
 
 /* ------------------------------------------------------
    INITIALIZATION
 ------------------------------------------------------ */
-window.onload = () => {
-    populateLanguageDropdown();
-    populateFormDropdown();
-    initMic();
-    attachEventListeners();
-    updateUIText(); // make sure UI matches currentLanguage
+window.onload = function () {
+    initLanguageSelector();
+    initFormSelector();
+    initButtons();
+    initDemoOverlay();
+    initTourButtons();
+    initMic(); // from mic.js
+    updateUIText();
 };
 
 /* ------------------------------------------------------
-   POPULATE LANGUAGE DROPDOWN
+   LANGUAGE SELECTOR
 ------------------------------------------------------ */
-function populateLanguageDropdown() {
+function initLanguageSelector() {
     const langSelect = document.getElementById("languageSelect");
     const introLangSelect = document.getElementById("introLanguageSelect");
 
-    if (!langSelect || !introLangSelect) return;
+    const languages = ["English", "Spanish", "Chinese", "Hindi", "Russian"];
 
-    langSelect.innerHTML = "";
-    introLangSelect.innerHTML = "";
-
-    Object.keys(translations).forEach(lang => {
-        const opt1 = document.createElement("option");
+    languages.forEach(lang => {
+        let opt1 = document.createElement("option");
         opt1.value = lang;
         opt1.textContent = lang;
-
-        const opt2 = opt1.cloneNode(true);
-
         langSelect.appendChild(opt1);
+
+        let opt2 = document.createElement("option");
+        opt2.value = lang;
+        opt2.textContent = lang;
         introLangSelect.appendChild(opt2);
     });
 
-    // Keep everything in sync with currentLanguage
     langSelect.value = currentLanguage;
     introLangSelect.value = currentLanguage;
+
+    langSelect.addEventListener("change", () => {
+        currentLanguage = langSelect.value;
+        updateUIText();
+    });
+
+    introLangSelect.addEventListener("change", () => {
+        currentLanguage = introLangSelect.value;
+        updateUIText();
+    });
 }
 
 /* ------------------------------------------------------
-   POPULATE FORM DROPDOWN
+   FORM SELECTOR
 ------------------------------------------------------ */
-function populateFormDropdown() {
+function initFormSelector() {
     const formSelect = document.getElementById("formSelect");
-    if (!formSelect) return;
-    formSelect.value = currentForm;
+
+    formSelect.addEventListener("change", () => {
+        currentForm = formSelect.value;
+        currentQuestionIndex = 0;
+        startForm();
+    });
 }
 
 /* ------------------------------------------------------
-   EVENT LISTENERS
+   BUTTONS
 ------------------------------------------------------ */
-function attachEventListeners() {
-    const startBtn = document.getElementById("startBtn");
-    const sendBtn = document.getElementById("sendBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const skipBtn = document.getElementById("skipBtn");
-    const repeatBtn = document.getElementById("repeatBtn");
-    const finishBtn = document.getElementById("finishBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const micBtn = document.getElementById("micBtn");
-    const langSelect = document.getElementById("languageSelect");
-    const formSelect = document.getElementById("formSelect");
-    const startDemoBtn = document.getElementById("startDemoBtn");
-    const introExitBtn = document.getElementById("introExitBtn");
-    const introLangSelect = document.getElementById("introLanguageSelect");
+function initButtons() {
+    document.getElementById("startBtn").onclick = startForm;
+    document.getElementById("pauseBtn").onclick = pauseForm;
+    document.getElementById("finishBtn").onclick = finishForm;
+    document.getElementById("repeatBtn").onclick = repeatQuestion;
+    document.getElementById("skipBtn").onclick = skipQuestion;
+    document.getElementById("resetBtn").onclick = resetForm;
+    document.getElementById("sendBtn").onclick = sendUserMessage;
 
-    if (startBtn) startBtn.onclick = startInterview;
-    if (sendBtn) sendBtn.onclick = sendUserInput;
-    if (resetBtn) resetBtn.onclick = resetInterview;
-    if (skipBtn) skipBtn.onclick = skipQuestion;
-    if (repeatBtn) repeatBtn.onclick = repeatQuestion;
-    if (finishBtn) finishBtn.onclick = showSummary;
-    if (pauseBtn) pauseBtn.onclick = () => addBotMessage("Paused.");
+    // ENTER KEY SUPPORT
+    document.getElementById("userInput").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            document.getElementById("sendBtn").click();
+        }
+    });
 
-    if (micBtn) micBtn.onclick = toggleMic;
+    // Toggles
+    document.getElementById("voiceModeToggle").addEventListener("change", (e) => {
+        isVoiceMode = e.target.checked;
+    });
 
-    if (langSelect) {
-        langSelect.onchange = (e) => {
-            currentLanguage = e.target.value;
-            // keep intro selector in sync
-            if (introLangSelect) introLangSelect.value = currentLanguage;
-            updateUIText();
-            setRecognitionLanguage(currentLanguage);
-        };
-    }
-
-    if (formSelect) {
-        formSelect.onchange = (e) => {
-            currentForm = e.target.value;
-            resetInterview();
-        };
-    }
-
-    if (introLangSelect) {
-        introLangSelect.onchange = (e) => {
-            currentLanguage = e.target.value;
-            if (langSelect) langSelect.value = currentLanguage;
-            updateUIText();
-            setRecognitionLanguage(currentLanguage);
-        };
-    }
-
-    if (startDemoBtn) {
-        startDemoBtn.onclick = () => {
-            const overlay = document.getElementById("demoOverlay");
-            if (overlay) overlay.style.display = "none";
-
-            // ensure language from intro is applied
-            if (introLangSelect) {
-                currentLanguage = introLangSelect.value;
-                if (langSelect) langSelect.value = currentLanguage;
-                updateUIText();
-                setRecognitionLanguage(currentLanguage);
-            }
-
-            startInterview();
-        };
-    }
-
-    if (introExitBtn) {
-        introExitBtn.onclick = () => {
-            const overlay = document.getElementById("demoOverlay");
-            if (overlay) overlay.style.display = "none";
-        };
-    }
+    document.getElementById("readAloudToggle").addEventListener("change", (e) => {
+        isReadAloud = e.target.checked;
+    });
 }
 
 /* ------------------------------------------------------
-   START INTERVIEW
+   DEMO OVERLAY
 ------------------------------------------------------ */
-function startInterview() {
-    currentStep = 0;
-    interviewAnswers = {};
-    clearChat();
-    showQuestion();
+function initDemoOverlay() {
+    document.getElementById("startDemoBtn").onclick = () => {
+        document.getElementById("demoOverlay").style.display = "none";
+        startForm();
+    };
+
+    document.getElementById("introExitBtn").onclick = () => {
+        document.getElementById("demoOverlay").style.display = "none";
+    };
 }
 
 /* ------------------------------------------------------
-   SEND USER INPUT
+   TOUR BUTTONS
 ------------------------------------------------------ */
-function sendUserInput() {
+function initTourButtons() {
+    document.getElementById("tourExitBtn").onclick = () => {
+        document.getElementById("tourOverlay").classList.add("hidden");
+        document.getElementById("tourTooltip").classList.add("hidden");
+    };
+
+    document.getElementById("tourNextBtn").onclick = () => {
+        nextTourStep();
+    };
+}
+
+/* ------------------------------------------------------
+   CHAT + FORM LOGIC
+------------------------------------------------------ */
+function startForm() {
+    const questions = forms[currentForm][currentLanguage];
+    currentQuestionIndex = 0;
+    showMessage("assistant", questions[currentQuestionIndex]);
+    updateProgress();
+}
+
+function pauseForm() {
+    showMessage("assistant", "Form paused.");
+}
+
+function finishForm() {
+    showMessage("assistant", "Form completed.");
+}
+
+function repeatQuestion() {
+    const questions = forms[currentForm][currentLanguage];
+    showMessage("assistant", questions[currentQuestionIndex]);
+}
+
+function skipQuestion() {
+    const questions = forms[currentForm][currentLanguage];
+    currentQuestionIndex++;
+
+    if (currentQuestionIndex >= questions.length) {
+        finishForm();
+        return;
+    }
+
+    showMessage("assistant", questions[currentQuestionIndex]);
+    updateProgress();
+}
+
+function resetForm() {
+    currentQuestionIndex = 0;
+    startForm();
+}
+
+function sendUserMessage() {
     const input = document.getElementById("userInput");
-    if (!input) return;
-
     const text = input.value.trim();
     if (!text) return;
 
-    addUserMessage(text);
-    processUserResponse(text);
-
+    showMessage("user", text);
     input.value = "";
+
+    skipQuestion();
 }
 
 /* ------------------------------------------------------
-   SKIP QUESTION
+   CHAT WINDOW
 ------------------------------------------------------ */
-function skipQuestion() {
-    addBotMessage("Skipping...");
-    currentStep++;
-    showQuestion();
-}
-
-/* ------------------------------------------------------
-   REPEAT QUESTION
------------------------------------------------------- */
-function repeatQuestion() {
-    const questions = forms[currentForm].questions;
-
-    if (currentStep < questions.length) {
-        const q = questions[currentStep];
-        addBotMessage(q);
-        speakText(q, currentLanguage);
-    }
-}
-
-/* ------------------------------------------------------
-   RESET INTERVIEW
------------------------------------------------------- */
-function resetInterview() {
-    currentStep = 0;
-    interviewAnswers = {};
-    clearChat();
-    updateProgressBar();
-}
-
-/* ------------------------------------------------------
-   CHAT HELPERS
------------------------------------------------------- */
-function addBotMessage(text) {
+function showMessage(sender, text) {
     const chat = document.getElementById("chatWindow");
-    if (!chat) return;
-
-    const div = document.createElement("div");
-    div.className = "bot-message";
-    div.textContent = text;
-    chat.appendChild(div);
+    const bubble = document.createElement("div");
+    bubble.className = sender === "user" ? "user-message" : "assistant-message";
+    bubble.textContent = text;
+    chat.appendChild(bubble);
     chat.scrollTop = chat.scrollHeight;
-}
-
-function addUserMessage(text) {
-    const chat = document.getElementById("chatWindow");
-    if (!chat) return;
-
-    const div = document.createElement("div");
-    div.className = "user-message";
-    div.textContent = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-}
-
-function clearChat() {
-    const chat = document.getElementById("chatWindow");
-    if (!chat) return;
-    chat.innerHTML = "";
 }
 
 /* ------------------------------------------------------
    PROGRESS BAR
 ------------------------------------------------------ */
-function updateProgressBar() {
-    const bar = document.getElementById("progressBar");
-    if (!bar) return;
-
-    const total = forms[currentForm].questions.length;
-    const percent = Math.min((currentStep / total) * 100, 100);
-    bar.style.width = percent + "%";
+function updateProgress() {
+    const questions = forms[currentForm][currentLanguage];
+    const percent = ((currentQuestionIndex + 1) / questions.length) * 100;
+    document.getElementById("progressBar").style.width = percent + "%";
 }
 
 /* ------------------------------------------------------
    EXPORT
 ------------------------------------------------------ */
-window.startInterview = startInterview;
-window.sendUserInput = sendUserInput;
-window.resetInterview = resetInterview;
-window.skipQuestion = skipQuestion;
-window.repeatQuestion = repeatQuestion;
-window.updateProgressBar = updateProgressBar;
-window.addBotMessage = addBotMessage;
-window.addUserMessage = addUserMessage;
+window.updateUIText = updateUIText;
