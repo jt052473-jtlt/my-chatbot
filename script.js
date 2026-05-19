@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 /* ------------------------------------------------------
    MAIN SCRIPT — Language, Form, Chat, Tour Refresh
 ------------------------------------------------------ */
@@ -5,50 +7,39 @@
 let currentLanguage = "English";
 let currentForm = "admission";
 let currentStep = 0;
-let isPaused = false;   // ⭐ Pause/Resume state
+let isPaused = false;
 
 /* ------------------------------------------------------
    INITIALIZE APP
 ------------------------------------------------------ */
-window.onload = () => {
-    populateLanguageSelect();
-    populateFormSelect();
-    updateUIText();
-    updateIntroText();
-    updateTourButtons();
-
-    // ⭐ FIX: Attach Send + Enter AFTER page loads
-    wireSendAndEnter();
-};
+populateLanguageSelect();
+populateFormSelect();
+updateUIText();
+updateIntroText();
+updateTourButtons();
 
 /* ------------------------------------------------------
-   FIXED SEND + ENTER HANDLER
+   SEND + ENTER (FIXED)
 ------------------------------------------------------ */
-function wireSendAndEnter() {
-    const sendBtn = document.getElementById("sendBtn");
-    const userInput = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+const userInput = document.getElementById("userInput");
 
-    if (!sendBtn || !userInput) return;
+sendBtn.onclick = () => {
+    const text = userInput.value.trim();
+    if (!text) return;
 
-    // ⭐ Force override any other script
-    sendBtn.onclick = () => {
-        const text = userInput.value.trim();
-        if (!text) return;
+    addUserMessage(text);
+    processUserResponse(text);
 
-        addUserMessage(text);
-        processUserResponse(text);
+    userInput.value = "";
+};
 
-        userInput.value = "";
-    };
-
-    // ⭐ Enter triggers same handler
-    userInput.onkeydown = (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            sendBtn.click();
-        }
-    };
-}
+userInput.onkeydown = (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        sendBtn.click();
+    }
+};
 
 /* ------------------------------------------------------
    POPULATE LANGUAGE DROPDOWNS
@@ -261,3 +252,5 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 
     addBotMessage("🔄 Interview reset.");
 });
+
+}); // END DOMContentLoaded
