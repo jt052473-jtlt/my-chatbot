@@ -16,17 +16,15 @@ window.onload = () => {
 };
 
 /* ------------------------------------------------------
-   POPULATE LANGUAGE DROPDOWN
+   POPULATE LANGUAGE DROPDOWNS
 ------------------------------------------------------ */
 function populateLanguageSelect() {
     const langSelect = document.getElementById("languageSelect");
     const introLangSelect = document.getElementById("introLanguageSelect");
 
     Object.keys(translations).forEach(lang => {
-        const opt1 = new Option(lang, lang);
-        const opt2 = new Option(lang, lang);
-        langSelect.add(opt1);
-        introLangSelect.add(opt2);
+        langSelect.add(new Option(lang, lang));
+        introLangSelect.add(new Option(lang, lang));
     });
 
     langSelect.value = currentLanguage;
@@ -41,27 +39,46 @@ function populateFormSelect() {
 }
 
 /* ------------------------------------------------------
-   LANGUAGE CHANGE HANDLER
+   LANGUAGE CHANGE — INTRO SCREEN
 ------------------------------------------------------ */
-document.getElementById("languageSelect").addEventListener("change", (e) => {
+document.getElementById("introLanguageSelect").addEventListener("change", (e) => {
     currentLanguage = e.target.value;
+
+    // Sync main dropdown
+    document.getElementById("languageSelect").value = currentLanguage;
+
     updateUIText();
 
-    // If tour is active, refresh the current step text
     if (!document.getElementById("tourOverlay").classList.contains("hidden")) {
         loadTourStep();
     }
 });
 
 /* ------------------------------------------------------
-   FORM CHANGE HANDLER
+   LANGUAGE CHANGE — MAIN SCREEN
+------------------------------------------------------ */
+document.getElementById("languageSelect").addEventListener("change", (e) => {
+    currentLanguage = e.target.value;
+
+    // Sync intro dropdown
+    document.getElementById("introLanguageSelect").value = currentLanguage;
+
+    updateUIText();
+
+    if (!document.getElementById("tourOverlay").classList.contains("hidden")) {
+        loadTourStep();
+    }
+});
+
+/* ------------------------------------------------------
+   FORM CHANGE
 ------------------------------------------------------ */
 document.getElementById("formSelect").addEventListener("change", (e) => {
     currentForm = e.target.value;
 });
 
 /* ------------------------------------------------------
-   SEND BUTTON HANDLER
+   SEND BUTTON
 ------------------------------------------------------ */
 document.getElementById("sendBtn").addEventListener("click", () => {
     const input = document.getElementById("userInput");
@@ -75,7 +92,7 @@ document.getElementById("sendBtn").addEventListener("click", () => {
 });
 
 /* ------------------------------------------------------
-   ADD CHAT MESSAGES
+   CHAT MESSAGE HELPERS
 ------------------------------------------------------ */
 function addBotMessage(text) {
     const chat = document.getElementById("chatWindow");
