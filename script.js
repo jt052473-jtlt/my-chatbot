@@ -1,90 +1,146 @@
 /* ------------------------------------------------------
-   GLOBAL STATE
+   MAIN SCRIPT — Language, Form, Chat, Tour Refresh
 ------------------------------------------------------ */
+
 let currentLanguage = "English";
+let currentForm = "admission";
 let currentStep = 0;
-let isPaused = false;
+let isPaused = false;   // ⭐ Pause/Resume state
 
 /* ------------------------------------------------------
-   DOM READY
+   INITIALIZE APP
 ------------------------------------------------------ */
-document.addEventListener("DOMContentLoaded", () => {
+window.onload = () => {
+    populateLanguageSelect();
+    populateFormSelect();
+    updateUIText();
+    updateIntroText();
+    updateTourButtons();
+};
 
-    /* ------------------------------------------------------
-       ELEMENTS
-    ------------------------------------------------------ */
-    const chatWindow = document.getElementById("chatWindow");
-    const userInput = document.getElementById("userInput");
-    const sendBtn = document.getElementById("sendBtn");
+/* ------------------------------------------------------
+   POPULATE LANGUAGE DROPDOWNS
+------------------------------------------------------ */
+function populateLanguageSelect() {
+    const langSelect = document.getElementById("languageSelect");
+    const introLangSelect = document.getElementById("introLanguageSelect");
 
-    const introLang = document.getElementById("introLanguageSelect");
-    const mainLang = document.getElementById("languageSelect");
-
-    const startDemoBtn = document.getElementById("startDemoBtn");
-    const exitDemoBtn = document.getElementById("introExitBtn");
-
-    /* ------------------------------------------------------
-       LANGUAGE SYNC
-    ------------------------------------------------------ */
-    introLang.addEventListener("change", () => {
-        currentLanguage = introLang.value;
-        mainLang.value = currentLanguage;
-        if (typeof updateUIForLanguage === "function") updateUIForLanguage();
+    Object.keys(translations).forEach(lang => {
+        langSelect.add(new Option(lang, lang));
+        introLangSelect.add(new Option(lang, lang));
     });
 
-    mainLang.addEventListener("change", () => {
-        currentLanguage = mainLang.value;
-        if (typeof updateUIForLanguage === "function") updateUIForLanguage();
-    });
+    langSelect.value = currentLanguage;
+    introLangSelect.value = currentLanguage;
+}
 
-    /* ------------------------------------------------------
-       SEND BUTTON — FIXED
-    ------------------------------------------------------ */
-    sendBtn.onclick = () => {
-        const text = userInput.value.trim();
-        if (!text) return;
+/* ------------------------------------------------------
+   POPULATE FORM DROPDOWN
+------------------------------------------------------ */
+function populateFormSelect() {
+    document.getElementById("formSelect").value = currentForm;
+}
 
-        addUserMessage(text);
-        userInput.value = "";
+/* ------------------------------------------------------
+   UPDATE INTRO OVERLAY TEXT
+------------------------------------------------------ */
+function updateIntroText() {
+    const t = translations[currentLanguage];
 
-        if (typeof processUserResponse === "function") {
-            processUserResponse(text);
-        }
-    };
+    document.querySelector("#demoOverlay h2").textContent = t.introTitle;
+    document.querySelector("#demoOverlay p").textContent = t.introDesc;
+    document.querySelector("label[for='introLanguageSelect']").textContent = t.introLanguage;
+    document.getElementById("startDemoBtn").textContent = t.introStart;
+    document.getElementById("introExitBtn").textContent = t.introExit;
+}
 
-    /* ------------------------------------------------------
-       ENTER KEY — FIXED
-    ------------------------------------------------------ */
-    userInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            sendBtn.click();
-        }
-    });
+/* ------------------------------------------------------
+   UPDATE TOUR BUTTONS
+------------------------------------------------------ */
+function updateTourButtons() {
+    const t = translations[currentLanguage];
+    document.getElementById("tourNextBtn").textContent = t.tourNext;
+    document.getElementById("tourExitBtn").textContent = t.tourExit;
+}
 
-    /* ------------------------------------------------------
-       START DEMO
-    ------------------------------------------------------ */
-    startDemoBtn.addEventListener("click", () => {
-        document.getElementById("demoOverlay").style.display = "none";
+/* ------------------------------------------------------
+   LANGUAGE CHANGE — INTRO SCREEN
+------------------------------------------------------ */
+document.getElementById("introLanguageSelect").addEventListener("change", (e) => {
+    currentLanguage = e.target.value;
 
-        currentLanguage = introLang.value;
-        mainLang.value = currentLanguage;
+    document.getElementById("languageSelect").value = currentLanguage;
 
-        if (typeof updateUIForLanguage === "function") updateUIForLanguage();
-        if (typeof showQuestion === "function") showQuestion();
-        if (typeof startTour === "function") startTour();
-    });
+    updateUIText();
+    updateIntroText();
+    updateTourButtons();
 
-    exitDemoBtn.addEventListener("click", () => {
-        document.getElementById("demoOverlay").style.display = "none";
-    });
-
+    if (!document.getElementById("tourOverlay").classList.contains("hidden")) {
+        loadTourStep();
+    }
 });
 
 /* ------------------------------------------------------
-   CHAT HELPERS
+   LANGUAGE CHANGE — MAIN SCREEN
 ------------------------------------------------------ */
+document.getElementById("languageSelect").addEventListener("change", (e) => {
+    currentLanguage = e.target.value;
+
+    document.getElementById("introLanguageSelect").value = currentLanguage;
+
+    updateUIText();
+    updateIntroText();
+    updateTourButtons();
+
+    if (!document.getElementById("tourOverlay").classList.contains("hidden")) {
+        loadTourStep();
+    }
+});
+
+/* ------------------------------------------------------
+   FORM CHANGE
+------------------------------------------------------ */
+document.getElementById("formSelect").addEventListener("change", (e) => {
+    currentForm = e.target.value;
+});
+
+/* ------------------------------------------------------
+   SEND BUTTON
+------------------------------------------------------ */
+document.getElementById("sendBtn").addEventListener("click", () => {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if (!text) return;
+
+    addUserMessage(text);
+    processUserResponse(text);
+
+    input.value = "";   // ⭐ CLEAR TEXT FIELD
+});
+
+/* ------------------------------------------------------
+   ENABLE ENTER KEY TO SEND MESSAGE
+------------------------------------------------------ */
+document.getElementById("userInput").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("sendBtn").click();
+        this.value = "";   // ⭐ FIX: clears input instantly after sending
+    }
+});
+
+/* ------------------------------------------------------
+   CHAT MESSAGE HELPERS
+------------------------------------------------------ */
+function addBotMessage(text) {
+    const chat = document.getElementById("chatWindow");
+    const div = document.createElement("div");
+    div.className = "bot-message";
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
+
 function addUserMessage(text) {
     const chat = document.getElementById("chatWindow");
     const div = document.createElement("div");
@@ -93,3 +149,110 @@ function addUserMessage(text) {
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
 }
+
+/* ------------------------------------------------------
+   ⭐ START BUTTON — START OR RESUME
+------------------------------------------------------ */
+document.getElementById("startBtn").addEventListener("click", () => {
+
+    // ⭐ If paused → resume
+    if (isPaused) {
+        isPaused = false;
+
+        if (document.getElementById("readAloudToggle")?.checked) {
+            speakText(currentQuestionText);
+        }
+
+        if (document.getElementById("voiceModeToggle")?.checked) {
+            if (typeof startListening === "function") startListening();
+        }
+
+        document.getElementById("pauseBtn").textContent = translations[currentLanguage].pause;
+        document.getElementById("pauseBtn").style.backgroundColor = "";
+
+        showQuestion();
+        return;
+    }
+
+    // ⭐ Fresh start
+    currentStep = 0;
+    interviewAnswers = {};
+    isPaused = false;
+
+    document.getElementById("pauseBtn").textContent = translations[currentLanguage].pause;
+    document.getElementById("pauseBtn").style.backgroundColor = "";
+
+    showQuestion();
+});
+
+/* ------------------------------------------------------
+   ⭐ PAUSE BUTTON — PAUSE OR RESUME
+------------------------------------------------------ */
+document.getElementById("pauseBtn").addEventListener("click", () => {
+
+    if (isPaused) {
+        isPaused = false;
+
+        if (document.getElementById("readAloudToggle")?.checked) {
+            speakText(currentQuestionText);
+        }
+
+        if (document.getElementById("voiceModeToggle")?.checked) {
+            if (typeof startListening === "function") startListening();
+        }
+
+        document.getElementById("pauseBtn").textContent = translations[currentLanguage].pause;
+        document.getElementById("pauseBtn").style.backgroundColor = "";
+
+        showQuestion();
+        return;
+    }
+
+    isPaused = true;
+
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    if (typeof stopListening === "function") stopListening();
+
+    document.getElementById("pauseBtn").textContent = translations[currentLanguage].resume;
+    document.getElementById("pauseBtn").style.backgroundColor = "orange";
+
+    addBotMessage("⏸️ Interview paused.");
+});
+
+/* ------------------------------------------------------
+   FINISH interview
+------------------------------------------------------ */
+document.getElementById("finishBtn").addEventListener("click", () => {
+    showSummary();
+});
+
+/* ------------------------------------------------------
+   REPEAT last question
+------------------------------------------------------ */
+document.getElementById("repeatBtn").addEventListener("click", () => {
+    showQuestion();
+});
+
+/* ------------------------------------------------------
+   SKIP question
+------------------------------------------------------ */
+document.getElementById("skipBtn").addEventListener("click", () => {
+    processUserResponse("");
+});
+
+/* ------------------------------------------------------
+   RESET interview
+------------------------------------------------------ */
+document.getElementById("resetBtn").addEventListener("click", () => {
+    currentStep = 0;
+    interviewAnswers = {};
+    isPaused = false;
+
+    document.getElementById("chatWindow").innerHTML = "";
+    updateProgressBar();
+
+    document.getElementById("pauseBtn").textContent = translations[currentLanguage].pause;
+    document.getElementById("pauseBtn").style.backgroundColor = "";
+
+    addBotMessage("🔄 Interview reset.");
+});
