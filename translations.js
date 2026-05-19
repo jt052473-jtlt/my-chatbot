@@ -1,5 +1,5 @@
 /* ------------------------------------------------------
-   TRANSLATIONS — UI Text + Guided Tour (5 Languages)
+   TRANSLATIONS — UI Text + Guided Tour + Intro Overlay
 ------------------------------------------------------ */
 
 const translations = {
@@ -20,6 +20,12 @@ const translations = {
         searching: "Searching...",
         listening: "Listening...",
         speakNow: "Speak now...",
+
+        introTitle: "Clinical Intake Assistant Demo",
+        introDesc: "Select your language and start a short 5‑question intake.",
+        introLanguage: "Language:",
+        introStart: "Start Demo",
+        introExit: "Exit",
 
         tour: {
             steps: [
@@ -49,6 +55,12 @@ const translations = {
         listening: "Escuchando...",
         speakNow: "Hable ahora...",
 
+        introTitle: "Demostración del Asistente de Admisión Clínica",
+        introDesc: "Seleccione su idioma y comience una breve admisión de 5 preguntas.",
+        introLanguage: "Idioma:",
+        introStart: "Iniciar Demo",
+        introExit: "Salir",
+
         tour: {
             steps: [
                 { title: "Bienvenido", text: "Este es el Asistente de Admisión Clínica. Te guiaré por la interfaz." },
@@ -76,6 +88,12 @@ const translations = {
         searching: "搜索中...",
         listening: "正在聆听...",
         speakNow: "请开始说话...",
+
+        introTitle: "临床问诊助手演示",
+        introDesc: "选择您的语言并开始一个简短的 5 个问题问诊。",
+        introLanguage: "语言：",
+        introStart: "开始演示",
+        introExit: "退出",
 
         tour: {
             steps: [
@@ -105,6 +123,12 @@ const translations = {
         listening: "सुन रहा है...",
         speakNow: "अब बोलें...",
 
+        introTitle: "क्लिनिकल इंटेक असिस्टेंट डेमो",
+        introDesc: "अपनी भाषा चुनें और 5 प्रश्नों की एक छोटी इंटेक शुरू करें।",
+        introLanguage: "भाषा:",
+        introStart: "डेमो शुरू करें",
+        introExit: "बाहर निकलें",
+
         tour: {
             steps: [
                 { title: "स्वागत है", text: "यह क्लिनिकल इंटेक असिस्टेंट है। मैं आपको इंटरफ़ेस दिखाऊँगा।" },
@@ -132,6 +156,12 @@ const translations = {
         searching: "Поиск...",
         listening: "Прослушивание...",
         speakNow: "Говорите...",
+
+        introTitle: "Демонстрация Клинического Ассистента",
+        introDesc: "Выберите язык и начните короткое интервью из 5 вопросов.",
+        introLanguage: "Язык:",
+        introStart: "Начать демо",
+        introExit: "Выход",
 
         tour: {
             steps: [
