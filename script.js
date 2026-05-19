@@ -105,9 +105,11 @@ document.getElementById("formSelect").addEventListener("change", (e) => {
 });
 
 /* ------------------------------------------------------
-   SEND BUTTON
+   SEND BUTTON — FIXED WITH CAPTURE MODE
 ------------------------------------------------------ */
-document.getElementById("sendBtn").addEventListener("click", () => {
+document.getElementById("sendBtn").addEventListener("click", handleSend, true);
+
+function handleSend() {
     const input = document.getElementById("userInput");
     const text = input.value.trim();
     if (!text) return;
@@ -116,7 +118,7 @@ document.getElementById("sendBtn").addEventListener("click", () => {
     processUserResponse(text);
 
     input.value = "";   // ⭐ CLEAR TEXT FIELD
-});
+}
 
 /* ------------------------------------------------------
    ENABLE ENTER KEY TO SEND MESSAGE
