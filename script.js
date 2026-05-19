@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 let currentLanguage = "English";
 let currentForm = "admission";
 let currentStep = 0;
-let isPaused = false;
+let isPaused = false;   // ⭐ Pause/Resume state
 
 /* ------------------------------------------------------
    INITIALIZE APP
@@ -19,27 +19,29 @@ updateIntroText();
 updateTourButtons();
 
 /* ------------------------------------------------------
-   SEND + ENTER (FIXED)
+   SEND BUTTON
 ------------------------------------------------------ */
-const sendBtn = document.getElementById("sendBtn");
-const userInput = document.getElementById("userInput");
-
-sendBtn.onclick = () => {
-    const text = userInput.value.trim();
+document.getElementById("sendBtn").addEventListener("click", () => {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
     if (!text) return;
 
     addUserMessage(text);
     processUserResponse(text);
 
-    userInput.value = "";
-};
+    input.value = "";   // ⭐ CLEAR TEXT FIELD
+});
 
-userInput.onkeydown = (e) => {
+/* ------------------------------------------------------
+   ENABLE ENTER KEY TO SEND MESSAGE
+------------------------------------------------------ */
+document.getElementById("userInput").addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
         e.preventDefault();
-        sendBtn.click();
+        document.getElementById("sendBtn").click();
+        this.value = "";   // ⭐ FIX: clears input instantly after sending
     }
-};
+});
 
 /* ------------------------------------------------------
    POPULATE LANGUAGE DROPDOWNS
@@ -153,6 +155,7 @@ function addUserMessage(text) {
 ------------------------------------------------------ */
 document.getElementById("startBtn").addEventListener("click", () => {
 
+    // ⭐ If paused → resume
     if (isPaused) {
         isPaused = false;
 
@@ -171,6 +174,7 @@ document.getElementById("startBtn").addEventListener("click", () => {
         return;
     }
 
+    // ⭐ Fresh start
     currentStep = 0;
     interviewAnswers = {};
     isPaused = false;
