@@ -4,9 +4,6 @@
 
 const translations = {
 
-    /* --------------------------------------------------
-       ENGLISH
-    -------------------------------------------------- */
     English: {
         start: "Start",
         pause: "Pause",
@@ -27,6 +24,9 @@ const translations = {
         introStart: "Start Demo",
         introExit: "Exit",
 
+        tourNext: "Next",
+        tourExit: "Exit",
+
         tour: {
             steps: [
                 { title: "Welcome", text: "This is the Clinical Intake Assistant. I will guide you through the interface." },
@@ -38,9 +38,6 @@ const translations = {
         }
     },
 
-    /* --------------------------------------------------
-       SPANISH
-    -------------------------------------------------- */
     Spanish: {
         start: "Comenzar",
         pause: "Pausar",
@@ -61,6 +58,9 @@ const translations = {
         introStart: "Iniciar Demo",
         introExit: "Salir",
 
+        tourNext: "Siguiente",
+        tourExit: "Salir",
+
         tour: {
             steps: [
                 { title: "Bienvenido", text: "Este es el Asistente de Admisión Clínica. Te guiaré por la interfaz." },
@@ -72,9 +72,6 @@ const translations = {
         }
     },
 
-    /* --------------------------------------------------
-       CHINESE
-    -------------------------------------------------- */
     Chinese: {
         start: "开始",
         pause: "暂停",
@@ -95,6 +92,9 @@ const translations = {
         introStart: "开始演示",
         introExit: "退出",
 
+        tourNext: "下一步",
+        tourExit: "退出",
+
         tour: {
             steps: [
                 { title: "欢迎", text: "这是临床问诊助手。我将带您了解界面。" },
@@ -106,9 +106,6 @@ const translations = {
         }
     },
 
-    /* --------------------------------------------------
-       HINDI
-    -------------------------------------------------- */
     Hindi: {
         start: "शुरू करें",
         pause: "रोकें",
@@ -129,6 +126,9 @@ const translations = {
         introStart: "डेमो शुरू करें",
         introExit: "बाहर निकलें",
 
+        tourNext: "आगे",
+        tourExit: "बाहर निकलें",
+
         tour: {
             steps: [
                 { title: "स्वागत है", text: "यह क्लिनिकल इंटेक असिस्टेंट है। मैं आपको इंटरफ़ेस दिखाऊँगा।" },
@@ -140,9 +140,6 @@ const translations = {
         }
     },
 
-    /* --------------------------------------------------
-       RUSSIAN
-    -------------------------------------------------- */
     Russian: {
         start: "Начать",
         pause: "Пауза",
@@ -163,6 +160,9 @@ const translations = {
         introStart: "Начать демо",
         introExit: "Выход",
 
+        tourNext: "Далее",
+        tourExit: "Выход",
+
         tour: {
             steps: [
                 { title: "Добро пожаловать", text: "Это Клинический Ассистент. Я проведу вас по интерфейсу." },
@@ -175,7 +175,4 @@ const translations = {
     }
 };
 
-/* ------------------------------------------------------
-   EXPORT
------------------------------------------------------- */
 window.translations = translations;
