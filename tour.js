@@ -73,3 +73,10 @@ document.getElementById("startDemoBtn").addEventListener("click", () => {
     document.getElementById("demoOverlay").style.display = "none";
     startTour();
 });
+
+/* ------------------------------------------------------
+   FIXED: INTRO EXIT BUTTON NOW WORKS
+------------------------------------------------------ */
+document.getElementById("introExitBtn").addEventListener("click", () => {
+    document.getElementById("demoOverlay").style.display = "none";
+});
