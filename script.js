@@ -5,7 +5,7 @@
 let currentLanguage = "English";
 let currentForm = "admission";
 let currentStep = 0;
-let isPaused = false;   // ⭐ Pause/Resume state
+let isPaused = false;
 
 /* ------------------------------------------------------
    INITIALIZE APP
@@ -68,7 +68,6 @@ function updateTourButtons() {
 ------------------------------------------------------ */
 document.getElementById("introLanguageSelect").addEventListener("change", (e) => {
     currentLanguage = e.target.value;
-
     document.getElementById("languageSelect").value = currentLanguage;
 
     updateUIText();
@@ -85,7 +84,6 @@ document.getElementById("introLanguageSelect").addEventListener("change", (e) =>
 ------------------------------------------------------ */
 document.getElementById("languageSelect").addEventListener("change", (e) => {
     currentLanguage = e.target.value;
-
     document.getElementById("introLanguageSelect").value = currentLanguage;
 
     updateUIText();
@@ -117,17 +115,17 @@ function handleSend() {
     addUserMessage(text);
     processUserResponse(text);
 
-    input.value = "";   // ⭐ CLEAR TEXT FIELD
+    input.value = "";   // clear input
 }
 
 /* ------------------------------------------------------
-   ENABLE ENTER KEY TO SEND MESSAGE
+   ENTER KEY — SEND + CLEAR
 ------------------------------------------------------ */
 document.getElementById("userInput").addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
         e.preventDefault();
         document.getElementById("sendBtn").click();
-        this.value = "";   // ⭐ FIX: clears input instantly after sending
+        this.value = "";   // clear immediately
     }
 });
 
@@ -153,11 +151,10 @@ function addUserMessage(text) {
 }
 
 /* ------------------------------------------------------
-   ⭐ START BUTTON — START OR RESUME
+   START BUTTON — START OR RESUME
 ------------------------------------------------------ */
 document.getElementById("startBtn").addEventListener("click", () => {
 
-    // ⭐ If paused → resume
     if (isPaused) {
         isPaused = false;
 
@@ -176,7 +173,6 @@ document.getElementById("startBtn").addEventListener("click", () => {
         return;
     }
 
-    // ⭐ Fresh start
     currentStep = 0;
     interviewAnswers = {};
     isPaused = false;
@@ -188,7 +184,7 @@ document.getElementById("startBtn").addEventListener("click", () => {
 });
 
 /* ------------------------------------------------------
-   ⭐ PAUSE BUTTON — PAUSE OR RESUME
+   PAUSE BUTTON — PAUSE OR RESUME
 ------------------------------------------------------ */
 document.getElementById("pauseBtn").addEventListener("click", () => {
 
