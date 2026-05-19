@@ -1,5 +1,3 @@
-document.addEventListener("DOMContentLoaded", () => {
-
 /* ------------------------------------------------------
    MAIN SCRIPT — Language, Form, Chat, Tour Refresh
 ------------------------------------------------------ */
@@ -12,36 +10,13 @@ let isPaused = false;   // ⭐ Pause/Resume state
 /* ------------------------------------------------------
    INITIALIZE APP
 ------------------------------------------------------ */
-populateLanguageSelect();
-populateFormSelect();
-updateUIText();
-updateIntroText();
-updateTourButtons();
-
-/* ------------------------------------------------------
-   SEND BUTTON
------------------------------------------------------- */
-document.getElementById("sendBtn").addEventListener("click", () => {
-    const input = document.getElementById("userInput");
-    const text = input.value.trim();
-    if (!text) return;
-
-    addUserMessage(text);
-    processUserResponse(text);
-
-    input.value = "";   // ⭐ CLEAR TEXT FIELD
-});
-
-/* ------------------------------------------------------
-   ENABLE ENTER KEY TO SEND MESSAGE
------------------------------------------------------- */
-document.getElementById("userInput").addEventListener("keydown", function (e) {
-    if (e.key === "Enter") {
-        e.preventDefault();
-        document.getElementById("sendBtn").click();
-        this.value = "";   // ⭐ FIX: clears input instantly after sending
-    }
-});
+window.onload = () => {
+    populateLanguageSelect();
+    populateFormSelect();
+    updateUIText();
+    updateIntroText();
+    updateTourButtons();
+};
 
 /* ------------------------------------------------------
    POPULATE LANGUAGE DROPDOWNS
@@ -127,6 +102,31 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
 ------------------------------------------------------ */
 document.getElementById("formSelect").addEventListener("change", (e) => {
     currentForm = e.target.value;
+});
+
+/* ------------------------------------------------------
+   SEND BUTTON
+------------------------------------------------------ */
+document.getElementById("sendBtn").addEventListener("click", () => {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if (!text) return;
+
+    addUserMessage(text);
+    processUserResponse(text);
+
+    input.value = "";   // ⭐ CLEAR TEXT FIELD
+});
+
+/* ------------------------------------------------------
+   ENABLE ENTER KEY TO SEND MESSAGE
+------------------------------------------------------ */
+document.getElementById("userInput").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("sendBtn").click();
+        this.value = "";   // ⭐ FIX: clears input instantly after sending
+    }
 });
 
 /* ------------------------------------------------------
@@ -256,5 +256,3 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 
     addBotMessage("🔄 Interview reset.");
 });
-
-}); // END DOMContentLoaded
